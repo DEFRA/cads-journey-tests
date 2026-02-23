@@ -2,25 +2,36 @@ module.exports = {
   env: {
     es2022: true,
     node: true,
-    jest: true
+    jest: true,
   },
   globals: {
     before: true,
-    after: true
+    after: true,
+  },
+  parser: '@typescript-eslint/parser',
+  parserOptions: {
+    ecmaVersion: 'latest',
+    sourceType: 'module',
   },
   extends: [
     'standard',
     'prettier',
     'eslint:recommended',
-    'plugin:wdio/recommended'
+    'plugin:@typescript-eslint/recommended',
   ],
-  overrides: [],
-  parserOptions: {
-    ecmaVersion: 'latest'
-  },
-  plugins: ['prettier', 'wdio'],
+  plugins: ['prettier', '@typescript-eslint', 'wdio'],
+  overrides: [
+    {
+      files: ['*.ts'],
+      parser: '@typescript-eslint/parser',
+      parserOptions: {
+        ecmaVersion: 'latest',
+        sourceType: 'module',
+      },
+    },
+  ],
   rules: {
     'prettier/prettier': 'error',
-    'no-console': 'error'
-  }
+    'no-console': 'error',
+  },
 }

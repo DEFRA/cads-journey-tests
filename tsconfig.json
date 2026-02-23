@@ -1,0 +1,21 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "strict": true,
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "types": ["node", "playwright"],
+    "rootDir": ".",
+    "outDir": "dist"
+  },
+  "scripts": {
+    "build:tests": "tsc",
+    "test": "npm run build:tests && npx playwright test --config=playwright.config.ts --test-dir=dist/tests --test-match=**/*.spec.js"
+  },
+  "include": ["tests/**/*.ts", "playwright.config.ts"],
+  "exclude": ["node_modules", "dist"]
+}
