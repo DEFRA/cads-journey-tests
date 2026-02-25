@@ -45,6 +45,7 @@ runs:
     - name: Run the tests
       shell: bash
       run: |
+        npx playwright install --with-deps \
         npx playwright test --grep= "${{inputs.test}}|${{inputs.tag}}"
     - name: debug
       if: always()
