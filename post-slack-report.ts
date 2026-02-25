@@ -82,7 +82,7 @@ const message =
     : {
         text: `❌ Playwright tests failed!\n${failedTests.map((t) => `• ${t.title}`).join('\n')}`
       }
-
+message.text = message.text + '\n' + process.env.BUILD_URL
 // Post to Slack
 axios
   .post(webhookUrl, message)
