@@ -1,7 +1,7 @@
 import { defineConfig, devices } from '@playwright/test'
 
 // Set Environment
-process.env.ENV = 'dev'
+//process.env.ENV = 'dev'
 
 const ENV = process.env.ENV ?? 'local'
 const isLocal = ENV === 'local'
@@ -11,15 +11,15 @@ const configByEnv = {
     api: 'http://localhost:5555'
   },
   dev: {
-    ui: 'https://cads-mis.dev.cdp-int.defra.cloud',
-    api: 'https://ephemeral-protected.api.dev.cdp-int.defra.cloud'
+    ui: 'DEV_URL',
+    api: 'DEV_URL'
   }
 }
 const { ui, api } = configByEnv[ENV as keyof typeof configByEnv]
 process.env.apiURL = api
 process.env.apiKey =
   !process.env.CI && ENV === 'dev'
-    ? 'Oop27XZKQpOu7cMjTwmQcSJxbzv2Odyc'
+    ? 'API_KEY'
     : undefined
 
 export default defineConfig({

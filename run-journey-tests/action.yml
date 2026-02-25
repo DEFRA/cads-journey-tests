@@ -1,23 +1,33 @@
-name: Run Journey Tests on GitHub
+name: Run Journey Tests
 
 inputs:
-  example-node-backend:
+  cads-frontend:
     required: false
     type: string
-  example-node-frontend:
+  cads-backend:
     required: false
     type: string
+  test:
+    description: "Choose Test Suite"
+    type: choice
+    required: true
+    options:
+      - API
+      - UI
+  tag:
+    description: "Choose Test Group"
+    type: choice
+    required: true
+    options:
+      - Smoke
+      - E2E    
 
 runs:
   using: "composite"
   steps:
     - uses: actions/checkout@v4
       with:
-        repository: DEFRA/cdp-node-journey-test-suite-template
-
-    - name: Docker Login
-      uses: DEFRA/cdp-build-action/docker-login@main
-
+        repository: DEFRA/cads-journey-test 
     - uses: actions/setup-node@v4
       with:
         node-version: 20
@@ -25,29 +35,29 @@ runs:
     - name: Setup the tests
       run: npm i
       shell: bash
+
     - name: Start docker compose
       shell: bash
       run: |
-          CDP_EXAMPLE_NODE_FRONTEND=${{inputs.example-node-frontend}} \
-          CDP_EXAMPLE_NODE_BACKEND=${{inputs.example-node-backend}} \
-          docker compose up --wait-timeout 300 -d --quiet-pull
+          CADS_FRONTEND=${{inputs.cads-frontend}} \
+          CADS_BACKEND=${{inputs.cads-backend}} \
+          docker compose -f compose.common.yml -f compose.ci.yml up --wait-timeout 300 -d --quiet-pull
     - name: Run the tests
       shell: bash
       run: |
-        npm run test:github
-        npm run report
+        npx playwright test --grep= "${{inputs.test}}|${{inputs.tag}}"
     - name: debug
       if: always()
       run: |
         docker compose logs > logs.txt
         docker ps
       shell: bash
-    - name: Upload allure report
+    - name: Upload playwright report
       if: always()
       uses: actions/upload-artifact@v4
       with:
         name: allure-report
-        path: ./allure-report
+        path: ./playwright-report/html
     - name: Upload docker compose logs
       if: always()
       uses: actions/upload-artifact@v4

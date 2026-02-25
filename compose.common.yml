@@ -1,0 +1,99 @@
+services:
+  ################################################################################
+  # All of the infrastructure services
+  ################################################################################
+  
+  localstack:
+    container_name: "cds-localstack-emulator"
+    image: localstack/localstack:3.0.2
+    ports:
+      - '4566:4566' # LocalStack Gateway
+      - '4510-4559:4510-4559' # external services port range
+    environment:
+      DEBUG: ${DEBUG:-1}
+      LS_LOG: WARN # Localstack DEBUG Level
+      SERVICES: s3,sqs,sns,firehose
+      LOCALSTACK_HOST: 127.0.0.1
+    volumes:
+      - '${TMPDIR:-/tmp}/localstack:/var/lib/localstack'
+      - ./compose/start-localstack.sh:/etc/localstack/init/ready.d/start-localstack.sh
+    healthcheck:
+      test: ['CMD', 'curl', 'http://cds-localstack-emulator:4566/health']
+      interval: 5s
+      start_period: 5s
+      retries: 3
+    networks:
+      - cdp-tenant
+
+  redis:
+    container_name: "cds-redis"
+    image: redis:7.2.3-alpine3.18
+    ports:
+      - '6379:6379'
+    restart: always
+    networks:
+      - cdp-tenant
+
+  mongodb:
+    image: mongo:6.0.13
+    networks:
+      - cdp-tenant
+    ports:
+      - '27017:27017'
+    volumes:
+      - mongodb-data:/data
+    restart: always
+
+
+  ################################################################################
+
+  cads-frontend:
+      image: defradigital/cads-mis:${CADS_FRONTEND:-latest}
+      container_name: cads-frontend
+      depends_on:
+        cads-backend:
+          condition: service_started
+        redis:
+          condition: service_started
+      environment:
+        PORT: 3000
+        NODE_ENV: development
+        REDIS_HOST: redis
+        LOCALSTACK_ENDPOINT: http://localstack:4566
+        USE_SINGLE_INSTANCE_CACHE: true
+      networks:
+        - cdp-tenant
+      healthcheck:
+        test: ["CMD", "curl", "http://localhost:5555/health"]
+        interval: 5s
+        timeout: 2s
+        start_period: 20s
+        retries: 10
+      networks:
+        - cdp-tenant
+
+  ################################################################################
+  
+  cads-backend:
+    container_name: "cads_backend"
+    platform: linux
+    image: defradigital/cads-data-service:${CADS_BACKEND:-latest}
+    ports:
+      - '5555:5555'
+    depends_on:
+      localstack:
+        condition: service_healthy
+    environment:
+      PORT: 5555
+      LOCALSTACK_ENDPOINT: http://cds-localstack-emulator:4566
+    networks:
+      - cdp-tenant
+
+  ################################################################################
+
+  volumes:
+    cdp-infra-mongodb-data:
+
+  networks:
+    cdpnet:
+      driver: bridge
