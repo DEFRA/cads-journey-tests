@@ -1,7 +1,7 @@
 import { defineConfig, devices } from '@playwright/test'
 
 // Set Environment
-//process.env.ENV = 'dev'
+// process.env.ENV = 'dev'
 
 const ENV = process.env.ENV ?? 'local'
 const isLocal = ENV === 'local'
@@ -17,10 +17,7 @@ const configByEnv = {
 }
 const { ui, api } = configByEnv[ENV as keyof typeof configByEnv]
 process.env.apiURL = api
-process.env.apiKey =
-  !process.env.CI && ENV === 'dev'
-    ? 'API_KEY'
-    : undefined
+process.env.apiKey = !process.env.CI && ENV === 'dev' ? 'API_KEY' : undefined
 
 export default defineConfig({
   // Look for test files in the "tests" directory, relative to this configuration file.
