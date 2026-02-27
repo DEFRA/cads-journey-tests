@@ -48,7 +48,7 @@ services:
   cads-backend:
     image: defradigital/cads-data-service:latest
     ports:
-      - "5555:80"
+      - "5555:8080"
     depends_on:
       localstack:
         condition: service_healthy
