@@ -37,17 +37,13 @@ services:
       image: defradigital/cads-mis:latest
       container_name: cads-frontend
       working_dir: /app/cads-mis
+      ports:
+      - "5555:3000"
       depends_on:
         cads-backend:
           condition: service_started
         redis:
           condition: service_started
-      environment:
-        PORT: 3000
-        NODE_ENV: development
-        REDIS_HOST: redis
-        LOCALSTACK_ENDPOINT: http://localstack:4566
-        USE_SINGLE_INSTANCE_CACHE: true
       command: npm run dev
       healthcheck:
         test: ["CMD", "curl", "http://localhost:5555/health"]
