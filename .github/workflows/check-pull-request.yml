@@ -35,3 +35,5 @@ jobs:
         with:
           repository: DEFRA/cads-journey-tests
       - uses: ./run-journey-tests
+        with:
+          path: ./run-journey-tests
