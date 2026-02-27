@@ -47,23 +47,6 @@ runs:
       run: |
           docker compose -f compose.common.yml -f compose.ci.yml up --wait-timeout 300 -d --quiet-pull
           docker ps --format "table {{.Names}}\t{{.Ports}}"
-    - name: Wait for frontend to be reachable
-      shell: bash
-      run: |
-        set -euo pipefail
-        for i in {1..90}; do
-          if curl -fsS http://127.0.0.1:3000/ >/dev/null; then
-            echo "Frontend is reachable"
-            exit 0
-          fi
-          echo "Waiting for frontend on 3000..."
-          sleep 2
-        done
-
-        echo "Frontend never became reachable. Dumping debug info..."
-        docker ps -a
-        docker compose -f compose.common.yml -f compose.ci.yml logs --no-color --tail=200 cads-frontend
-        exit 1
     - name: Run the tests
       shell: bash
       run: |

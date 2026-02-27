@@ -42,7 +42,6 @@ services:
         condition: service_started
       redis:
         condition: service_started
-    command: npm run dev
 
   ################################################################################
   
@@ -53,9 +52,6 @@ services:
     depends_on:
       localstack:
         condition: service_healthy
-    environment:
-      PORT: "5555"
-      LOCALSTACK_ENDPOINT: http://cds-localstack-emulator:4566
     healthcheck:
       test: ['CMD', 'curl', 'http://localhost:5555/health']
       interval: 5s
