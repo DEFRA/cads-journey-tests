@@ -88,10 +88,6 @@ services:
       - cdp-tenant
 
   ################################################################################
-
-  volumes:
-    cdp-infra-mongodb-data:
-
   networks:
     cdpnet:
       driver: bridge
