@@ -1,5 +1,10 @@
 name: Run Journey Tests
 
+on:
+  workflow_dispatch:
+    permissions:
+      contents: read
+
 inputs:
   cads-frontend:
     required: false
@@ -26,11 +31,7 @@ runs:
   using: "composite"
   steps:
     - uses: actions/checkout@v4
-      with:
-        repository: DEFRA/cads-journey-test 
-        
-    - name: Docker Login
-      uses: DEFRA/cdp-build-action/docker-login@main
+    - uses: DEFRA/cads-journey-test 
 
     - uses: actions/setup-node@v4
       with:
@@ -60,7 +61,7 @@ runs:
     - name: Post Slack Report
       shell: bash
       run: |
-        BUILD_URL = "Build URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}" \
+        BUILD_URL="Build URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}" \
         node post-slack-report.ts
     - name: Upload playwright report
       if: always()
