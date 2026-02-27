@@ -31,7 +31,7 @@ runs:
   using: "composite"
   steps:
     - uses: actions/checkout@v4
-    - uses: DEFRA/cads-journey-test 
+    - uses: DEFRA/cads-journey-test/run-journey-tests 
 
     - uses: actions/setup-node@v4
       with:
