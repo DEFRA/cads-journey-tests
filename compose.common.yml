@@ -34,33 +34,33 @@ services:
   ################################################################################
 
   cads-frontend:
-      image: defradigital/cads-mis:latest
-      container_name: cads-frontend
+    container_name: cads-frontend
+    image: defradigital/cads-mis:latest
       ports:
       - "5555:3000"
-      depends_on:
-        cads-backend:
-          condition: service_started
-        redis:
-          condition: service_started
-      command: npm run dev
+    depends_on:
+      cads-backend:
+        condition: service_started
+      redis:
+        condition: service_started
+    command: npm run dev
 
   ################################################################################
   
   cads-backend:
-  container_name: cads_backend
-  image: defradigital/cads-data-service:latest
-  ports:
-    - "5555:5555"
-  depends_on:
-    localstack:
-      condition: service_healthy
-  environment:
-    PORT: "5555"
-    LOCALSTACK_ENDPOINT: http://cds-localstack-emulator:4566
-  healthcheck:
-    test: ["CMD-SHELL", "wget -qO- http://127.0.0.1:5555/health >/dev/null || exit 1"]
-    interval: 5s
-    timeout: 2s
-    retries: 30
+    container_name: cads_backend
+    image: defradigital/cads-data-service:latest
+    ports:
+      - "5555:5555"
+    depends_on:
+      localstack:
+        condition: service_healthy
+    environment:
+      PORT: "5555"
+      LOCALSTACK_ENDPOINT: http://cds-localstack-emulator:4566
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://127.0.0.1:5555/health >/dev/null || exit 1"]
+      interval: 5s
+      timeout: 2s
+      retries: 30
   ################################################################################
