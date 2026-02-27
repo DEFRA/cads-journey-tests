@@ -46,6 +46,7 @@ runs:
       shell: bash
       run: |
           docker compose -f compose.common.yml -f compose.ci.yml up --wait-timeout 300 -d --quiet-pull
+          docker ps --format "table {{.Names}}\t{{.Ports}}"
     - name: Run the tests
       shell: bash
       run: |
