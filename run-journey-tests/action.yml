@@ -47,18 +47,31 @@ runs:
       run: |
           docker compose -f compose.common.yml -f compose.ci.yml up --wait-timeout 300 -d --quiet-pull
           docker ps --format "table {{.Names}}\t{{.Ports}}"
-    - name: Backend logs + health probe
+    - name: Inspect backend state
       shell: bash
       run: |
         set -euxo pipefail
-        echo "=== Try HTTP ==="
-        curl -v --max-time 5 http://127.0.0.1:5555/ || true
+        docker ps -a --format "table {{.Names}}\t{{.Status}}\t{{.Image}}"
+        docker inspect cads-journey-tests-cads-backend-1 --format \
+          'Status={{.State.Status}} Running={{.State.Running}} Restarting={{.State.Restarting}} ExitCode={{.State.ExitCode}} Health={{if .State.Health}}{{.State.Health.Status}}{{else}}none{{end}}'
 
-        echo "=== Try HTTPS (ignore cert) ==="
-        curl -vk --max-time 5 https://127.0.0.1:5555/ || true
+    - name: Backend logs (docker logs)
+      shell: bash
+      run: |
+        set -euxo pipefail
+        docker logs --tail=300 cads-journey-tests-cads-backend-1 || true
 
-        echo "=== Backend logs ==="
-        docker compose -f compose.common.yml -f compose.ci.yml logs --no-color --tail=300 cads-backend || true
+    - name: Check what backend listens on inside container
+      shell: bash
+      run: |
+        set -euxo pipefail
+        docker exec cads-journey-tests-cads-backend-1 sh -lc '
+          echo "== env ==";
+          printenv | sort | sed -n "1,160p";
+          echo "== listeners ==";
+          (ss -lntp || netstat -lntp) 2>/dev/null || true;
+          echo "== curl inside container ==";
+          wget -qSO- http://127.0.0.1:80/ 2>&1 | head -n 40 || true;
     - name: Run the tests
       shell: bash
       run: |
