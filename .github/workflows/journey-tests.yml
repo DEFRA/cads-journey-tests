@@ -1,4 +1,4 @@
-name: Run Journey Tests on GitHub
+name: Run Journey Tests
 
 permissions:
   checks: write
@@ -12,4 +12,4 @@ jobs:
     name: Run Journey Tests
     runs-on: ubuntu-latest
     steps:
-      - uses: DEFRA/cdp-node-journey-test-suite-template/run-journey-tests@main
+      - uses: DEFRA/cads-journey-tests/run-journey-tests@main

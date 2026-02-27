@@ -1,22 +1,38 @@
-name: Run Journey Tests on GitHub
+name: Run Journey Tests
+
+on:
+  workflow_dispatch:
+    permissions:
+      contents: read
 
 inputs:
-  example-node-backend:
+  cads-frontend:
     required: false
     type: string
-  example-node-frontend:
+  cads-backend:
     required: false
     type: string
+  test:
+    description: "Choose Test Suite"
+    type: choice
+    required: true
+    options:
+      - API
+      - UI
+  tag:
+    description: "Choose Test Group"
+    type: choice
+    required: true
+    options:
+      - Smoke
+      - E2E    
 
 runs:
   using: "composite"
   steps:
     - uses: actions/checkout@v4
       with:
-        repository: DEFRA/cdp-node-journey-test-suite-template
-
-    - name: Docker Login
-      uses: DEFRA/cdp-build-action/docker-login@main
+        repository: DEFRA/cads-journey-tests
 
     - uses: actions/setup-node@v4
       with:
@@ -25,29 +41,128 @@ runs:
     - name: Setup the tests
       run: npm i
       shell: bash
+
     - name: Start docker compose
       shell: bash
       run: |
-          CDP_EXAMPLE_NODE_FRONTEND=${{inputs.example-node-frontend}} \
-          CDP_EXAMPLE_NODE_BACKEND=${{inputs.example-node-backend}} \
-          docker compose up --wait-timeout 300 -d --quiet-pull
+          docker compose -f compose.common.yml -f compose.ci.yml up --wait-timeout 300 -d --quiet-pull
+          docker ps --format "table {{.Names}}\t{{.Ports}}"
+    - name: Inspect backend state
+      shell: bash
+      run: |
+        set -euxo pipefail
+        docker ps -a --format "table {{.Names}}\t{{.Status}}\t{{.Image}}"
+        docker inspect cads-journey-tests-cads-backend-1 --format \
+          'Status={{.State.Status}} Running={{.State.Running}} Restarting={{.State.Restarting}} ExitCode={{.State.ExitCode}} Health={{if .State.Health}}{{.State.Health.Status}}{{else}}none{{end}}'
+
+    - name: Backend logs (docker logs)
+      shell: bash
+      run: |
+        set -euxo pipefail
+        docker logs --tail=300 cads-journey-tests-cads-backend-1 || true
+
+    - name: Check what backend listens on inside container
+      shell: bash
+      run: |
+        set -euxo pipefail
+        docker exec cads-journey-tests-cads-backend-1 sh -lc '
+          echo "== env ==";
+          printenv | sort | sed -n "1,160p";
+          echo "== listeners ==";
+          (ss -lntp || netstat -lntp) 2>/dev/null || true;
+          echo "== curl inside container ==";
+          wget -qSO- http://127.0.0.1:80/ 2>&1 | head -n 40 || true;'
+    - name: Print backend /health response
+      shell: bash
+      run: |
+        set -euxo pipefail
+        echo "=== status + headers ==="
+        curl -i --max-time 10 http://127.0.0.1:5555/health || true
+        echo
+        echo "=== body only ==="
+        curl -sS --max-time 10 http://127.0.0.1:5555/health || true
+    - name: Init localstack resources
+      shell: bash
+      run: |
+        set -euxo pipefail
+
+        export AWS_ACCESS_KEY_ID=test
+        export AWS_SECRET_ACCESS_KEY=test
+        export AWS_DEFAULT_REGION=eu-west-2
+
+        # create S3 bucket expected by backend
+        aws --endpoint-url=http://127.0.0.1:4566 s3 mb s3://test-bucket || true
+    - name: Dump backend connection-related env vars
+      shell: bash
+      run: |
+        set -euxo pipefail
+        docker exec cads-journey-tests-cads-backend-1 sh -lc '
+          echo "=== likely connection string env vars ==="
+          printenv | sort | egrep -i "connectionstring|connectionstrings|sql|postgres|db_|databaseurl|mongodb|mongo__|redis" || true
+        '
+    - name: Wait for backend health
+      shell: bash
+      run: |
+        set -euxo pipefail
+        for i in {1..90}; do
+          code=$(curl -s -o /dev/null -w "%{http_code}" http://127.0.0.1:5555/health || echo "000")
+          echo "health status: $code"
+          if [[ "$code" == "200" ]]; then
+            echo "Backend is healthy"
+            exit 0
+          fi
+          sleep 2
+        done
+
+        echo "Backend never became healthy"
+        curl -i http://127.0.0.1:5555/health || true
+        exit 1
     - name: Run the tests
       shell: bash
       run: |
-        npm run test:github
-        npm run report
+        npx playwright install --with-deps
+
+        TEST_INPUT="${{ inputs.test }}"
+        TAG_INPUT="${{ inputs.tag }}"
+
+        FILTER=""
+
+        if [[ -n "$TEST_INPUT" ]]; then
+          FILTER="$TEST_INPUT"
+        fi
+
+        if [[ -n "$TAG_INPUT" ]]; then
+          if [[ -n "$FILTER" ]]; then
+            FILTER="$FILTER|$TAG_INPUT"
+          else
+            FILTER="$TAG_INPUT"
+          fi
+        fi
+
+        if [[ -z "$FILTER" ]]; then
+          echo "No filters provided. Running all tests..."
+          npx playwright test
+        else
+          echo "Running filtered tests with grep: $FILTER"
+          npx playwright test --grep="$FILTER"
+        fi
     - name: debug
       if: always()
       run: |
         docker compose logs > logs.txt
         docker ps
       shell: bash
-    - name: Upload allure report
+    - name: Post Slack Report
+      shell: bash
+      run: |
+        BUILD_URL="Build URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}" \
+        node post-slack-report.ts
+    - name: Upload playwright report
       if: always()
       uses: actions/upload-artifact@v4
       with:
         name: allure-report
-        path: ./allure-report
+        path: ./playwright-report/html
     - name: Upload docker compose logs
       if: always()
       uses: actions/upload-artifact@v4

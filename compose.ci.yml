@@ -1,0 +1,36 @@
+################################################################################
+# Docker Compose file for starting up the service for testing in GitHub workflow
+# This template provides comparable infrastructure to the real environment.
+#   - mongodb
+#   - redis
+#   - localstack (s3, sqs, sns)
+#
+# Both mongo and localstack have init scripts included for setting up resources
+# on startup. These scripts are in scripts/.
+#
+# It also includes a selenium-chrome container for running the browser headless.
+#
+# The services being tested can either be started up here using the latest
+# builds from dockerhub.
+# In the example each service has a .env config file in config/
+# Services can reference each other by their container names.
+# e.g. http://cdp-example-node-backend:3001/
+#
+################################################################################
+services:
+
+  localstack:
+    env_file:
+      - ./dockerconfig/defaults.env
+
+  cads-frontend:
+    env_file:
+      - ./dockerconfig/defaults.env
+      - ./dockerconfig/frontend.env
+
+  cads-backend:
+    env_file:
+      - .//dockerconfig/defaults.env
+      - ./dockerconfig/backend.env
+
+################################################################################

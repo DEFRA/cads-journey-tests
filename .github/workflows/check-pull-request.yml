@@ -27,10 +27,13 @@ jobs:
       - run: npm ci
       - run: npm run format:check
       - run: npm run lint
-
-# Uncomment this to run the tests in your test suite
-#  tests:
-#    name: Run Journey Tests
-#    runs-on: ubuntu-latest
-#    steps:
-#      - uses: DEFRA/cdp-node-journey-test-suite-template/run-journey-tests@main
+  tests:
+    name: Run Journey Tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          repository: DEFRA/cads-journey-tests
+      - uses: ./run-journey-tests
+        with:
+          path: ./run-journey-tests

@@ -1,0 +1,72 @@
+services:
+  ################################################################################
+  # All of the infrastructure services
+  ################################################################################
+  
+  localstack:
+    container_name: "cds-localstack-emulator"
+    image: localstack/localstack:3.0.2
+    ports:
+      - '4566:4566' # LocalStack Gateway
+    env_file:
+      - 'dockerconfig/aws.env'
+    environment:
+      DEBUG: ${DEBUG:-1}
+      LS_LOG: WARN # Localstack DEBUG Level
+      SERVICES: s3,sqs,sns,firehose
+      LOCALSTACK_HOST: 127.0.0.1
+    volumes:
+      - '${TMPDIR:-/tmp}/localstack:/var/lib/localstack'
+      - ./compose/start-localstack.sh:/etc/localstack/init/ready.d/start-localstack.sh
+    healthcheck:
+      test: ['CMD', 'curl', 'http://cds-localstack-emulator:4566/health']
+      interval: 5s
+      start_period: 5s
+      retries: 3
+    
+
+  redis:
+    container_name: "redis"
+    image: redis:7.2.3-alpine3.18
+    ports:
+      - '6379:6379'
+    restart: always
+
+  mongodb:
+    container_name: "mongodb"
+    image: mongo:6.0.13
+    ports:
+      - '27017:27017'
+    environment:
+      MONGO_INITDB_DATABASE: cads
+
+  ################################################################################
+
+  cads-frontend:
+    image: defradigital/cads-mis:latest
+    ports:
+      - "3000:3000"
+    depends_on:
+      cads-backend:
+        condition: service_started
+      redis:
+        condition: service_started
+
+  ################################################################################
+  
+  cads-backend:
+    image: defradigital/cads-data-service:latest
+    ports:
+      - "5555:8080"
+    depends_on:
+      localstack:
+        condition: service_healthy
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      LOCALSTACK_ENDPOINT: "http://localstack:4566"
+    healthcheck:
+      test: ['CMD', 'curl', 'http://localhost:8080/health']
+      interval: 5s
+      timeout: 2s
+      retries: 30
+  ################################################################################
