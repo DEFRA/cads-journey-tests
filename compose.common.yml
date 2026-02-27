@@ -34,7 +34,6 @@ services:
   ################################################################################
 
   cads-frontend:
-    container_name: cads-frontend
     image: defradigital/cads-mis:latest
     ports:
       - "5555:3000"
@@ -48,7 +47,6 @@ services:
   ################################################################################
   
   cads-backend:
-    container_name: cads_backend
     image: defradigital/cads-data-service:latest
     ports:
       - "5555:5555"
