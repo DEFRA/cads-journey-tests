@@ -23,15 +23,17 @@ services:
       interval: 5s
       start_period: 5s
       retries: 3
+    
 
   redis:
-    container_name: "cds-redis"
+    container_name: "redis"
     image: redis:7.2.3-alpine3.18
     ports:
       - '6379:6379'
     restart: always
 
   mongodb:
+    container_name: "mongodb"
     image: mongo:6.0.13
     ports:
       - '27017:27017'

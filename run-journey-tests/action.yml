@@ -72,6 +72,44 @@ runs:
           (ss -lntp || netstat -lntp) 2>/dev/null || true;
           echo "== curl inside container ==";
           wget -qSO- http://127.0.0.1:80/ 2>&1 | head -n 40 || true;'
+    - name: Print backend /health response
+      shell: bash
+      run: |
+        set -euxo pipefail
+        echo "=== status + headers ==="
+        curl -i --max-time 10 http://127.0.0.1:5555/health || true
+        echo
+        echo "=== body only ==="
+        curl -sS --max-time 10 http://127.0.0.1:5555/health || true
+    - name: Init localstack resources
+      shell: bash
+      run: |
+        set -euxo pipefail
+
+        export AWS_ACCESS_KEY_ID=test
+        export AWS_SECRET_ACCESS_KEY=test
+        export AWS_DEFAULT_REGION=eu-west-2
+
+        # create S3 bucket expected by backend
+        aws --endpoint-url=http://127.0.0.1:4566 s3 mb s3://test-bucket || true
+        
+    - name: Wait for backend health
+      shell: bash
+      run: |
+        set -euxo pipefail
+        for i in {1..90}; do
+          code=$(curl -s -o /dev/null -w "%{http_code}" http://127.0.0.1:5555/health || echo "000")
+          echo "health status: $code"
+          if [[ "$code" == "200" ]]; then
+            echo "Backend is healthy"
+            exit 0
+          fi
+          sleep 2
+        done
+
+        echo "Backend never became healthy"
+        curl -i http://127.0.0.1:5555/health || true
+        exit 1
     - name: Run the tests
       shell: bash
       run: |
