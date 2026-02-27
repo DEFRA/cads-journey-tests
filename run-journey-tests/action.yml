@@ -31,7 +31,9 @@ runs:
   using: "composite"
   steps:
     - uses: actions/checkout@v4
-    - uses: DEFRA/cads-journey-test/run-journey-tests@ULITP-4426-Playwright_setup 
+      with:
+        repository: DEFRA/cads-journey-test
+        token: ${{ secrets.GITHUB_TOKEN }}
 
     - uses: actions/setup-node@v4
       with:
