@@ -29,8 +29,3 @@ jobs:
         uses: DEFRA/cdp-build-action/build-test@main
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
-  build:
-    name: Run Journey Tests
-    runs-on: ubuntu-latest
-    steps:
-      - uses: DEFRA/cads-journey-tests/run-journey-tests@main
