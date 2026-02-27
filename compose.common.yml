@@ -57,7 +57,7 @@ services:
       PORT: "5555"
       LOCALSTACK_ENDPOINT: http://cds-localstack-emulator:4566
     healthcheck:
-      test: ["CMD-SHELL", "wget -qO- http://127.0.0.1:5555/health >/dev/null || exit 1"]
+      test: ['CMD', 'curl', 'http://localhost:5555/health']
       interval: 5s
       timeout: 2s
       retries: 30

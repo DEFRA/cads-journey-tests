@@ -8,8 +8,8 @@ const ENV = process.env.ENV ?? 'local'
 const isLocal = ENV === 'local'
 const configByEnv = {
   local: {
-    ui: 'http://localhost:3000',
-    api: 'http://localhost:5555'
+    ui: 'http://127.0.0.1:3000',
+    api: 'http://127.0.0.1:5555'
   },
   dev: {
     ui: 'DEV_URL',
