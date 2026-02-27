@@ -47,6 +47,22 @@ runs:
       run: |
           docker compose -f compose.common.yml -f compose.ci.yml up --wait-timeout 300 -d --quiet-pull
           docker ps --format "table {{.Names}}\t{{.Ports}}"
+    - name: Backend logs + health probe
+      shell: bash
+      run: |
+        set -euxo pipefail
+
+        echo "=== compose ps ==="
+        docker compose -f compose.common.yml -f compose.ci.yml ps
+
+        echo "=== backend logs (last 200 lines) ==="
+        docker compose -f compose.common.yml -f compose.ci.yml logs --no-color --tail=200 cads-backend
+
+        echo "=== curl health (verbose) ==="
+        curl -v --max-time 5 http://127.0.0.1:5555/health || true
+
+        echo "=== curl root (verbose) ==="
+        curl -v --max-time 5 http://127.0.0.1:5555/ || true
     - name: Run the tests
       shell: bash
       run: |
