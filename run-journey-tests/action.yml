@@ -92,7 +92,14 @@ runs:
 
         # create S3 bucket expected by backend
         aws --endpoint-url=http://127.0.0.1:4566 s3 mb s3://test-bucket || true
-        
+    - name: Dump backend connection-related env vars
+      shell: bash
+      run: |
+        set -euxo pipefail
+        docker exec cads-journey-tests-cads-backend-1 sh -lc '
+          echo "=== likely connection string env vars ==="
+          printenv | sort | egrep -i "connectionstring|connectionstrings|sql|postgres|db_|databaseurl|mongodb|mongo__|redis" || true
+        '
     - name: Wait for backend health
       shell: bash
       run: |
