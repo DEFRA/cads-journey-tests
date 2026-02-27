@@ -71,7 +71,7 @@ runs:
           echo "== listeners ==";
           (ss -lntp || netstat -lntp) 2>/dev/null || true;
           echo "== curl inside container ==";
-          wget -qSO- http://127.0.0.1:80/ 2>&1 | head -n 40 || true;
+          wget -qSO- http://127.0.0.1:80/ 2>&1 | head -n 40 || true;'
     - name: Run the tests
       shell: bash
       run: |
