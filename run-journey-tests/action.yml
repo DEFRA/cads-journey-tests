@@ -31,7 +31,7 @@ runs:
   using: "composite"
   steps:
     - uses: actions/checkout@v4
-    - uses: DEFRA/cads-journey-test/run-journey-tests@V1 
+    - uses: DEFRA/cads-journey-test/run-journey-tests@ULITP-4426-Playwright_setup 
 
     - uses: actions/setup-node@v4
       with:
