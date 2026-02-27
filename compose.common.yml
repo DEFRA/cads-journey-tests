@@ -32,11 +32,4 @@ services:
     image: defradigital/cads-data-service:${CADS_BACKEND:-latest}
     ports:
       - '5555:5555'
-    depends_on:
-      localstack:
-        condition: service_healthy
-    environment:
-      PORT: 5555
-      LOCALSTACK_ENDPOINT: http://cds-localstack-emulator:4566
-
   ################################################################################
