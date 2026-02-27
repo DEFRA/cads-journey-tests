@@ -21,16 +21,16 @@ services:
 
   localstack:
     env_file:
-      - ./docker/config/defaults.env
+      - ./dockerconfig/defaults.env
 
   cads-frontend:
     env_file:
-      - ./docker/config/defaults.env
-      - ./docker/config/frontend.env
+      - ./dockerconfig/defaults.env
+      - ./dockerconfig/frontend.env
 
   cads-backend:
     env_file:
       - .//dockerconfig/defaults.env
-      - ./docker/config/backend.env
+      - ./dockerconfig/backend.env
 
 ################################################################################
