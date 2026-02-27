@@ -16,6 +16,6 @@
     "build:tests": "tsc",
     "test": "npm run build:tests && npx playwright test --config=playwright.config.ts --test-dir=dist/tests --test-match=**/*.spec.js"
   },
-  "include": ["tests/**/*.ts", "playwright.config.ts"],
+  "include": ["tests/**/*.ts", "playwright.config.ts", "types/**/*.d.ts"],
   "exclude": ["node_modules", "dist"]
 }

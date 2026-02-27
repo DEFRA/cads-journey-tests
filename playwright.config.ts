@@ -1,4 +1,5 @@
 import { defineConfig, devices } from '@playwright/test'
+import type { GitHubActionOptions } from '@estruyf/github-actions-reporter'
 
 // Set Environment
 // process.env.ENV = 'dev'
@@ -40,7 +41,15 @@ export default defineConfig({
   reporter: [
     ['list'], // CLI console output
     ['html', { outputFolder: 'playwright-report/html' }],
-    ['json', { outputFile: 'playwright-report/results.json' }]
+    ['json', { outputFile: 'playwright-report/results.json' }],
+    [
+      '@estruyf/github-actions-reporter',
+      <GitHubActionOptions>{
+        title: 'My custom title',
+        useDetails: true,
+        showError: true
+      }
+    ]
     // ['junit', { outputFile: 'report/results.xml' }]
   ],
 
