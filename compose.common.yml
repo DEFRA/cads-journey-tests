@@ -61,8 +61,6 @@ services:
         REDIS_HOST: redis
         LOCALSTACK_ENDPOINT: http://localstack:4566
         USE_SINGLE_INSTANCE_CACHE: true
-      networks:
-        - cdp-tenant
       healthcheck:
         test: ["CMD", "curl", "http://localhost:5555/health"]
         interval: 5s
