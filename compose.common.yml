@@ -36,7 +36,7 @@ services:
   cads-frontend:
     image: defradigital/cads-mis:latest
     ports:
-      - "5555:3000"
+      - "3000:3000"
     depends_on:
       cads-backend:
         condition: service_started
