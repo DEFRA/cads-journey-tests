@@ -1,11 +1,5 @@
 name: Run Journey Tests
 
-on:
-  workflow_dispatch:
-    permissions:
-      id-token: write
-      contents: read
-
 inputs:
   cads-frontend:
     required: false
