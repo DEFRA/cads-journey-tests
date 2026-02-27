@@ -48,12 +48,11 @@ services:
   cads-backend:
     image: defradigital/cads-data-service:latest
     ports:
-      - "5555:5555"
+      - "5555:80"
     depends_on:
       localstack:
         condition: service_healthy
     environment:
-      ASPNETCORE_URLS: "http://0.0.0.0:5555"
       LOCALSTACK_ENDPOINT: "http://localstack:4566"
     healthcheck:
       test: ['CMD', 'curl', 'http://localhost:5555/health']
