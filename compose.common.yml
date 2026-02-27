@@ -22,8 +22,6 @@ services:
       interval: 5s
       start_period: 5s
       retries: 3
-    networks:
-      - cdp-tenant
 
   redis:
     container_name: "cds-redis"
@@ -31,13 +29,9 @@ services:
     ports:
       - '6379:6379'
     restart: always
-    networks:
-      - cdp-tenant
 
   mongodb:
     image: mongo:6.0.13
-    networks:
-      - cdp-tenant
     ports:
       - '27017:27017'
     volumes:
@@ -67,8 +61,6 @@ services:
         timeout: 2s
         start_period: 20s
         retries: 10
-      networks:
-        - cdp-tenant
 
   ################################################################################
   
@@ -84,7 +76,5 @@ services:
     environment:
       PORT: 5555
       LOCALSTACK_ENDPOINT: http://cds-localstack-emulator:4566
-    networks:
-      - cdp-tenant
 
   ################################################################################
