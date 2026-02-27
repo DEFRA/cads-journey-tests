@@ -30,15 +30,6 @@ services:
       - '6379:6379'
     restart: always
 
-  mongodb:
-    image: mongo:6.0.13
-    ports:
-      - '27017:27017'
-    volumes:
-      - mongodb-data:/data
-    restart: always
-
-
   ################################################################################
 
   cads-frontend:
