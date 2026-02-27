@@ -45,8 +45,6 @@ runs:
     - name: Start docker compose
       shell: bash
       run: |
-          CADS_FRONTEND=${{inputs.cads-frontend}} \
-          CADS_BACKEND=${{inputs.cads-backend}} \
           docker compose -f compose.common.yml -f compose.ci.yml up --wait-timeout 300 -d --quiet-pull
     - name: Run the tests
       shell: bash

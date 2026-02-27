@@ -71,4 +71,9 @@ services:
       PORT: 5555
       LOCALSTACK_ENDPOINT: http://cds-localstack-emulator:4566
     command: docker-compose -f docker-compose.yml -f docker-compose.override.yml up --build
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://localhost:3000/health"]
+      interval: 5s
+      timeout: 2s
+      retries: 30
   ################################################################################
