@@ -51,8 +51,32 @@ runs:
     - name: Run the tests
       shell: bash
       run: |
-        npx playwright install --with-deps \
-        npx playwright test --grep= "${{inputs.test}}|${{inputs.tag}}"
+        npx playwright install --with-deps
+
+        TEST_INPUT="${{ inputs.test }}"
+        TAG_INPUT="${{ inputs.tag }}"
+
+        FILTER=""
+
+        if [[ -n "$TEST_INPUT" ]]; then
+          FILTER="$TEST_INPUT"
+        fi
+
+        if [[ -n "$TAG_INPUT" ]]; then
+          if [[ -n "$FILTER" ]]; then
+            FILTER="$FILTER|$TAG_INPUT"
+          else
+            FILTER="$TAG_INPUT"
+          fi
+        fi
+
+        if [[ -z "$FILTER" ]]; then
+          echo "No filters provided. Running all tests..."
+          npx playwright test
+        else
+          echo "Running filtered tests with grep: $FILTER"
+          npx playwright test --grep="$FILTER"
+        fi
     - name: debug
       if: always()
       run: |
