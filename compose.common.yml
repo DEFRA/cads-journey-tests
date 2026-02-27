@@ -34,7 +34,7 @@ services:
   ################################################################################
 
   cads-frontend:
-      image: defradigital/cads-mis:${CADS_FRONTEND:-latest}
+      image: defradigital/cads-mis:latest
       container_name: cads-frontend
       working_dir: /app/cads-mis
       depends_on:
@@ -61,7 +61,7 @@ services:
   cads-backend:
     container_name: "cads_backend"
     working_dir: /app/cads-data-service
-    image: defradigital/cads-data-service:${CADS_BACKEND:-latest}
+    image: defradigital/cads-data-service:latest
     ports:
       - '5555:5555'
     depends_on:
