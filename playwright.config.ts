@@ -9,7 +9,7 @@ const isLocal = ENV === 'local'
 const configByEnv = {
   local: {
     ui: 'http://127.0.0.1:3000',
-    api: 'https://127.0.0.1:5555'
+    api: 'http://127.0.0.1:5555'
   },
   dev: {
     ui: 'DEV_URL',
