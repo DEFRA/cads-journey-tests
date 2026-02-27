@@ -51,18 +51,14 @@ runs:
       shell: bash
       run: |
         set -euxo pipefail
-
-        echo "=== compose ps ==="
-        docker compose -f compose.common.yml -f compose.ci.yml ps
-
-        echo "=== backend logs (last 200 lines) ==="
-        docker compose -f compose.common.yml -f compose.ci.yml logs --no-color --tail=200 cads-backend
-
-        echo "=== curl health (verbose) ==="
-        curl -v --max-time 5 http://127.0.0.1:5555/health || true
-
-        echo "=== curl root (verbose) ==="
+        echo "=== Try HTTP ==="
         curl -v --max-time 5 http://127.0.0.1:5555/ || true
+
+        echo "=== Try HTTPS (ignore cert) ==="
+        curl -vk --max-time 5 https://127.0.0.1:5555/ || true
+
+        echo "=== Backend logs ==="
+        docker compose -f compose.common.yml -f compose.ci.yml logs --no-color --tail=300 cads-backend || true
     - name: Run the tests
       shell: bash
       run: |

@@ -52,6 +52,9 @@ services:
     depends_on:
       localstack:
         condition: service_healthy
+    environment:
+      ASPNETCORE_URLS: "http://0.0.0.0:5555"
+      LOCALSTACK_ENDPOINT: "http://localstack:4566"
     healthcheck:
       test: ['CMD', 'curl', 'http://localhost:5555/health']
       interval: 5s
