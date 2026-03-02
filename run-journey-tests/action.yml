@@ -38,8 +38,13 @@ runs:
       with:
         node-version: 20
         cache: npm
+  
     - name: Setup the tests
       run: npm i
+      shell: bash
+
+    - name: Make LocalStack init script executable
+      run: chmod +x ./docker/scripts/localstack/init/start-localstack.sh
       shell: bash
 
     - name: Start docker compose
