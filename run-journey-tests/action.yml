@@ -142,10 +142,10 @@ runs:
         fi
     - name: debug
       if: always()
-      run: |
-        docker compose logs > logs.txt
-        docker ps
       shell: bash
+      run: |
+        docker compose -f compose.common.yml -f compose.ci.yml logs > logs.txt
+        docker ps
     - name: Post Slack Report
       shell: bash
       run: |
