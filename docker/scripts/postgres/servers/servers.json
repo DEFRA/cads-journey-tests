@@ -1,0 +1,17 @@
+{
+  "Servers": {
+    "1": {
+      "Name": "Local Postgres",
+      "Group": "Servers",
+      "Host": "postgres",
+      "Port": 5432,
+      "MaintenanceDB": "cads-data-service",
+      "Username": "postgres",
+      "SSLMode": "prefer",
+      "PassFile": "/pgpass",
+      "Comment": "Local Postgres instance for E2E tests",
+      "DBRestriction": "",
+      "Service": "postgres"
+    }
+  }
+}

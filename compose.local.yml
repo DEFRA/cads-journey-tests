@@ -14,10 +14,11 @@ services:
       SERVICES: s3,sqs,firehose
       LOCALSTACK_HOST: 127.0.0.1    
     env_file:
+      - ./dockerconfig/aws.env
       - ./dockerconfig/local-defaults.env
     volumes:
       - '${TMPDIR:-/tmp}/localstack:/var/lib/localstack'
-      - ./compose/start-localstack.sh:/etc/localstack/init/ready.d/start-localstack.sh
+      - ./docker/scripts/localstack/init/start-localstack.sh:/etc/localstack/init/ready.d/start-localstack.sh
     healthcheck:
       test: ['CMD', 'curl', 'http://cds-localstack-emulator:4566/health']
       interval: 5s
@@ -30,12 +31,9 @@ services:
 
   postgres:
     image: postgres:16.6
-    #environment:
-    #  - POSTGRES_USER=${POSTGRES_USER}
-    #  - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
-    #  - POSTGRES_DB=${POSTGRES_DB}
     volumes:
       - "./postgres-data:/var/lib/postgresql/data"
+      - "./docker/scripts/postgres/init:/docker-entrypoint-initdb.d"
     ports:
       - 5432:5432
     healthcheck:
@@ -44,31 +42,50 @@ services:
       timeout: 5s
       retries: 5
     env_file:
+      - ./dockerconfig/aws.env
       - ./dockerconfig/postgres.env
     networks:
       - cdpnet
 
 ################################################################################
 
-  #liquibase:
-  #  build:
-  #    context: .
-  #    dockerfile_inline: |
-  #      FROM liquibase/liquibase:5.0.1
-  #      RUN lpm add postgresql --global
-  #      USER liquibase
-  #  depends_on:
-  #    postgres:
-  #      condition: service_healthy
-  #  volumes:
-  #    - "./changelog:/liquibase/changelog"
-  #  env_file:
-  #    - ./dockerconfig/postgres.env
-  #  command: sh -c "liquibase --url=jdbc:postgresql://postgres:5432/${POSTGRES_DB} --username=${POSTGRES_USER} --password=${POSTGRES_PASSWORD} --searchPath=/liquibase/changelog --changelog-file=db.changelog.xml update && tail -f /dev/null"
-  #  networks:
-  #    - cdpnet
+  pgadmin:
+    image: dpage/pgadmin4
+    environment:
+      PGADMIN_DEFAULT_EMAIL: "pgadmin@pgadmin.com"
+      PGADMIN_DEFAULT_PASSWORD: "pgadmin"
+    ports:
+      - 16543:80
+    volumes:
+      - "./docker/scripts/postgres/servers/servers.json:/pgadmin4/servers.json"
+      - "./pgadmin-data:/var/lib/pgadmin"
+      - "./docker/scripts/postgres/servers/pgpass:/pgpass"
+    command: sh -c "chmod 600 /pgpass && /entrypoint.sh"
+    networks:
+      - cdpnet
 
-  ################################################################################
+################################################################################
+
+  liquibase:
+    build:
+      context: .
+      dockerfile_inline: |
+        FROM liquibase/liquibase:5.0.1
+        RUN lpm add postgresql --global
+        USER liquibase
+    depends_on:
+      postgres:
+        condition: service_healthy
+    volumes:
+      - "./changelog:/liquibase/changelog"
+    env_file:
+      - ./dockerconfig/aws.env
+      - ./dockerconfig/postgres.env
+    command: sh -c "liquibase --url=jdbc:postgresql://postgres:5432/cads-data-service --username=postgres --password=postgres --searchPath=/liquibase/changelog --changelog-file=db.changelog.xml update && tail -f /dev/null"
+    networks:
+      - cdpnet
+
+################################################################################
 
   redis:
     container_name: "cds-redis"
@@ -79,7 +96,7 @@ services:
     networks:
       - cdpnet
 
-  ################################################################################
+################################################################################
 
   cads-frontend:
     image: defradigital/cads-mis:latest
@@ -91,12 +108,13 @@ services:
       redis:
         condition: service_started
     env_file:
-      - ./dockerconfig/defaults.env
+      - ./dockerconfig/aws.env
+      - ./dockerconfig/local-defaults.env
       - ./dockerconfig/frontend.env
     networks:
       - cdpnet
 
-  ################################################################################
+################################################################################
   
   cads-backend:
     image: defradigital/cads-data-service:0.113.0
@@ -109,7 +127,8 @@ services:
       ASPNETCORE_ENVIRONMENT: Development
       LOCALSTACK_ENDPOINT: "http://localstack:4566"
     env_file:
-      - ./dockerconfig/defaults.env
+      - ./dockerconfig/aws.env
+      - ./dockerconfig/local-defaults.env
       - ./dockerconfig/backend.env
     healthcheck:
       test: ['CMD', 'curl', 'http://localhost:5555/health']
@@ -118,7 +137,7 @@ services:
       retries: 30
     networks:
       - cdpnet
-  ################################################################################
+################################################################################
 
 networks:
   cdpnet:

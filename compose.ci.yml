@@ -21,24 +21,28 @@ services:
 
   localstack:
     env_file:
-      - ./dockerconfig/defaults.env
-
-  cads-frontend:
-    env_file:
-      - ./dockerconfig/defaults.env
-      - ./dockerconfig/frontend.env
-
-  cads-backend:
-    env_file:
-      - ./dockerconfig/defaults.env
-      - ./dockerconfig/backend.env
+      - ./dockerconfig/aws.env
+      - ./dockerconfig/local-defaults.env
 
   postgres:
     env_file:
+      - ./dockerconfig/aws.env
       - ./dockerconfig/postgres.env
 
   liquibase:
     env_file:
+      - ./dockerconfig/aws.env
       - ./dockerconfig/postgres.env
 
+  cads-frontend:
+    env_file:
+      - ./dockerconfig/aws.env
+      - ./dockerconfig/local-defaults.env
+      - ./dockerconfig/frontend.env
+
+  cads-backend:
+    env_file:
+      - ./dockerconfig/aws.env
+      - ./dockerconfig/local-defaults.env
+      - ./dockerconfig/backend.env
 ################################################################################
