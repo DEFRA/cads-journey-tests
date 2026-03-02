@@ -30,7 +30,15 @@ services:
 
   cads-backend:
     env_file:
-      - .//dockerconfig/defaults.env
+      - ./dockerconfig/defaults.env
       - ./dockerconfig/backend.env
+
+  postgres:
+    env_file:
+      - ./dockerconfig/postgres.env
+
+  liquibase:
+    env_file:
+      - ./dockerconfig/postgres.env
 
 ################################################################################

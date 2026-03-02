@@ -13,3 +13,7 @@ allure-results/
 playwright-report
 package-lock.json
 FAILED
+/localstack_data/cache
+/postgres-data
+/pgadmin-data
+/test-results

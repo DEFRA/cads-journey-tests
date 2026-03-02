@@ -18,8 +18,8 @@
   "scripts": {
     "clean": "rm -rf allure-results && rm -rf allure-report",
     "test": "npx playwright test --config=playwright.config.ts",
-    "format": "prettier --write 'tests/**/*.ts' '**/*.{ts,md,json,config.ts}'",
-    "format:check": "prettier --check 'tests/**/*.ts' '**/*.{ts,md,json,config.ts}'",
+    "format": "prettier --write \"tests/**/*.ts\" \"**/*.{ts,md,json,config.ts}\"",
+    "format:check": "prettier --check \"tests/**/*.ts\" \"**/*.{ts,md,json,config.ts}\"",
     "git:pre-commit-hook": "npm run format:check && npm run lint",
     "lint": "eslint \"tests/**/*.ts\" \"configs/**/*.ts\" \"playwright.config.ts\" \"post-slack-report.ts\"",
     "lint:fix": "eslint \"tests/**/*.ts\" \"configs/**/*.ts\" \"playwright.config.ts\" \"post-slack-report.ts\" --fix",

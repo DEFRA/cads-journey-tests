@@ -81,17 +81,15 @@ runs:
         echo
         echo "=== body only ==="
         curl -sS --max-time 10 http://127.0.0.1:5555/health || true
-    - name: Init localstack resources
-      shell: bash
-      run: |
-        set -euxo pipefail
-
-        export AWS_ACCESS_KEY_ID=test
-        export AWS_SECRET_ACCESS_KEY=test
-        export AWS_DEFAULT_REGION=eu-west-2
-
-        # create S3 bucket expected by backend
-        aws --endpoint-url=http://127.0.0.1:4566 s3 mb s3://test-bucket || true
+    #- name: Init localstack resources
+    #  shell: bash
+    #  run: |
+    #    set -euxo pipefail
+    #    export AWS_ACCESS_KEY_ID=test
+    #    export AWS_SECRET_ACCESS_KEY=test
+    #    export AWS_DEFAULT_REGION=eu-west-2
+    #    # create S3 bucket expected by backend
+    #    aws --endpoint-url=http://127.0.0.1:4566 s3 mb s3://test-bucket || true
     - name: Dump backend connection-related env vars
       shell: bash
       run: |
