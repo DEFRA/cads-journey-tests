@@ -83,6 +83,8 @@ services:
     depends_on:
       localstack:
         condition: service_healthy
+      postgres:
+        condition: service_healthy
     environment:
       ASPNETCORE_ENVIRONMENT: Development
       LOCALSTACK_ENDPOINT: "http://localstack:4566"
