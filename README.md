@@ -1,26 +1,32 @@
 cads-journey-tests
 
-The template to create a service that runs WDIO tests against an environment.
+A Playwright test suite for running end-to-end and API tests against the CADS journey application.
 
-- [Local](#local)
+- [Local Development](#local-development)
   - [Requirements](#requirements)
     - [Node.js](#nodejs)
+    - [Prerequisites](#Prerequisites)
   - [Setup](#setup)
-  - [Running local tests](#running-local-tests)
-  - [Debugging local tests](#debugging-local-tests)
-- [Production](#production)
+  - [Running tests](#running-tests)
+  - [Environment Configuration](#environment-configuration)
   - [Debugging tests](#debugging-tests)
+- [Project Structure](#project-structure)
+- [Production](#production)
 - [Licence](#licence)
-  - [About the licence](#about-the-licence)
 
 ## Local Development
 
-### Requirements
+### Prerequisites
+
+- **.NET 10 SDK** - [Download](https://dotnet.microsoft.com/download/dotnet/10.0)
+- **Docker & Docker Compose** - [Download](https://www.docker.com/products/docker-desktop)
+- **Git** Cads Data Service- [Download](https://github.com/DEFRA/cads-data-service)
+- **Git** Cads Front-End- [Download](https://github.com/DEFRA/cads-mis)
 
 #### Node.js
 
-Please install [Node.js](http://nodejs.org/) `>= v20` and [npm](https://nodejs.org/) `>= v9`. You will find it
-easier to use the Node Version Manager [nvm](https://github.com/creationix/nvm)
+Please install [Node.js](http://nodejs.org/) `>= v22.13.1` and [npm](https://nodejs.org/). You will find it
+easier to use the Node Version Manager [nvm](https://github.com/creationix/nvm).
 
 To use the correct version of Node.js for this application, via nvm:
 
@@ -36,18 +42,84 @@ Install application dependencies:
 npm install
 ```
 
-### Running local tests
-
-Start application you are testing on the url specified in `baseUrl` [wdio.local.conf.js](wdio.local.conf.js)
+Install Playwright browsers:
 
 ```bash
-npm run test:local
+npx playwright install
 ```
 
-### Debugging local tests
+### Running tests
+
+Run all tests:
 
 ```bash
-npm run test:local:debug
+npm run test
+```
+
+Run tests for a specific environment:
+
+```bash
+npx playwright test --ENV=local
+npx playwright test --ENV=dev
+```
+
+Run tests in UI mode (interactive):
+
+```bash
+npx playwright test --ui
+```
+
+Run a specific test file:
+
+```bash
+npx playwright test tests/front-end/features/home.spec.ts
+```
+
+### Environment Configuration
+
+The test environment is configured via the `ENV` environment variable in `playwright.config.ts`:
+
+- `local` (default): Runs against `http://localhost:3000` (UI) and `http://localhost:5555` (API)
+- `dev`: Runs against development environment URLs
+
+When `ENV=local`, Playwright will automatically start the frontend and backend servers before running tests.
+
+### Debugging tests
+
+Run tests in debug mode:
+
+```bash
+npx playwright test --debug
+```
+
+Run tests with Playwright Inspector:
+
+```bash
+npx playwright test --headed
+```
+
+View test reports:
+
+```bash
+npx playwright show-report
+```
+
+## Project Structure
+
+```
+tests/
+├── back-end/              # API tests
+│   ├── api/               # API client implementations
+│   ├── config/            # Environment-specific configs
+│   ├── features/          # Test specifications
+│   └── step-definitions/  # Step definition classes
+├── front-end/             # UI tests
+│   ├── features/          # Test specifications
+│   ├── page-objects/      # Page object models
+│   └── step-definitions/  # Step definition classes
+├── fixtures/              # Playwright test fixtures
+├── types/                 # TypeScript type definitions
+└── utils/                 # Utility functions and constants
 ```
 
 ## Production
@@ -59,7 +131,21 @@ You can check the progress of the build under the actions section of this reposi
 
 The results of the test run are made available in the portal.
 
-## Requirements of CDP Environment Tests
+### Test Reports
+
+Test reports are generated in multiple formats:
+
+- **HTML Report**: `playwright-report/html/index.html` - Interactive HTML report
+- **JSON Report**: `playwright-report/results.json` - Machine-readable test results
+- **Console Output**: Real-time test execution output
+
+View the HTML report:
+
+```bash
+npx playwright show-report
+```
+
+### Requirements of CDP Environment Tests
 
 1. Your service builds as a docker container using the `.github/workflows/publish.yml`
    The workflow tags the docker images allowing the CDP Portal to identify how the container should be run on the platform.
@@ -72,25 +158,19 @@ The results of the test run are made available in the portal.
 ## Running on GitHub
 
 Alternatively you can run the test suite as a GitHub workflow.
-Test runs on GitHub are not able to connect to the CDP Test environments. Instead, they run the tests agains a version of the services running in docker.
+Test runs on GitHub are not able to connect to the CDP Test environments. Instead, they run the tests against a version of the services running in docker.
 A docker compose `compose.yml` is included as a starting point, which includes the databases (mongodb, redis) and infrastructure (localstack) pre-setup.
 
 Steps:
 
 1. Edit the compose.yml to include your services.
 2. Modify the scripts in docker/scripts to pre-populate the database, if required and create any localstack resources.
-3. Test the setup locally with `docker compose up` and `npm run test:github`
+3. Test the setup locally with `docker compose up` and `npm run test`
 4. Set up the workflow trigger in `.github/workflows/journey-tests`.
 
 By default, the provided workflow will run when triggered manually from GitHub or when triggered by another workflow.
 
-If you want to use the repository exclusively for running docker composed based test suites consider displaying the publish.yml workflow.
-
-## BrowserStack
-
-Two wdio configuration files are provided to help run the tests using BrowserStack in both a GitHub workflow (`wdio.github.browserstack.conf.js`) and from the CDP Portal (`wdio.browserstack.conf.js`).
-They can be run from npm using the `npm run test:browserstack` (for running via portal) and `npm run test:github:browserstack` (from GitHib runner).
-See the CDP Documentation for more details.
+If you want to use the repository exclusively for running docker composed based test suites consider disabling the publish.yml workflow.
 
 ## Licence
 

@@ -1,0 +1,95 @@
+services:
+  ################################################################################
+  # All of the infrastructure services
+  ################################################################################
+  
+  localstack:
+    container_name: "cds-localstack-emulator"
+    image: localstack/localstack:3.0.2
+    ports:
+      - '4566:4566' # LocalStack Gateway
+    environment:
+      DEBUG: ${DEBUG:-1}
+      LS_LOG: WARN # Localstack DEBUG Level
+      SERVICES: s3,sqs,firehose
+      LOCALSTACK_HOST: 127.0.0.1
+    volumes:
+      - '${TMPDIR:-/tmp}/localstack:/var/lib/localstack'
+      - ./docker/scripts/localstack/init/start-localstack.sh:/etc/localstack/init/ready.d/start-localstack.sh
+    healthcheck:
+      test: ['CMD', 'curl', 'http://cds-localstack-emulator:4566/health']
+      interval: 5s
+      start_period: 5s
+      retries: 3
+    
+  ################################################################################
+
+  postgres:
+    image: postgres:16.6
+    volumes:
+      - "./postgres-data:/var/lib/postgresql/data"
+      - "./docker/scripts/postgres/init:/docker-entrypoint-initdb.d"
+    ports:
+      - 5432:5432
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+################################################################################
+
+  liquibase:
+    build:
+      context: .
+      dockerfile_inline: |
+        FROM liquibase/liquibase:5.0.1
+        RUN lpm add postgresql --global
+        USER liquibase
+    depends_on:
+      postgres:
+        condition: service_healthy
+    volumes:
+      - "./changelog:/liquibase/changelog"
+    command: sh -c "liquibase --url=jdbc:postgresql://postgres:5432/cads-data-service --username=postgres --password=postgres --searchPath=/liquibase/changelog --changelog-file=db.changelog.xml update && tail -f /dev/null"
+    
+  ################################################################################
+
+  redis:
+    container_name: "cds-redis"
+    image: redis:7.2.3-alpine3.18
+    ports:
+      - '6379:6379'
+    restart: always
+
+  ################################################################################
+
+  cads-frontend:
+    image: defradigital/cads-mis:latest
+    ports:
+      - "3000:3000"
+    depends_on:
+      cads-backend:
+        condition: service_started
+      redis:
+        condition: service_started
+
+  ################################################################################
+  
+  cads-backend:
+    image: defradigital/cads-data-service:0.113.0
+    ports:
+      - "5555:5555"
+    depends_on:
+      localstack:
+        condition: service_healthy
+      postgres:
+        condition: service_healthy
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+    healthcheck:
+      test: ['CMD', 'curl', 'http://localhost:5555/health']
+      interval: 5s
+      timeout: 2s
+      retries: 30
+  ################################################################################
