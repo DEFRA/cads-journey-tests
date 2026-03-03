@@ -12,6 +12,15 @@ inputs:
   cads-backend:
     required: false
     type: string
+  cads-environment:
+    required: false
+    type: string
+    default: local
+    options:
+      - local
+      - docker
+      - dev
+      - test
   test:
     description: "Choose Test Suite"
     type: choice
@@ -50,67 +59,10 @@ runs:
     - name: Start docker compose
       shell: bash
       run: |
+        if [[ "${{ inputs.cads-environment }}" == "docker" ]]; then
           docker compose -f compose.common.yml -f compose.ci.yml up --wait-timeout 300 -d --quiet-pull
           docker ps --format "table {{.Names}}\t{{.Ports}}"
-    - name: Inspect backend state
-      shell: bash
-      run: |
-        set -euxo pipefail
-        docker ps -a --format "table {{.Names}}\t{{.Status}}\t{{.Image}}"
-        docker inspect cads-journey-tests-cads-backend-1 --format \
-          'Status={{.State.Status}} Running={{.State.Running}} Restarting={{.State.Restarting}} ExitCode={{.State.ExitCode}} Health={{if .State.Health}}{{.State.Health.Status}}{{else}}none{{end}}'
-
-    - name: Backend logs (docker logs)
-      shell: bash
-      run: |
-        set -euxo pipefail
-        docker logs --tail=300 cads-journey-tests-cads-backend-1 || true
-
-    - name: Check what backend listens on inside container
-      shell: bash
-      run: |
-        set -euxo pipefail
-        docker exec cads-journey-tests-cads-backend-1 sh -lc '
-          echo "== env ==";
-          printenv | sort | sed -n "1,160p";
-          echo "== listeners ==";
-          (ss -lntp || netstat -lntp) 2>/dev/null || true;
-          echo "== curl inside container ==";
-          wget -qSO- http://127.0.0.1:80/ 2>&1 | head -n 40 || true;'
-    - name: Print backend /health response
-      shell: bash
-      run: |
-        set -euxo pipefail
-        echo "=== status + headers ==="
-        curl -i --max-time 10 http://127.0.0.1:5555/health || true
-        echo
-        echo "=== body only ==="
-        curl -sS --max-time 10 http://127.0.0.1:5555/health || true
-    - name: Dump backend connection-related env vars
-      shell: bash
-      run: |
-        set -euxo pipefail
-        docker exec cads-journey-tests-cads-backend-1 sh -lc '
-          echo "=== likely connection string env vars ==="
-          printenv | sort | egrep -i "connectionstring|connectionstrings|sql|postgres|db_|databaseurl|mongodb|mongo__|redis" || true
-        '
-    - name: Wait for backend health
-      shell: bash
-      run: |
-        set -euxo pipefail
-        for i in {1..90}; do
-          code=$(curl -s -o /dev/null -w "%{http_code}" http://127.0.0.1:5555/health || echo "000")
-          echo "health status: $code"
-          if [[ "$code" == "200" ]]; then
-            echo "Backend is healthy"
-            exit 0
-          fi
-          sleep 2
-        done
-
-        echo "Backend never became healthy"
-        curl -i http://127.0.0.1:5555/health || true
-        exit 1
+        fi
     - name: Run the tests
       shell: bash
       run: |
@@ -135,10 +87,10 @@ runs:
 
         if [[ -z "$FILTER" ]]; then
           echo "No filters provided. Running all tests..."
-          npx playwright test
+          NV=${{ inputs.cads-environment }} npx playwright test --config=playwright.config.ts
         else
           echo "Running filtered tests with grep: $FILTER"
-          npx playwright test --grep="$FILTER"
+          ENV=${{ inputs.cads-environment }} npx playwright test --config=playwright.config.ts --grep="$FILTER"
         fi
     - name: debug
       if: always()
