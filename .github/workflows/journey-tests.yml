@@ -6,38 +6,58 @@ permissions:
 
 on:
   workflow_dispatch:
-  workflow_call:
+    inputs:
+      cads-frontend:
+        description: "CADS frontend image tag"
+        required: false
+        type: string
+      cads-backend:
+        description: "CADS backend image tag"
+        required: false
+        type: string
+      cads-environment:
+        description: "Target environment"
+        required: false
+        type: choice
+        default: docker
+        options:
+          - local
+          - docker
+          - dev
+          - test
+      test:
+        description: "Choose Test Suite"
+        type: choice
+        required: true
+        options:
+          - API
+          - UI
+      tag:
+        description: "Choose Test Group"
+        type: choice
+        required: true
+        options:
+          - Smoke
+          - E2E
 
-inputs:
-  cads-frontend:
-    required: false
-    type: string
-  cads-backend:
-    required: false
-    type: string
-  cads-environment:
-    required: false
-    type: string
-    default: docker
-    options:
-      - local
-      - docker
-      - dev
-      - test
-  test:
-    description: "Choose Test Suite"
-    type: choice
-    required: true
-    options:
-      - API
-      - UI
-  tag:
-    description: "Choose Test Group"
-    type: choice
-    required: true
-    options:
-      - Smoke
-      - E2E  
+  workflow_call:
+    inputs:
+      cads-frontend:
+        required: false
+        type: string
+      cads-backend:
+        required: false
+        type: string
+      cads-environment:
+        required: false
+        type: string
+        default: docker
+      test:
+        required: true
+        type: string
+      tag:
+        required: true
+        type: string
 
 jobs:
   build:
