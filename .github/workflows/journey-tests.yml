@@ -7,9 +7,43 @@ permissions:
 on:
   workflow_dispatch:
   workflow_call:
+
+inputs:
+  cads-frontend:
+    required: false
+    type: string
+  cads-backend:
+    required: false
+    type: string
+  cads-environment:
+    required: false
+    type: string
+    default: docker
+    options:
+      - local
+      - docker
+      - dev
+      - test
+  test:
+    description: "Choose Test Suite"
+    type: choice
+    required: true
+    options:
+      - API
+      - UI
+  tag:
+    description: "Choose Test Group"
+    type: choice
+    required: true
+    options:
+      - Smoke
+      - E2E  
+
 jobs:
   build:
     name: Run Journey Tests
     runs-on: ubuntu-latest
     steps:
       - uses: DEFRA/cads-journey-tests/run-journey-tests@main
+        with:
+          cads-environment: ${{ inputs.cads-environment }}
