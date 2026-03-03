@@ -39,7 +39,24 @@ on:
         options:
           - Smoke
           - E2E
-
+  workflow_call:
+    inputs:
+      cads-frontend:
+        required: false
+        type: string
+      cads-backend:
+        required: false
+        type: string
+      cads-environment:
+        required: false
+        type: string
+        default: docker
+      test:
+        required: false
+        type: string
+      tag:
+        required: false
+        type: string
 jobs:
   build:
     name: Run Journey Tests
