@@ -1,42 +1,36 @@
 name: Run Journey Tests
 
-on:
-  workflow_dispatch:
-    permissions:
-      contents: read  
-  workflow_call:
-    inputs:
-      cads-frontend:
-        required: false
-        type: string
-      cads-backend:
-        required: false
-        type: string
-      cads-environment:
-        description: "Target environment"
-        required: true
-        type: choice
-        default: docker
-        options:
-          - local
-          - docker
-          - dev
-          - test
-      test:
-        description: "Choose Test Suite"
-        type: choice
-        required: true
-        options:
-          - API
-          - UI
-      tag:
-        description: "Choose Test Group"
-        type: choice
-        required: true
-        options:
-          - Smoke
-          - E2E    
-
+inputs:
+  cads-frontend:
+    required: false
+    type: string
+  cads-backend:
+    required: false
+    type: string
+  cads-environment:
+    description: "Target environment"
+    required: true
+    type: choice
+    default: docker
+    options:
+      - local
+      - docker
+      - dev
+      - test
+  test:
+    description: "Choose Test Suite"
+    type: choice
+    required: true
+    options:
+      - API
+      - UI
+  tag:
+    description: "Choose Test Group"
+    type: choice
+    required: true
+    options:
+      - Smoke
+      - E2E
 runs:
   using: "composite"
   steps:
