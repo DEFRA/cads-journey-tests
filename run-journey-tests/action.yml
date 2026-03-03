@@ -5,6 +5,28 @@ on:
     permissions:
       contents: read  
 
+inputs:
+  cads-frontend:
+    required: false
+    type: string
+  cads-backend:
+    required: false
+    type: string
+  test:
+    description: "Choose Test Suite"
+    type: choice
+    required: true
+    options:
+      - API
+      - UI
+  tag:
+    description: "Choose Test Group"
+    type: choice
+    required: true
+    options:
+      - Smoke
+      - E2E    
+
 runs:
   using: "composite"
   steps:
