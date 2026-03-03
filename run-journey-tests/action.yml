@@ -54,6 +54,8 @@ runs:
           fi
         fi
 
+        echo "Environment: ${{ inputs.cads-environment }}"
+
         if [[ -z "$FILTER" ]]; then
           echo "No filters provided. Running all tests..."
           ENV=${{ inputs.cads-environment }} npx playwright test --config=playwright.config.ts
