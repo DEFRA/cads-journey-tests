@@ -62,10 +62,6 @@ jobs:
     name: Run Journey Tests
     runs-on: ubuntu-latest
     steps:
-     - name: Start docker compose
-       shell: bash
-       run: |
-        echo "Environment1: ${{ github.inputs.cads-environment }}"
       - uses: DEFRA/cads-journey-tests/run-journey-tests@main
         with:
           cads-environment: ${{ github.event.inputs.cads-environment }}
