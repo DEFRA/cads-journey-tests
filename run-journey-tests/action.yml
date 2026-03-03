@@ -12,6 +12,16 @@ on:
       cads-backend:
         required: false
         type: string
+      cads-environment:
+        description: "Target environment"
+        required: true
+        type: choice
+        default: docker
+        options:
+          - local
+          - docker
+          - dev
+          - test
       test:
         description: "Choose Test Suite"
         type: choice
