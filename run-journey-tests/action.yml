@@ -15,7 +15,7 @@ inputs:
   cads-environment:
     required: false
     type: string
-    default: local
+    default: docker
     options:
       - local
       - docker
@@ -87,7 +87,7 @@ runs:
 
         if [[ -z "$FILTER" ]]; then
           echo "No filters provided. Running all tests..."
-          NV=${{ inputs.cads-environment }} npx playwright test --config=playwright.config.ts
+          ENV=${{ inputs.cads-environment }} npx playwright test --config=playwright.config.ts
         else
           echo "Running filtered tests with grep: $FILTER"
           ENV=${{ inputs.cads-environment }} npx playwright test --config=playwright.config.ts --grep="$FILTER"
