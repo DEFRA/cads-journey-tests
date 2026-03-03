@@ -31,6 +31,41 @@ inputs:
     options:
       - Smoke
       - E2E
+on:
+  workflow_dispatch:
+    inputs:
+      cads-frontend:
+        description: "CADS frontend image tag"
+        required: false
+        type: string
+      cads-backend:
+        description: "CADS backend image tag"
+        required: false
+        type: string
+      cads-environment:
+        description: "Target environment"
+        required: true
+        type: choice
+        default: docker
+        options:
+          - local
+          - docker
+          - dev
+          - test
+      test:
+        description: "Choose Test Suite"
+        type: choice
+        required: false
+        options:
+          - API
+          - UI
+      tag:
+        description: "Choose Test Group"
+        type: choice
+        required: false
+        options:
+          - Smoke
+          - E2E
 runs:
   using: "composite"
   steps:
