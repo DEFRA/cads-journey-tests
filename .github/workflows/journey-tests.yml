@@ -51,6 +51,6 @@ jobs:
         echo "Environment1: ${{ github.inputs.cads-environment }}"
       - uses: DEFRA/cads-journey-tests/run-journey-tests@main
         with:
-          cads-environment: ${{ github.inputs.cads-environment }}
-          test: ${{ github.inputs.test }}
-          tag: ${{ github.inputs.tag }}
+          cads-environment: ${{ github.event.inputs.cads-environment }}
+          test: ${{ github.event.inputs.test }}
+          tag: ${{ github.event.inputs.tag }}
