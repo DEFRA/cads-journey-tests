@@ -66,6 +66,6 @@ jobs:
     steps:
       - uses: DEFRA/cads-journey-tests/run-journey-tests@main
         with:
-          cads-environment: ${{ inputs.cads-environment }}
-          test: ${{ inputs.test }}
-          tag: ${{ inputs.tag }}
+          cads-environment: ${{ github.inputs.cads-environment }}
+          test: ${{ github.inputs.test }}
+          tag: ${{ github.inputs.tag }}
