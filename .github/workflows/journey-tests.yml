@@ -62,7 +62,7 @@ jobs:
     name: Run Journey Tests
     runs-on: ubuntu-latest
     steps:
-      - uses: DEFRA/cads-journey-tests/run-journey-tests@main
+      - uses: DEFRA/cads-journey-tests/run-journey-tests@environement_variables
         with:
           cads-environment: ${{ github.event.inputs.cads-environment }}
           test: ${{ github.event.inputs.test }}
