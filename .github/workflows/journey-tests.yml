@@ -31,6 +31,7 @@ on:
         description: "Choose Test Suite"
         type: choice
         required: false
+        default: ''
         options:
           - API
           - UI
@@ -38,6 +39,7 @@ on:
         description: "Choose Test Group"
         type: choice
         required: false
+        default: ''
         options:
           - Smoke
           - E2E
@@ -58,9 +60,11 @@ on:
       test:
         required: false
         type: string
+        default: ''
       tag:
         required: false
         type: string
+        default: ''
 jobs:
   build:
     name: Run Journey Tests

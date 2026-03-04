@@ -22,14 +22,16 @@ inputs:
   test:
     description: "Choose Test Suite"
     type: choice
-    required: true
+    required: false
+    default: ''
     options:
       - API
       - UI
   tag:
     description: "Choose Test Group"
     type: choice
-    required: true
+    required: false
+    default: ''
     options:
       - Smoke
       - E2E
@@ -60,6 +62,7 @@ on:
         description: "Choose Test Suite"
         type: choice
         required: false
+        default: ''
         options:
           - API
           - UI
@@ -67,6 +70,7 @@ on:
         description: "Choose Test Group"
         type: choice
         required: false
+        default: ''
         options:
           - Smoke
           - E2E
