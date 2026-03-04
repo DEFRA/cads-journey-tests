@@ -88,7 +88,7 @@ jobs:
     name: Run Journey Tests
     runs-on: ubuntu-latest
     steps:
-      - uses: ./run-journey-tests
+      - uses: DEFRA/cads-journey-tests/run-journey-tests@main
         with:
           dev-api-url:  ${{ inputs.dev-api-url  || vars.DEV_API_URL }}
           dev-ui-url:   ${{ inputs.dev-ui-url   || vars.DEV_UI_URL }}
