@@ -33,6 +33,7 @@ on:
         required: false
         default: ''
         options:
+          - ''
           - API
           - UI
       tag:
@@ -41,6 +42,7 @@ on:
         required: false
         default: ''
         options:
+          - ''
           - Smoke
           - E2E
   workflow_call:
