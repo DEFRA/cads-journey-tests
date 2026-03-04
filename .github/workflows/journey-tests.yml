@@ -73,9 +73,3 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: DEFRA/cads-journey-tests/run-journey-tests@main
-        with:
-          cads-environment: ${{ github.event.inputs.cads-environment }}
-          test: ${{ github.event.inputs.test }}
-          tag: ${{ github.event.inputs.tag }}
-          cads-frontend: ${{ github.event.inputs.cads-frontend }}
-          cads-backend: ${{ github.event.inputs.cads-backend }}
