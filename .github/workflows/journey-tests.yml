@@ -87,18 +87,6 @@ jobs:
   build:
     name: Run Journey Tests
     runs-on: ubuntu-latest
-    steps:
-      - name: Debug vars (workflow scope)
-        shell: bash
-        run: |
-          set -x
-          echo "repo=${{ github.repository }}"
-          echo "event=${{ github.event_name }}"
-          echo "DEV_API_URL=${{ vars.DEV_API_URL }}"
-          echo "DEV_UI_URL=${{ vars.DEV_UI_URL }}"
-          echo "TEST_API_URL=${{ vars.TEST_API_URL }}"
-          echo "TEST_UI_URL=${{ vars.TEST_UI_URL }}"
-          echo "SLACK_WEBHOOK_URL=${{ vars.SLACK_WEBHOOK_URL }}"
       - uses: DEFRA/cads-journey-tests/run-journey-tests@main
         with:
           dev-api-url:  ${{ (github.event_name == 'workflow_call' && inputs.dev-api-url)  || vars.DEV_API_URL }}
