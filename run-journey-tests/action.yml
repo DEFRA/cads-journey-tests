@@ -35,6 +35,10 @@ inputs:
     options:
       - Smoke
       - E2E
+  slack-webhook-url:
+    description: "Slack webhook URL for notifications"
+    required: false
+    type: string
 
 runs:
   using: "composite"
@@ -109,7 +113,7 @@ runs:
       shell: bash
       run: |
         BUILD_URL="Build URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}" \
-        node post-slack-report.mjs
+        SLACK_WEBHOOK_URL="${{ inputs.slack-webhook-url }}" node post-slack-report.mjs
     - name: Upload playwright report
       if: always()
       uses: actions/upload-artifact@v4
