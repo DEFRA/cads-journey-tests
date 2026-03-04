@@ -86,13 +86,21 @@ on:
 jobs:
   build:
     name: Debug repo vars (workflow scope)
-    run: |
-      echo "repo=${{ github.repository }}"
-      echo "branch=${{ github.ref_name }}"
-      echo "DEV_API_URL='${{ vars.DEV_API_URL }}'"
-      echo "DEV_UI_URL='${{ vars.DEV_UI_URL }}'"
-      echo "TEST_API_URL='${{ vars.TEST_API_URL }}'"
-      echo "TEST_UI_URL='${{ vars.TEST_UI_URL }}'"
+    runs-on: ubuntu-latest
+    steps:
+      - name: Debug repo vars
+        shell: bash
+        run: |
+          set -x
+          echo "repo=${{ github.repository }}"
+          echo "ref=${{ github.ref }}"
+          echo "ref_name=${{ github.ref_name }}"
+          echo "event=${{ github.event_name }}"
+          echo "DEV_API_URL=${{ vars.DEV_API_URL }}"
+          echo "DEV_UI_URL=${{ vars.DEV_UI_URL }}"
+          echo "TEST_API_URL=${{ vars.TEST_API_URL }}"
+          echo "TEST_UI_URL=${{ vars.TEST_UI_URL }}"
+          echo "SLACK_WEBHOOK_URL=${{ vars.SLACK_WEBHOOK_URL }}"
     name: Run Journey Tests
     runs-on: ubuntu-latest
     steps:
