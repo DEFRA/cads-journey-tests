@@ -45,6 +45,9 @@ on:
           - ''
           - Smoke
           - E2E
+    secrets:
+      SLACK_WEBHOOK_URL:
+        required: true
   workflow_call:
     inputs:
       cads-frontend:
