@@ -133,6 +133,7 @@ runs:
 
         if [[ -z "$FILTER" ]]; then
           echo "No filters provided. Running all tests..."
+          echo "Environment: ${{ inputs.cads-environment }}"
           ENV=${{ inputs.cads-environment }} npx playwright test --config=playwright.config.ts
         else
           echo "Running filtered tests with grep: $FILTER"
