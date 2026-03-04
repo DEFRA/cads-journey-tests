@@ -107,11 +107,14 @@ runs:
           docker compose -f compose.common.yml -f compose.ci.yml up --wait-timeout 300 -d --quiet-pull
           docker ps --format "table {{.Names}}\t{{.Ports}}"
         fi
+    - name: Install playwright browsers
+      shell: bash
+      run: |
+        echo "Installing playwright browsers for environment: ${{ inputs.cads-environment }}"
+        npx playwright install --with-deps
     - name: Run the tests
       shell: bash
       run: |
-        npx playwright install --with-deps
-
         TEST_INPUT="${{ inputs.test }}"
         TAG_INPUT="${{ inputs.tag }}"
 
@@ -129,11 +132,8 @@ runs:
           fi
         fi
 
-        echo "Environment: ${{ inputs.cads-environment }}"
-
         if [[ -z "$FILTER" ]]; then
           echo "No filters provided. Running all tests..."
-          echo "Environment: ${{ inputs.cads-environment }}"
           ENV=${{ inputs.cads-environment }} npx playwright test --config=playwright.config.ts
         else
           echo "Running filtered tests with grep: $FILTER"
