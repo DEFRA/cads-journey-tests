@@ -68,6 +68,21 @@ on:
         required: false
         type: string
         default: ''
+      dev-api-url:
+        required: false
+        type: string
+      dev-ui-url:
+        required: false
+        type: string
+      test-api-url:
+        required: false
+        type: string
+      test-ui-url:
+        required: false
+        type: string
+      slack-webhook-url:
+        required: false
+        type: string
 jobs:
   build:
     name: Run Journey Tests
@@ -75,8 +90,8 @@ jobs:
     steps:
       - uses: ./run-journey-tests
         with:
-          dev-api-url: ${{ vars.DEV_API_URL }}
-          dev-ui-url: ${{ vars.DEV_UI_URL }}
-          test-api-url: ${{ vars.TEST_API_URL }}
-          test-ui-url: ${{ vars.TEST_UI_URL }}
-          slack-webhook-url: ${{ vars.SLACK_WEBHOOK_URL }}
+          dev-api-url:  ${{ inputs.dev-api-url  || vars.DEV_API_URL }}
+          dev-ui-url:   ${{ inputs.dev-ui-url   || vars.DEV_UI_URL }}
+          test-api-url: ${{ inputs.test-api-url || vars.TEST_API_URL }}
+          test-ui-url:  ${{ inputs.test-ui-url  || vars.TEST_UI_URL }}
+          slack-webhook-url: ${{ inputs.slack-webhook-url || vars.SLACK_WEBHOOK_URL }}

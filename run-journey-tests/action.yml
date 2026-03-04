@@ -90,10 +90,14 @@ runs:
         TEST_API_URL: ${{ inputs.test-api-url }}
         TEST_UI_URL: ${{ inputs.test-ui-url }}
       run: |
-        echo "DEV_API_URL: $DEV_API_URL"
-        echo "DEV_UI_URL: $DEV_UI_URL"
-        echo "TEST_API_URL: $TEST_API_URL"
-        echo "TEST_UI_URL: $TEST_UI_URL"
+        echo "DEV_API_URL from vars: '${{ vars.DEV_API_URL }}'"
+        echo "DEV_UI_URL from vars: '${{ vars.DEV_UI_URL }}'"
+        echo "TEST_API_URL from vars: '${{ vars.TEST_API_URL }}'"
+        echo "TEST_UI_URL from vars: '${{ vars.TEST_UI_URL }}'"
+        echo "DEV_API_URL from inputs: '${{ inputs.dev-api-url }}'"
+        echo "DEV_UI_URL from inputs: '${{ inputs.dev-ui-url }}'"
+        echo "TEST_API_URL from inputs: '${{ inputs.test-api-url }}'"
+        echo "TEST_UI_URL from inputs: '${{ inputs.test-ui-url }}'"
         TEST_INPUT="${{ inputs.test }}"
         TAG_INPUT="${{ inputs.tag }}"
 
