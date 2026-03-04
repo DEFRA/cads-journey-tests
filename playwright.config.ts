@@ -53,7 +53,7 @@ export default defineConfig({
     [
       '@estruyf/github-actions-reporter',
       <GitHubActionOptions>{
-        title: 'My custom title',
+        title: 'Journey Tests on environment: ' + ENV,
         useDetails: true,
         showError: true
       }
