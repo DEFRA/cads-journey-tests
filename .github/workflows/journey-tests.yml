@@ -81,6 +81,5 @@ jobs:
       - name: Check Slack secret is present
         run: echo "Has SLACK_WEBHOOK_URL secret: ${{ secrets.SLACK_WEBHOOK_URL != '' }}"
       - uses: ./run-journey-tests
-        secrets: inherit
         with:
           slack-webhook-url: ${{ secrets.SLACK_WEBHOOK_URL }}
