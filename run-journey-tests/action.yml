@@ -112,9 +112,9 @@ runs:
     - name: Post Slack Report
       shell: bash
       run: |
-        echo "Slack webhook provided: ${{ inputs.slack-webhook-url != '' }}"
+        echo "Slack env webhook provided: ${{ env.SLACK_WEBHOOK_URL != '' }}"
         BUILD_URL="Build URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}" \
-        SLACK_WEBHOOK_URL="${{ inputs.slack-webhook-url }}" node post-slack-report.mjs
+        SLACK_WEBHOOK_URL="${{ env.SLACK_WEBHOOK_URL }}" node post-slack-report.mjs
     - name: Upload playwright report
       if: always()
       uses: actions/upload-artifact@v4
