@@ -93,6 +93,11 @@ jobs:
         
       - uses: ./run-journey-tests
         with:
+          cads-frontend: ${{ inputs.cads-frontend }}
+          cads-backend: ${{ inputs.cads-backend }}
+          cads-environment: ${{ inputs.cads-environment }}
+          test: ${{ inputs.test }}
+          tag: ${{ inputs.tag }}
           dev-api-url:  ${{ (github.event_name == 'workflow_call' && inputs.dev-api-url)  || vars.DEV_API_URL }}
           dev-ui-url:   ${{ (github.event_name == 'workflow_call' && inputs.dev-ui-url)   || vars.DEV_UI_URL }}
           test-api-url: ${{ (github.event_name == 'workflow_call' && inputs.test-api-url) || vars.TEST_API_URL }}
