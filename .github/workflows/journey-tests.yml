@@ -45,9 +45,7 @@ on:
           - ''
           - Smoke
           - E2E
-    secrets:
-      SLACK_WEBHOOK_URL:
-        required: true
+
   workflow_call:
     inputs:
       cads-frontend:
@@ -70,16 +68,15 @@ on:
         required: false
         type: string
         default: ''
-    secrets:
-      SLACK_WEBHOOK_URL:
-        required: true
 jobs:
   build:
     name: Run Journey Tests
     runs-on: ubuntu-latest
     steps:
-      - name: Check Slack secret is present
-        run: echo "Has SLACK_WEBHOOK_URL secret: ${{ secrets.SLACK_WEBHOOK_URL != '' }}"
       - uses: ./run-journey-tests
         with:
-          slack-webhook-url: ${{ secrets.SLACK_WEBHOOK_URL }}
+          dev-api-url: ${{ vars.DEV_API_URL }}
+          dev-ui-url: ${{ vars.DEV_UI_URL }}
+          test-api-url: ${{ vars.TEST_API_URL }}
+          test-ui-url: ${{ vars.TEST_UI_URL }}
+          slack-webhook-url: ${{ vars.SLACK_WEBHOOK_URL }}

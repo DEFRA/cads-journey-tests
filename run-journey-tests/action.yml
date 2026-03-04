@@ -35,10 +35,16 @@ inputs:
     options:
       - Smoke
       - E2E
-  slack-webhook-url:
-    description: "Slack webhook URL for notifications"
+  dev-api-url:
     required: false
-    type: string
+  dev-ui-url:
+    required: false
+  test-api-url:
+    required: false
+  test-ui-url:
+    required: false
+  slack-webhook-url:
+    required: false
 
 runs:
   using: "composite"
@@ -78,6 +84,11 @@ runs:
         npx playwright install --with-deps
     - name: Run the tests
       shell: bash
+      env:
+        DEV_API_URL: ${{ inputs.dev-api-url }}
+        DEV_UI_URL: ${{ inputs.dev-ui-url }}
+        TEST_API_URL: ${{ inputs.test-api-url }}
+        TEST_UI_URL: ${{ inputs.test-ui-url }}
       run: |
         TEST_INPUT="${{ inputs.test }}"
         TAG_INPUT="${{ inputs.tag }}"
