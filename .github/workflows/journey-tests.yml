@@ -87,10 +87,11 @@ jobs:
   build:
     name: Run Journey Tests
     runs-on: ubuntu-latest
-      - uses: DEFRA/cads-journey-tests/run-journey-tests@main
+    steps:
+      - uses: ./run-journey-tests
         with:
           dev-api-url:  ${{ (github.event_name == 'workflow_call' && inputs.dev-api-url)  || vars.DEV_API_URL }}
           dev-ui-url:   ${{ (github.event_name == 'workflow_call' && inputs.dev-ui-url)   || vars.DEV_UI_URL }}
           test-api-url: ${{ (github.event_name == 'workflow_call' && inputs.test-api-url) || vars.TEST_API_URL }}
           test-ui-url:  ${{ (github.event_name == 'workflow_call' && inputs.test-ui-url)  || vars.TEST_UI_URL }}
-          slack-webhook-url: ${{ (github.event_name == 'workflow_call' && inputs.slack-webhook-url) || vars.SLACK_WEBHOOK_URL }}
+          slack-webhook-url: ${{ secrets.SLACK_WEBHOOK_URL }}
