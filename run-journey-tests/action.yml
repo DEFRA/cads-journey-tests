@@ -90,6 +90,10 @@ runs:
         TEST_API_URL: ${{ inputs.test-api-url }}
         TEST_UI_URL: ${{ inputs.test-ui-url }}
       run: |
+        echo "DEV_API_URL: $DEV_API_URL"
+        echo "DEV_UI_URL: $DEV_UI_URL"
+        echo "TEST_API_URL: $TEST_API_URL"
+        echo "TEST_UI_URL: $TEST_UI_URL"
         TEST_INPUT="${{ inputs.test }}"
         TAG_INPUT="${{ inputs.tag }}"
 
