@@ -85,29 +85,24 @@ on:
         type: string
 jobs:
   build:
-    name: Debug repo vars (workflow scope)
+    name: Run Journey Tests
     runs-on: ubuntu-latest
     steps:
-      - name: Debug repo vars
+      - name: Debug vars (workflow scope)
         shell: bash
         run: |
           set -x
           echo "repo=${{ github.repository }}"
-          echo "ref=${{ github.ref }}"
-          echo "ref_name=${{ github.ref_name }}"
           echo "event=${{ github.event_name }}"
           echo "DEV_API_URL=${{ vars.DEV_API_URL }}"
           echo "DEV_UI_URL=${{ vars.DEV_UI_URL }}"
           echo "TEST_API_URL=${{ vars.TEST_API_URL }}"
           echo "TEST_UI_URL=${{ vars.TEST_UI_URL }}"
           echo "SLACK_WEBHOOK_URL=${{ vars.SLACK_WEBHOOK_URL }}"
-    name: Run Journey Tests
-    runs-on: ubuntu-latest
-    steps:
       - uses: DEFRA/cads-journey-tests/run-journey-tests@main
         with:
-          dev-api-url:  ${{ inputs.dev-api-url  || vars.DEV_API_URL }}
-          dev-ui-url:   ${{ inputs.dev-ui-url   || vars.DEV_UI_URL }}
-          test-api-url: ${{ inputs.test-api-url || vars.TEST_API_URL }}
-          test-ui-url:  ${{ inputs.test-ui-url  || vars.TEST_UI_URL }}
-          slack-webhook-url: ${{ inputs.slack-webhook-url || vars.SLACK_WEBHOOK_URL }}
+          dev-api-url:  ${{ (github.event_name == 'workflow_call' && inputs.dev-api-url)  || vars.DEV_API_URL }}
+          dev-ui-url:   ${{ (github.event_name == 'workflow_call' && inputs.dev-ui-url)   || vars.DEV_UI_URL }}
+          test-api-url: ${{ (github.event_name == 'workflow_call' && inputs.test-api-url) || vars.TEST_API_URL }}
+          test-ui-url:  ${{ (github.event_name == 'workflow_call' && inputs.test-ui-url)  || vars.TEST_UI_URL }}
+          slack-webhook-url: ${{ (github.event_name == 'workflow_call' && inputs.slack-webhook-url) || vars.SLACK_WEBHOOK_URL }}
