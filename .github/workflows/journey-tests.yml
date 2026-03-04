@@ -67,6 +67,9 @@ on:
         required: false
         type: string
         default: ''
+    secrets:
+      SLACK_WEBHOOK_URL:
+        required: true
 jobs:
   build:
     name: Run Journey Tests
