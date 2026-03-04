@@ -4,9 +4,11 @@ inputs:
   cads-frontend:
     required: false
     type: string
+    default: latest
   cads-backend:
     required: false
     type: string
+    default: latest
   cads-environment:
     description: "Target environment"
     required: true
@@ -38,10 +40,12 @@ on:
         description: "CADS frontend image tag"
         required: false
         type: string
+        default: latest
       cads-backend:
         description: "CADS backend image tag"
         required: false
         type: string
+        default: latest
       cads-environment:
         description: "Target environment"
         required: true
@@ -90,6 +94,10 @@ runs:
       shell: bash
       run: |
         if [[ "${{ inputs.cads-environment }}" == "docker" ]]; then
+          export CADS_FRONTEND_VERSION="${{ inputs.cads-frontend }}"
+          export CADS_BACKEND_VERSION="${{ inputs.cads-backend }}"
+          echo "CADS_FRONTEND_VERSION: $CADS_FRONTEND_VERSION"
+          echo "CADS_BACKEND_VERSION: $CADS_BACKEND_VERSION"
           docker compose -f compose.common.yml -f compose.ci.yml up --wait-timeout 300 -d --quiet-pull
           docker ps --format "table {{.Names}}\t{{.Ports}}"
         fi

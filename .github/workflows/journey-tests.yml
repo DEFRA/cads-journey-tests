@@ -11,10 +11,12 @@ on:
         description: "CADS frontend image tag"
         required: false
         type: string
+        default: latest
       cads-backend:
         description: "CADS backend image tag"
         required: false
         type: string
+        default: latest
       cads-environment:
         description: "Target environment"
         required: true
@@ -44,9 +46,11 @@ on:
       cads-frontend:
         required: false
         type: string
+        default: latest
       cads-backend:
         required: false
         type: string
+        default: latest
       cads-environment:
         required: false
         type: string
@@ -67,3 +71,5 @@ jobs:
           cads-environment: ${{ github.event.inputs.cads-environment }}
           test: ${{ github.event.inputs.test }}
           tag: ${{ github.event.inputs.tag }}
+          cads-frontend: ${{ github.event.inputs.cads-frontend }}
+          cads-backend: ${{ github.event.inputs.cads-backend }}
