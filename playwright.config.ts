@@ -8,12 +8,20 @@ const ENV = process.env.ENV ?? 'local'
 const isLocal = ENV === 'local'
 const configByEnv = {
   local: {
+    ui: 'http://localhost:3000',
+    api: 'http://localhost:5555'
+  },
+  docker: {
     ui: 'http://127.0.0.1:3000',
     api: 'http://127.0.0.1:5555'
   },
   dev: {
-    ui: 'DEV_URL',
-    api: 'DEV_URL'
+    ui: process.env.DEV_UI_URL,
+    api: process.env.DEV_API_URL
+  },
+  test: {
+    ui: process.env.TEST_UI_URL,
+    api: process.env.TEST_API_URL
   }
 }
 const { ui, api } = configByEnv[ENV as keyof typeof configByEnv]
@@ -45,7 +53,7 @@ export default defineConfig({
     [
       '@estruyf/github-actions-reporter',
       <GitHubActionOptions>{
-        title: 'My custom title',
+        title: 'Journey Tests on environment: ' + ENV,
         useDetails: true,
         showError: true
       }

@@ -65,7 +65,7 @@ services:
   ################################################################################
 
   cads-frontend:
-    image: defradigital/cads-mis:latest
+    image: defradigital/cads-mis:${CADS_FRONTEND_VERSION:-latest}
     ports:
       - "3000:3000"
     depends_on:
@@ -77,7 +77,7 @@ services:
   ################################################################################
   
   cads-backend:
-    image: defradigital/cads-data-service:0.113.0
+    image: defradigital/cads-data-service:${CADS_BACKEND_VERSION:-latest}
     ports:
       - "5555:5555"
     depends_on:

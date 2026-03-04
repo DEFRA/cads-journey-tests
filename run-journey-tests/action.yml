@@ -1,31 +1,50 @@
 name: Run Journey Tests
 
-on:
-  workflow_dispatch:
-    permissions:
-      contents: read
-
 inputs:
   cads-frontend:
     required: false
     type: string
+    default: latest
   cads-backend:
     required: false
     type: string
+    default: latest
+  cads-environment:
+    description: "Target environment"
+    required: true
+    type: choice
+    default: docker
+    options:
+      - local
+      - docker
+      - dev
+      - test
   test:
     description: "Choose Test Suite"
     type: choice
-    required: true
+    required: false
+    default: ''
     options:
       - API
       - UI
   tag:
     description: "Choose Test Group"
     type: choice
-    required: true
+    required: false
+    default: ''
     options:
       - Smoke
-      - E2E    
+      - E2E
+  dev-api-url:
+    required: false
+  dev-ui-url:
+    required: false
+  test-api-url:
+    required: false
+  test-ui-url:
+    required: false
+  slack-webhook-url:
+    required: false
 
 runs:
   using: "composite"
@@ -50,72 +69,35 @@ runs:
     - name: Start docker compose
       shell: bash
       run: |
+        if [[ "${{ inputs.cads-environment }}" == "docker" ]]; then
+          export CADS_FRONTEND_VERSION="${{ inputs.cads-frontend }}"
+          export CADS_BACKEND_VERSION="${{ inputs.cads-backend }}"
+          echo "CADS_FRONTEND_VERSION: $CADS_FRONTEND_VERSION"
+          echo "CADS_BACKEND_VERSION: $CADS_BACKEND_VERSION"
           docker compose -f compose.common.yml -f compose.ci.yml up --wait-timeout 300 -d --quiet-pull
           docker ps --format "table {{.Names}}\t{{.Ports}}"
-    - name: Inspect backend state
+        fi
+    - name: Install playwright browsers
       shell: bash
       run: |
-        set -euxo pipefail
-        docker ps -a --format "table {{.Names}}\t{{.Status}}\t{{.Image}}"
-        docker inspect cads-journey-tests-cads-backend-1 --format \
-          'Status={{.State.Status}} Running={{.State.Running}} Restarting={{.State.Restarting}} ExitCode={{.State.ExitCode}} Health={{if .State.Health}}{{.State.Health.Status}}{{else}}none{{end}}'
-
-    - name: Backend logs (docker logs)
-      shell: bash
-      run: |
-        set -euxo pipefail
-        docker logs --tail=300 cads-journey-tests-cads-backend-1 || true
-
-    - name: Check what backend listens on inside container
-      shell: bash
-      run: |
-        set -euxo pipefail
-        docker exec cads-journey-tests-cads-backend-1 sh -lc '
-          echo "== env ==";
-          printenv | sort | sed -n "1,160p";
-          echo "== listeners ==";
-          (ss -lntp || netstat -lntp) 2>/dev/null || true;
-          echo "== curl inside container ==";
-          wget -qSO- http://127.0.0.1:80/ 2>&1 | head -n 40 || true;'
-    - name: Print backend /health response
-      shell: bash
-      run: |
-        set -euxo pipefail
-        echo "=== status + headers ==="
-        curl -i --max-time 10 http://127.0.0.1:5555/health || true
-        echo
-        echo "=== body only ==="
-        curl -sS --max-time 10 http://127.0.0.1:5555/health || true
-    - name: Dump backend connection-related env vars
-      shell: bash
-      run: |
-        set -euxo pipefail
-        docker exec cads-journey-tests-cads-backend-1 sh -lc '
-          echo "=== likely connection string env vars ==="
-          printenv | sort | egrep -i "connectionstring|connectionstrings|sql|postgres|db_|databaseurl|mongodb|mongo__|redis" || true
-        '
-    - name: Wait for backend health
-      shell: bash
-      run: |
-        set -euxo pipefail
-        for i in {1..90}; do
-          code=$(curl -s -o /dev/null -w "%{http_code}" http://127.0.0.1:5555/health || echo "000")
-          echo "health status: $code"
-          if [[ "$code" == "200" ]]; then
-            echo "Backend is healthy"
-            exit 0
-          fi
-          sleep 2
-        done
-
-        echo "Backend never became healthy"
-        curl -i http://127.0.0.1:5555/health || true
-        exit 1
+        echo "Installing playwright browsers for environment: ${{ inputs.cads-environment }}"
+        npx playwright install --with-deps
     - name: Run the tests
       shell: bash
+      env:
+        DEV_API_URL: ${{ inputs.dev-api-url }}
+        DEV_UI_URL: ${{ inputs.dev-ui-url }}
+        TEST_API_URL: ${{ inputs.test-api-url }}
+        TEST_UI_URL: ${{ inputs.test-ui-url }}
       run: |
-        npx playwright install --with-deps
-
+        echo "DEV_API_URL from vars: '${{ vars.DEV_API_URL }}'"
+        echo "DEV_UI_URL from vars: '${{ vars.DEV_UI_URL }}'"
+        echo "TEST_API_URL from vars: '${{ vars.TEST_API_URL }}'"
+        echo "TEST_UI_URL from vars: '${{ vars.TEST_UI_URL }}'"
+        echo "DEV_API_URL from inputs: '${{ inputs.dev-api-url }}'"
+        echo "DEV_UI_URL from inputs: '${{ inputs.dev-ui-url }}'"
+        echo "TEST_API_URL from inputs: '${{ inputs.test-api-url }}'"
+        echo "TEST_UI_URL from inputs: '${{ inputs.test-ui-url }}'"
         TEST_INPUT="${{ inputs.test }}"
         TAG_INPUT="${{ inputs.tag }}"
 
@@ -134,11 +116,11 @@ runs:
         fi
 
         if [[ -z "$FILTER" ]]; then
-          echo "No filters provided. Running all tests..."
-          npx playwright test
+          echo "No filters provided. Running all tests for environment: ${{ inputs.cads-environment }}"
+          ENV=${{ inputs.cads-environment }} npx playwright test --config=playwright.config.ts
         else
           echo "Running filtered tests with grep: $FILTER"
-          npx playwright test --grep="$FILTER"
+          ENV=${{ inputs.cads-environment }} npx playwright test --config=playwright.config.ts --grep="$FILTER"
         fi
     - name: debug
       if: always()
@@ -146,16 +128,24 @@ runs:
       run: |
         docker compose -f compose.common.yml -f compose.ci.yml logs > logs.txt
         docker ps
-    #- name: Post Slack Report
-    #  shell: bash
-    #  run: |
-    #    BUILD_URL="Build URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}" \
-    #    node post-slack-report.ts
+    - name: Post Slack Report
+      if: always()
+      shell: bash
+      env:
+        SLACK_WEBHOOK_URL: ${{ inputs.slack-webhook-url }}
+        BUILD_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+      run: |
+        echo "Slack env webhook provided: $([[ -n "$SLACK_WEBHOOK_URL" ]] && echo true || echo false)"
+        if [[ -z "$SLACK_WEBHOOK_URL" ]]; then
+          echo "SLACK_WEBHOOK_URL not set; skipping Slack"
+          exit 0
+        fi
+        node post-slack-report.mjs
     - name: Upload playwright report
       if: always()
       uses: actions/upload-artifact@v4
       with:
-        name: allure-report
+        name: playwright report
         path: ./playwright-report/html
     - name: Upload docker compose logs
       if: always()

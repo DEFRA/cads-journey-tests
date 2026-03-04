@@ -6,10 +6,91 @@ permissions:
 
 on:
   workflow_dispatch:
+    inputs:
+      cads-frontend:
+        description: "CADS frontend image tag"
+        required: false
+        type: string
+        default: latest
+      cads-backend:
+        description: "CADS backend image tag"
+        required: false
+        type: string
+        default: latest
+      cads-environment:
+        description: "Target environment"
+        required: true
+        type: choice
+        default: docker
+        options:
+          - local
+          - docker
+          - dev
+          - test
+      test:
+        description: "Choose Test Suite"
+        type: choice
+        required: false
+        default: ''
+        options:
+          - ''
+          - API
+          - UI
+      tag:
+        description: "Choose Test Group"
+        type: choice
+        required: false
+        default: ''
+        options:
+          - ''
+          - Smoke
+          - E2E
+
   workflow_call:
+    inputs:
+      cads-frontend:
+        required: false
+        type: string
+        default: latest
+      cads-backend:
+        required: false
+        type: string
+        default: latest
+      cads-environment:
+        required: false
+        type: string
+        default: docker
+      test:
+        required: false
+        type: string
+        default: ''
+      tag:
+        required: false
+        type: string
+        default: ''
+      dev-api-url:
+        required: false
+        type: string
+      dev-ui-url:
+        required: false
+        type: string
+      test-api-url:
+        required: false
+        type: string
+      test-ui-url:
+        required: false
+        type: string
+      slack-webhook-url:
+        required: false
+        type: string
 jobs:
   build:
     name: Run Journey Tests
     runs-on: ubuntu-latest
-    steps:
       - uses: DEFRA/cads-journey-tests/run-journey-tests@main
+        with:
+          dev-api-url:  ${{ (github.event_name == 'workflow_call' && inputs.dev-api-url)  || vars.DEV_API_URL }}
+          dev-ui-url:   ${{ (github.event_name == 'workflow_call' && inputs.dev-ui-url)   || vars.DEV_UI_URL }}
+          test-api-url: ${{ (github.event_name == 'workflow_call' && inputs.test-api-url) || vars.TEST_API_URL }}
+          test-ui-url:  ${{ (github.event_name == 'workflow_call' && inputs.test-ui-url)  || vars.TEST_UI_URL }}
+          slack-webhook-url: ${{ (github.event_name == 'workflow_call' && inputs.slack-webhook-url) || vars.SLACK_WEBHOOK_URL }}
