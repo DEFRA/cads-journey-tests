@@ -85,6 +85,14 @@ on:
         type: string
 jobs:
   build:
+    name: Debug repo vars (workflow scope)
+    run: |
+      echo "repo=${{ github.repository }}"
+      echo "branch=${{ github.ref_name }}"
+      echo "DEV_API_URL='${{ vars.DEV_API_URL }}'"
+      echo "DEV_UI_URL='${{ vars.DEV_UI_URL }}'"
+      echo "TEST_API_URL='${{ vars.TEST_API_URL }}'"
+      echo "TEST_UI_URL='${{ vars.TEST_UI_URL }}'"
     name: Run Journey Tests
     runs-on: ubuntu-latest
     steps:
