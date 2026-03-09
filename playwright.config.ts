@@ -6,7 +6,6 @@ import type { GitHubActionOptions } from '@estruyf/github-actions-reporter'
 
 const ENV = process.env.ENVIRONMENT ?? 'local'
 const isLocal = ENV === 'local'
-const isCI = !!process.env.CI
 
 const configByEnv = {
   local: {
@@ -54,7 +53,7 @@ export default defineConfig({
       'html',
       {
         outputFolder: 'playwright-report/html',
-        open: isCI ? 'never' : 'on-failure'
+        open: 'never'
       }
     ],
     ['json', { outputFile: 'playwright-report/results.json' }],
