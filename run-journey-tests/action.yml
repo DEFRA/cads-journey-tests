@@ -117,10 +117,10 @@ runs:
 
         if [[ -z "$FILTER" ]]; then
           echo "No filters provided. Running all tests for environment: ${{ inputs.cads-environment }}"
-          ENV=${{ inputs.cads-environment }} npx playwright test --config=playwright.config.ts
+          ENVIRONMENT=${{ inputs.cads-environment }} npx playwright test --config=playwright.config.ts
         else
           echo "Running filtered tests with grep: $FILTER"
-          ENV=${{ inputs.cads-environment }} npx playwright test --config=playwright.config.ts --grep="$FILTER"
+          ENVIRONMENT=${{ inputs.cads-environment }} npx playwright test --config=playwright.config.ts --grep="$FILTER"
         fi
     - name: debug
       if: always()

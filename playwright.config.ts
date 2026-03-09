@@ -16,12 +16,12 @@ const configByEnv = {
     api: 'http://127.0.0.1:5555'
   },
   dev: {
-    ui: process.env.DEV_UI_URL,
-    api: process.env.DEV_API_URL
+    ui: 'https://cads-mis.dev.cdp-int.defra.cloud',
+    api: 'https://cads-data-service.dev.cdp-int.defra.cloud'
   },
   test: {
-    ui: process.env.TEST_UI_URL,
-    api: process.env.TEST_API_URL
+    ui: 'https://cads-mis.test.cdp-int.defra.cloud',
+    api: 'https://cads-data-service.test.cdp-int.defra.cloud'
   }
 }
 const { ui, api } = configByEnv[ENV as keyof typeof configByEnv]

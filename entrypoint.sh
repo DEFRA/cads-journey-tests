@@ -1,7 +1,28 @@
 #!/bin/sh
 
 echo "run_id: $RUN_ID"
-npm test
+
+# Pick up values from environment variables provided at container runtime.
+# EXPECTED ENV VARS:
+# - TEST_INPUT: optional test suite filter (e.g. "API" or "UI")
+# - ENVIRONMENT: target environment (e.g. "docker", "dev", "test")
+
+TEST_INPUT="${PROFILE}"
+ENVIRONMENT="${ENVIRONMENT}"
+
+FILTER=""
+
+if [ -n "$TEST_INPUT" ]; then
+  FILTER="$TEST_INPUT"
+fi
+
+if [ -z "$FILTER" ]; then
+  echo "No filters provided. Running all tests for environment: $ENVIRONMENT"
+  ENVIRONMENT="$ENVIRONMENT" npx playwright test --config=playwright.config.ts
+else
+  echo "Running filtered tests with grep: $FILTER"
+  ENVIRONMENT="$ENVIRONMENT" npx playwright test --config=playwright.config.ts --grep="$FILTER"
+fi
 
 npm run report:publish
 publish_exit_code=$?
