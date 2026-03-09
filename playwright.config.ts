@@ -4,7 +4,7 @@ import type { GitHubActionOptions } from '@estruyf/github-actions-reporter'
 // Set Environment
 // process.env.ENV = 'dev'
 
-const ENV = process.env.ENV ?? 'local'
+const ENV = process.env.ENVIRONMENT ?? 'local'
 const isLocal = ENV === 'local'
 const configByEnv = {
   local: {
