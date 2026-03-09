@@ -49,13 +49,6 @@ export default defineConfig({
   // Reporter to use
   reporter: [
     ['list'], // CLI console output
-    [
-      'html',
-      {
-        outputFolder: 'playwright-report/html',
-        open: 'never'
-      }
-    ],
     ['json', { outputFile: 'playwright-report/results.json' }],
     ['allure-playwright', { reportDir: 'allure-report' }],
     [
