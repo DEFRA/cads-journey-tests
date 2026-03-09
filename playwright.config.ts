@@ -17,11 +17,11 @@ const configByEnv = {
   },
   dev: {
     ui: 'https://cads-mis.dev.cdp-int.defra.cloud',
-    api: 'https://cads-data-service.dev.cdp-int.defra.cloud'
+    api: 'https://ephemeral-protected.api.dev.cdp-int.defra.cloud/cads-data-service'
   },
   test: {
     ui: 'https://cads-mis.test.cdp-int.defra.cloud',
-    api: 'https://cads-data-service.test.cdp-int.defra.cloud'
+    api: 'https://ephemeral-protected.api.test.cdp-int.defra.cloud/cads-data-service'
   }
 }
 const { ui, api } = configByEnv[ENV as keyof typeof configByEnv]
