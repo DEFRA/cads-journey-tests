@@ -6,6 +6,8 @@ import type { GitHubActionOptions } from '@estruyf/github-actions-reporter'
 
 const ENV = process.env.ENVIRONMENT ?? 'local'
 const isLocal = ENV === 'local'
+const isCI = !!process.env.CI
+
 const configByEnv = {
   local: {
     ui: 'http://localhost:3000',
@@ -48,8 +50,15 @@ export default defineConfig({
   // Reporter to use
   reporter: [
     ['list'], // CLI console output
-    ['html', { outputFolder: 'playwright-report/html' }],
+    [
+      'html',
+      {
+        outputFolder: 'playwright-report/html',
+        open: isCI ? 'never' : 'on-failure'
+      }
+    ],
     ['json', { outputFile: 'playwright-report/results.json' }],
+    ['allure-playwright', { reportDir: 'allure-report' }],
     [
       '@estruyf/github-actions-reporter',
       <GitHubActionOptions>{
