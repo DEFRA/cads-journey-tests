@@ -18,16 +18,17 @@ const configByEnv = {
   },
   dev: {
     ui: 'https://cads-mis.dev.cdp-int.defra.cloud',
-    api: 'https://ephemeral-protected.api.dev.cdp-int.defra.cloud/cads-data-service'
+    api: 'https://cads-data-service.dev.cdp-int.defra.cloud'
   },
   test: {
     ui: 'https://cads-mis.test.cdp-int.defra.cloud',
-    api: 'https://ephemeral-protected.api.test.cdp-int.defra.cloud/cads-data-service'
+    api: 'https://cads-data-service.test.cdp-int.defra.cloud'
   }
 }
 const { ui, api } = configByEnv[ENV as keyof typeof configByEnv]
 process.env.apiURL = api
 process.env.apiKey = !process.env.CI && ENV === 'dev' ? 'API_KEY' : undefined
+const isCDPEnvironment = ENV === 'dev' || ENV === 'test'
 
 export default defineConfig({
   // Look for test files in the "tests" directory, relative to this configuration file.
@@ -49,6 +50,13 @@ export default defineConfig({
   // Reporter to use
   reporter: [
     ['list'], // CLI console output
+    [
+      'html',
+      {
+        outputFolder: 'playwright-report/html',
+        open: isCDPEnvironment ? 'never' : 'on-failure'
+      }
+    ],
     ['json', { outputFile: 'playwright-report/results.json' }],
     ['allure-playwright', { reportDir: 'allure-report' }],
     [
