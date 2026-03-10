@@ -17,16 +17,6 @@ on:
         required: false
         type: string
         default: latest
-      cads-environment:
-        description: "Target environment"
-        required: true
-        type: choice
-        default: docker
-        options:
-          - local
-          - docker
-          - dev
-          - test
       test:
         description: "Choose Test Suite"
         type: choice
@@ -56,10 +46,6 @@ on:
         required: false
         type: string
         default: latest
-      cads-environment:
-        required: false
-        type: string
-        default: docker
       test:
         required: false
         type: string
@@ -68,18 +54,6 @@ on:
         required: false
         type: string
         default: ''
-      dev-api-url:
-        required: false
-        type: string
-      dev-ui-url:
-        required: false
-        type: string
-      test-api-url:
-        required: false
-        type: string
-      test-ui-url:
-        required: false
-        type: string
       slack-webhook-url:
         required: false
         type: string
@@ -95,11 +69,6 @@ jobs:
         with:
           cads-frontend: ${{ inputs.cads-frontend }}
           cads-backend: ${{ inputs.cads-backend }}
-          cads-environment: ${{ inputs.cads-environment }}
           test: ${{ inputs.test }}
           tag: ${{ inputs.tag }}
-          dev-api-url:  ${{ (github.event_name == 'workflow_call' && inputs.dev-api-url)  || vars.DEV_API_URL }}
-          dev-ui-url:   ${{ (github.event_name == 'workflow_call' && inputs.dev-ui-url)   || vars.DEV_UI_URL }}
-          test-api-url: ${{ (github.event_name == 'workflow_call' && inputs.test-api-url) || vars.TEST_API_URL }}
-          test-ui-url:  ${{ (github.event_name == 'workflow_call' && inputs.test-ui-url)  || vars.TEST_UI_URL }}
           slack-webhook-url: ${{ secrets.SLACK_WEBHOOK_URL }}
