@@ -2,7 +2,7 @@ import { defineConfig, devices } from '@playwright/test'
 import type { GitHubActionOptions } from '@estruyf/github-actions-reporter'
 
 // Set Environment
-// process.env.ENV = 'dev'
+// process.env.ENVIRONMENT = 'dev'
 
 const ENV = process.env.ENVIRONMENT ?? 'local'
 const isLocal = ENV === 'local'

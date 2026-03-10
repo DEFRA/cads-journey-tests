@@ -32,10 +32,6 @@ export abstract class BaseClient {
     statusCode: StatusCodes,
     options?: object
   ) {
-    if (process.env.apiKey !== 'undefined') {
-      const apiKeyOptions = this.prepareRemoteRequest(options)
-      options = apiKeyOptions
-    }
     const response = await this.apiContext.get(url, options)
     expect(response.status()).toEqual(statusCode)
     return (await response.json()) as T
