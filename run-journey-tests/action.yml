@@ -9,16 +9,6 @@ inputs:
     required: false
     type: string
     default: latest
-  cads-environment:
-    description: "Target environment"
-    required: true
-    type: choice
-    default: docker
-    options:
-      - local
-      - docker
-      - dev
-      - test
   test:
     description: "Choose Test Suite"
     type: choice
