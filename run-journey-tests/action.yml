@@ -61,18 +61,18 @@ runs:
     - name: Start docker compose
       shell: bash
       run: |
-        if [[ "${{ inputs.cads-environment }}" == "docker" ]]; then
-          export CADS_FRONTEND_VERSION="${{ inputs.cads-frontend }}"
-          export CADS_BACKEND_VERSION="${{ inputs.cads-backend }}"
-          echo "CADS_FRONTEND_VERSION: $CADS_FRONTEND_VERSION"
-          echo "CADS_BACKEND_VERSION: $CADS_BACKEND_VERSION"
-          docker compose -f compose.common.yml -f compose.ci.yml up --wait-timeout 300 -d --quiet-pull
-          docker ps --format "table {{.Names}}\t{{.Ports}}"
-        fi
+        echo "Starting docker compose"
+        export CADS_FRONTEND_VERSION="${{ inputs.cads-frontend }}"
+        export CADS_BACKEND_VERSION="${{ inputs.cads-backend }}"
+        echo "CADS_FRONTEND_VERSION: $CADS_FRONTEND_VERSION"
+        echo "CADS_BACKEND_VERSION: $CADS_BACKEND_VERSION"
+        docker compose -f compose.common.yml -f compose.ci.yml up --wait-timeout 300 -d --quiet-pull
+        docker ps --format "table {{.Names}}\t{{.Ports}}"
+
     - name: Install playwright browsers
       shell: bash
       run: |
-        echo "Installing playwright browsers for environment: ${{ inputs.cads-environment }}"
+        echo "Installing playwright browsers"
         npx playwright install --with-deps
     - name: Run the tests
       shell: bash
