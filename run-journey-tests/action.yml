@@ -9,6 +9,16 @@ inputs:
     required: false
     type: string
     default: latest
+  cads-environment:
+    description: "Target environment"
+    required: true
+    type: choice
+    default: docker
+    options:
+      - local
+      - docker
+      - dev
+      - test
   test:
     description: "Choose Test Suite"
     type: choice
@@ -25,6 +35,14 @@ inputs:
     options:
       - Smoke
       - E2E
+  dev-api-url:
+    required: false
+  dev-ui-url:
+    required: false
+  test-api-url:
+    required: false
+  test-ui-url:
+    required: false
   slack-webhook-url:
     required: false
 
@@ -51,22 +69,36 @@ runs:
     - name: Start docker compose
       shell: bash
       run: |
-        echo "Starting docker compose"
-        export CADS_FRONTEND_VERSION="${{ inputs.cads-frontend }}"
-        export CADS_BACKEND_VERSION="${{ inputs.cads-backend }}"
-        echo "CADS_FRONTEND_VERSION: $CADS_FRONTEND_VERSION"
-        echo "CADS_BACKEND_VERSION: $CADS_BACKEND_VERSION"
-        docker compose -f compose.common.yml -f compose.ci.yml up --wait-timeout 300 -d --quiet-pull
-        docker ps --format "table {{.Names}}\t{{.Ports}}"
+        if [[ "${{ inputs.cads-environment }}" == "docker" ]]; then
+          export CADS_FRONTEND_VERSION="${{ inputs.cads-frontend }}"
+          export CADS_BACKEND_VERSION="${{ inputs.cads-backend }}"
+          echo "CADS_FRONTEND_VERSION: $CADS_FRONTEND_VERSION"
+          echo "CADS_BACKEND_VERSION: $CADS_BACKEND_VERSION"
+          docker compose -f compose.common.yml -f compose.ci.yml up --wait-timeout 300 -d --quiet-pull
+          docker ps --format "table {{.Names}}\t{{.Ports}}"
+        fi
 
     - name: Install playwright browsers
       shell: bash
       run: |
-        echo "Installing playwright browsers"
+        echo "Installing playwright browsers for environment: ${{ inputs.cads-environment }}"
         npx playwright install --with-deps
     - name: Run the tests
       shell: bash
+      env:
+        DEV_API_URL: ${{ inputs.dev-api-url }}
+        DEV_UI_URL: ${{ inputs.dev-ui-url }}
+        TEST_API_URL: ${{ inputs.test-api-url }}
+        TEST_UI_URL: ${{ inputs.test-ui-url }}
       run: |
+        echo "DEV_API_URL from vars: '${{ vars.DEV_API_URL }}'"
+        echo "DEV_UI_URL from vars: '${{ vars.DEV_UI_URL }}'"
+        echo "TEST_API_URL from vars: '${{ vars.TEST_API_URL }}'"
+        echo "TEST_UI_URL from vars: '${{ vars.TEST_UI_URL }}'"
+        echo "DEV_API_URL from inputs: '${{ inputs.dev-api-url }}'"
+        echo "DEV_UI_URL from inputs: '${{ inputs.dev-ui-url }}'"
+        echo "TEST_API_URL from inputs: '${{ inputs.test-api-url }}'"
+        echo "TEST_UI_URL from inputs: '${{ inputs.test-ui-url }}'"
         TEST_INPUT="${{ inputs.test }}"
         TAG_INPUT="${{ inputs.tag }}"
 
@@ -85,10 +117,10 @@ runs:
         fi
 
         if [[ -z "$FILTER" ]]; then
-          echo "No filters provided. Running all tests"
+          echo "No filters provided. Running all tests for environment: ${{ inputs.cads-environment }}"
           ENVIRONMENT=docker npx playwright test --config=playwright.config.ts
         else
-          echo "Running filtered tests with grep: $FILTER"
+          ENVIRONMENT=${{ inputs.cads-environment }} npx playwright test --config=playwright.config.ts --grep="$FILTER"
           ENVIRONMENT=docker npx playwright test --config=playwright.config.ts --grep="$FILTER"
         fi
     - name: debug
