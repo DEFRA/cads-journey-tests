@@ -9,22 +9,29 @@ export abstract class BaseClient {
   }
 
   // eslint-disable-next-line
-  private prepareRemoteRequest(options?: any) {
-    if (options !== undefined && options !== null) {
-      if (!options.headers) {
-        options.headers = {}
-      }
-      options.headers['Content-Type'] = 'application/json'
-      options.headers['x-api-key'] = process.env.apiKey
-    } else {
-      options = {
-        headers: {
-          'Content-Type': 'application/json',
-          'x-api-key': process.env.apiKey
+  private prepareRemoteRequest(url: string, options?: any) {
+    if (process.env.apiKey !== 'undefined' && process.env.CDP === undefined) {
+      if (options !== undefined && options !== null) {
+        if (!options.headers) {
+          options.headers = {}
+        }
+        options.headers['Content-Type'] = 'application/json'
+        options.headers['x-api-key'] = process.env.apiKey
+      } else {
+        options = {
+          headers: {
+            'Content-Type': 'application/json',
+            'x-api-key': process.env.apiKey
+          }
         }
       }
+      // APIRequestContext removes /cads-data-service from the endpoint
+      const absoluteUrl = '/cads-data-service' + url
+      const apiKeyOptions = options
+      return { apiKeyOptions, absoluteUrl }
+    } else {
+      return { apiKeyOptions: options, absoluteUrl: url }
     }
-    return options
   }
 
   protected async get<T>(
@@ -32,6 +39,12 @@ export abstract class BaseClient {
     statusCode: StatusCodes,
     options?: object
   ) {
+    const { apiKeyOptions, absoluteUrl } = this.prepareRemoteRequest(
+      url,
+      options
+    )
+    options = apiKeyOptions
+    url = absoluteUrl
     const response = await this.apiContext.get(url, options)
     expect(response.status()).toEqual(statusCode)
     return (await response.json()) as T
@@ -42,20 +55,24 @@ export abstract class BaseClient {
     statusCode: StatusCodes,
     options?: object
   ) {
-    if (process.env.apiKey !== 'undefined') {
-      const apiKeyOptions = this.prepareRemoteRequest(options)
-      options = apiKeyOptions
-    }
+    const { apiKeyOptions, absoluteUrl } = this.prepareRemoteRequest(
+      url,
+      options
+    )
+    options = apiKeyOptions
+    url = absoluteUrl
     const response = await this.apiContext.post(url, options)
     expect(response.status()).toEqual(statusCode)
     return (await response.json()) as T
   }
 
   protected async postWithResponseReturn(url: string, options?: object) {
-    if (process.env.apiKey !== 'undefined') {
-      const apiKeyOptions = this.prepareRemoteRequest(options)
-      options = apiKeyOptions
-    }
+    const { apiKeyOptions, absoluteUrl } = this.prepareRemoteRequest(
+      url,
+      options
+    )
+    options = apiKeyOptions
+    url = absoluteUrl
     return await this.apiContext.post(url, options)
   }
 
@@ -64,10 +81,12 @@ export abstract class BaseClient {
     statusCode: StatusCodes,
     options?: object
   ) {
-    if (process.env.apiKey !== 'undefined') {
-      const apiKeyOptions = this.prepareRemoteRequest(options)
-      options = apiKeyOptions
-    }
+    const { apiKeyOptions, absoluteUrl } = this.prepareRemoteRequest(
+      url,
+      options
+    )
+    options = apiKeyOptions
+    url = absoluteUrl
     const response = await this.apiContext.put(url, options)
     expect(response.status()).toEqual(statusCode)
     return (await response.json()) as T

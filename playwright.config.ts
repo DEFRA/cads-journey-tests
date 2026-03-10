@@ -10,24 +10,32 @@ const isLocal = ENV === 'local'
 const configByEnv = {
   local: {
     ui: 'http://localhost:3000',
-    api: 'http://localhost:5555'
+    api: 'http://localhost:5555',
+    apiExt: ''
   },
   docker: {
     ui: 'http://127.0.0.1:3000',
-    api: 'http://127.0.0.1:5555'
+    api: 'http://127.0.0.1:5555',
+    apiExt: ''
   },
   dev: {
     ui: 'https://cads-mis.dev.cdp-int.defra.cloud',
-    api: 'https://cads-data-service.dev.cdp-int.defra.cloud'
+    api: 'https://cads-data-service.dev.cdp-int.defra.cloud',
+    apiExt: 'https://ephemeral-protected.api.dev.cdp-int.defra.cloud'
   },
   test: {
     ui: 'https://cads-mis.test.cdp-int.defra.cloud',
-    api: 'https://cads-data-service.test.cdp-int.defra.cloud'
+    api: 'https://cads-data-service.test.cdp-int.defra.cloud',
+    apiExt: 'https://ephemeral-protected.api.test.cdp-int.defra.cloud'
   }
 }
-const { ui, api } = configByEnv[ENV as keyof typeof configByEnv]
+const { ui, api, apiExt } = configByEnv[ENV as keyof typeof configByEnv]
 process.env.apiURL = api
-process.env.apiKey = !process.env.CI && ENV === 'dev' ? 'API_KEY' : undefined
+process.env.apiURLExt = apiExt
+process.env.apiKey =
+  !process.env.CI && ENV === 'dev' && process.env.CDP === undefined
+    ? 'API_KEY'
+    : undefined
 const isCDPEnvironment = ENV === 'dev' || ENV === 'test'
 
 export default defineConfig({
