@@ -1,8 +1,6 @@
 name: Run Journey Tests
 
-on:
-  schedule:
-    - cron: "0 8 * * *"   # 8am UTC
+on:  
 
   workflow_dispatch:
     inputs:
@@ -24,6 +22,14 @@ on:
           - ''
           - Smoke
           - E2E
+      branch-set:
+        description: "Which branch set to test (develop or main)"
+        type: choice
+        required: false
+        default: develop
+        options:
+          - develop
+          - main
 
   workflow_call:
     inputs:
@@ -56,28 +62,37 @@ jobs:
         uses: actions/checkout@v4.2.0
         with:
           repository: DEFRA/cads-tools
-          ref: main
+          ref: ${{ inputs.branch-set == 'main' && 'main' || 'main' }}
           path: cads-tools
 
       - name: Checkout cads-data-service
         uses: actions/checkout@v4.2.0
         with:
           repository: DEFRA/cads-data-service
-          ref: develop
+          ref: ${{ inputs.branch-set == 'main' && 'main' || 'develop' }}
           path: cads-data-service
 
       - name: Checkout cads-mis
         uses: actions/checkout@v4.2.0
         with:
           repository: DEFRA/cads-mis
-          ref: develop
+          ref: ${{ inputs.branch-set == 'main' && 'main' || 'develop' }}
           path: cads-mis
 
       - name: Checkout cads-journey-tests
         uses: actions/checkout@v4.2.0
         with:
+          ref: ${{ inputs.branch-set == 'main' && 'main' || github.ref }}
           path: cads-journey-tests
-      
+
+      # Shell script permissions
+      - name: Fix permissions for platform scripts
+        run: |
+          chmod -R +x cads-tools/**/*.sh || true
+          chmod -R +x cads-data-service/**/*.sh || true
+          chmod -R +x cads-mis/**/*.sh || true
+          chmod -R +x cads-journey-tests/**/*.sh || true
+
       # Start platform (tools + backend + UI)
       - name: Start platform
         working-directory: cads-journey-tests/bin
