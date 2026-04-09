@@ -8,7 +8,6 @@ services:
       PROFILE: ""
       RUN_ID: "local-docker"
     env_file:
-      - .env
       - .env.docker
     depends_on: []
     networks:
