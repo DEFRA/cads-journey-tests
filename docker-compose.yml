@@ -1,0 +1,21 @@
+services:
+  journey-tests:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      ENVIRONMENT: docker
+      PROFILE: ""
+      RUN_ID: "local-docker"
+    env_file:
+      - .env
+      - .env.docker
+    depends_on: []
+    networks:
+      - cads-tools
+    volumes:
+      - .:/app
+
+networks:
+  cads-tools:
+    external: true

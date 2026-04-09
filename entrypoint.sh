@@ -1,5 +1,7 @@
 #!/bin/sh
 
+# Linux make this executable via: chmod +x entrypoint.sh
+
 echo "run_id: $RUN_ID"
 
 # Pick up values from environment variables provided at container runtime.

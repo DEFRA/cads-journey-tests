@@ -17,3 +17,5 @@ FAILED
 /postgres-data
 /pgadmin-data
 /test-results
+.env
+!.gitkeep

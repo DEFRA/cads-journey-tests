@@ -17,6 +17,8 @@ RUN curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2
 WORKDIR /app
 
 COPY . .
+RUN chmod +x entrypoint.sh
+RUN chmod +x ./bin/publish-tests.sh
 RUN npm install \
     && npx playwright install --with-deps
 

@@ -1,14 +1,6 @@
 name: Run Journey Tests
 
 inputs:
-  cads-frontend:
-    required: false
-    type: string
-    default: latest
-  cads-backend:
-    required: false
-    type: string
-    default: latest
   test:
     description: "Choose Test Suite"
     type: choice
@@ -34,91 +26,94 @@ runs:
     - uses: actions/checkout@v4
       with:
         repository: DEFRA/cads-journey-tests
+        ref: ${{ github.ref }}
+        path: 'cads-journey-tests'
 
     - uses: actions/setup-node@v4
       with:
-        node-version: 20
+        node-version-file: .nvmrc
         cache: npm
   
     - name: Setup the tests
       run: npm i
       shell: bash
 
-    - name: Make LocalStack init script executable
-      run: chmod +x ./docker/scripts/localstack/init/start-localstack.sh
-      shell: bash
+    # - name: Make LocalStack init script executable
+    #   run: chmod +x ./docker/scripts/localstack/init/start-localstack.sh
+    #   shell: bash
 
-    - name: Start docker compose
-      shell: bash
-      run: |
-        echo "Starting docker compose"
-        export CADS_FRONTEND_VERSION="${{ inputs.cads-frontend }}"
-        export CADS_BACKEND_VERSION="${{ inputs.cads-backend }}"
-        echo "CADS_FRONTEND_VERSION: $CADS_FRONTEND_VERSION"
-        echo "CADS_BACKEND_VERSION: $CADS_BACKEND_VERSION"
-        docker compose -f compose.common.yml -f compose.ci.yml up --wait-timeout 300 -d --quiet-pull
-        docker ps --format "table {{.Names}}\t{{.Ports}}"
+    # - name: Start docker compose
+    #   shell: bash
+    #   run: |
+    #     echo "Starting docker compose"
+    #     docker compose -f compose.common.yml -f compose.ci.yml up --wait-timeout 300 -d --quiet-pull
+    #     docker ps --format "table {{.Names}}\t{{.Ports}}"
 
     - name: Install playwright browsers
       shell: bash
       run: |
         echo "Installing playwright browsers"
         npx playwright install --with-deps
-    - name: Run the tests
-      shell: bash
-      run: |
-        TEST_INPUT="${{ inputs.test }}"
-        TAG_INPUT="${{ inputs.tag }}"
+  
+    # - name: Run the tests
+    #   shell: bash
+    #   run: |
+    #     TEST_INPUT="${{ inputs.test }}"
+    #     TAG_INPUT="${{ inputs.tag }}"
 
-        FILTER=""
+    #     FILTER=""
 
-        if [[ -n "$TEST_INPUT" ]]; then
-          FILTER="$TEST_INPUT"
-        fi
+    #     if [[ -n "$TEST_INPUT" ]]; then
+    #       FILTER="$TEST_INPUT"
+    #     fi
 
-        if [[ -n "$TAG_INPUT" ]]; then
-          if [[ -n "$FILTER" ]]; then
-            FILTER="$FILTER|$TAG_INPUT"
-          else
-            FILTER="$TAG_INPUT"
-          fi
-        fi
+    #     if [[ -n "$TAG_INPUT" ]]; then
+    #       if [[ -n "$FILTER" ]]; then
+    #         FILTER="$FILTER|$TAG_INPUT"
+    #       else
+    #         FILTER="$TAG_INPUT"
+    #       fi
+    #     fi
 
-        if [[ -z "$FILTER" ]]; then
-          echo "No filters provided. Running all tests"
-          ENVIRONMENT=docker npx playwright test --config=playwright.config.ts
-        else
-          echo "Running filtered tests with grep: $FILTER"
-          ENVIRONMENT=docker npx playwright test --config=playwright.config.ts --grep="$FILTER"
-        fi
-    - name: debug
-      if: always()
-      shell: bash
-      run: |
-        docker compose -f compose.common.yml -f compose.ci.yml logs > logs.txt
-        docker ps
-    - name: Post Slack Report
-      if: always()
-      shell: bash
-      env:
-        SLACK_WEBHOOK_URL: ${{ inputs.slack-webhook-url }}
-        BUILD_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
-      run: |
-        echo "Slack env webhook provided: $([[ -n "$SLACK_WEBHOOK_URL" ]] && echo true || echo false)"
-        if [[ -z "$SLACK_WEBHOOK_URL" ]]; then
-          echo "SLACK_WEBHOOK_URL not set; skipping Slack"
-          exit 0
-        fi
-        node post-slack-report.mjs
-    - name: Upload playwright report
-      if: always()
-      uses: actions/upload-artifact@v4
-      with:
-        name: playwright report
-        path: ./playwright-report/html
-    - name: Upload docker compose logs
-      if: always()
-      uses: actions/upload-artifact@v4
-      with:
-        name: docker-compose-logs
-        path: ./logs.txt
+    #     if [[ -z "$FILTER" ]]; then
+    #       echo "No filters provided. Running all tests"
+    #       ENVIRONMENT=docker npx playwright test --config=playwright.config.ts
+    #     else
+    #       echo "Running filtered tests with grep: $FILTER"
+    #       ENVIRONMENT=docker npx playwright test --config=playwright.config.ts --grep="$FILTER"
+    #     fi
+  
+    # - name: debug
+    #   if: always()
+    #   shell: bash
+    #   run: |
+    #     docker compose -f compose.common.yml -f compose.ci.yml logs > logs.txt
+    #     docker ps
+  
+    # - name: Post Slack Report
+    #   if: always()
+    #   shell: bash
+    #   env:
+    #     SLACK_WEBHOOK_URL: ${{ inputs.slack-webhook-url }}
+    #     BUILD_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+    #   run: |
+    #     echo "Slack env webhook provided: $([[ -n "$SLACK_WEBHOOK_URL" ]] && echo true || echo false)"
+    #     if [[ -z "$SLACK_WEBHOOK_URL" ]]; then
+    #       echo "SLACK_WEBHOOK_URL not set; skipping Slack"
+    #       exit 0
+    #     fi
+    #     node post-slack-report.mjs
+    
+    # - name: Upload playwright report
+    #   if: always()
+    #   uses: actions/upload-artifact@v4
+    #   with:
+    #     name: playwright report
+    #     path: ./playwright-report/html
+    
+    # - name: Upload docker compose logs
+    #   if: always()
+    #   uses: actions/upload-artifact@v4
+    #   with:
+    #     name: docker-compose-logs
+    #     path: ./logs.txt

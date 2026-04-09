@@ -7,16 +7,6 @@ permissions:
 on:
   workflow_dispatch:
     inputs:
-      cads-frontend:
-        description: "CADS frontend image tag"
-        required: false
-        type: string
-        default: latest
-      cads-backend:
-        description: "CADS backend image tag"
-        required: false
-        type: string
-        default: latest
       test:
         description: "Choose Test Suite"
         type: choice
@@ -38,14 +28,6 @@ on:
 
   workflow_call:
     inputs:
-      cads-frontend:
-        required: false
-        type: string
-        default: latest
-      cads-backend:
-        required: false
-        type: string
-        default: latest
       test:
         required: false
         type: string
@@ -67,8 +49,6 @@ jobs:
         
       - uses: ./run-journey-tests
         with:
-          cads-frontend: ${{ inputs.cads-frontend }}
-          cads-backend: ${{ inputs.cads-backend }}
           test: ${{ inputs.test }}
           tag: ${{ inputs.tag }}
           slack-webhook-url: ${{ secrets.SLACK_WEBHOOK_URL }}
