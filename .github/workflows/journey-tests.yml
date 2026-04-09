@@ -79,10 +79,10 @@ jobs:
           ref: ${{ inputs.branch-set == 'main' && 'main' || 'develop' }}
           path: cads-mis
 
-      - name: Checkout cads-journey-tests
-        uses: actions/checkout@v4.2.0
-        with:
-          ref: ${{ inputs.branch-set == 'main' && 'main' || github.ref }}
+      # - name: Checkout cads-journey-tests
+      #   uses: actions/checkout@v4.2.0
+      #   with:
+      #     ref: ${{ inputs.branch-set == 'main' && 'main' || github.ref }}
 
       # Shell script permissions
       - name: Fix permissions for platform scripts
