@@ -1,14 +1,10 @@
 name: Run Journey Tests
 
-permissions:
-  checks: write
-  pull-requests: write
-
 on:
   workflow_dispatch:
     inputs:
       test:
-        description: "Choose Test Suite"
+        description: "Choose test suite"
         type: choice
         required: false
         default: ''
@@ -17,7 +13,7 @@ on:
           - API
           - UI
       tag:
-        description: "Choose Test Group"
+        description: "Choose test group"
         type: choice
         required: false
         default: ''
@@ -39,16 +35,132 @@ on:
       slack-webhook-url:
         required: false
         type: string
+
+permissions:
+  contents: read
+  checks: write
+  pull-requests: write
+
 jobs:
-  build:
+  journey-tests:
     name: Run Journey Tests
     runs-on: ubuntu-latest
+    timeout-minutes: 30
+
     steps:
-      - name: Checkout repo
-        uses: actions/checkout@v4
-        
-      - uses: ./run-journey-tests
+
+      # Checkout all 4 required repositories
+      - name: Checkout cads-tools
+        uses: actions/checkout@v4.2.0
         with:
-          test: ${{ inputs.test }}
-          tag: ${{ inputs.tag }}
-          slack-webhook-url: ${{ secrets.SLACK_WEBHOOK_URL }}
+          repository: DEFRA/cads-tools
+          ref: main
+          path: cads-tools
+
+      - name: Checkout cads-data-service
+        uses: actions/checkout@v4.2.0
+        with:
+          repository: DEFRA/cads-data-service
+          ref: develop
+          path: cads-data-service
+
+      - name: Checkout cads-mis
+        uses: actions/checkout@v4.2.0
+        with:
+          repository: DEFRA/cads-mis
+          ref: develop
+          path: cads-mis
+
+      - name: Checkout cads-journey-tests
+        uses: actions/checkout@v4.2.0
+        with:
+          path: cads-journey-tests
+      
+      # Start platform (tools + backend + UI)
+      - name: Start platform
+        working-directory: cads-journey-tests/bin
+        run: |
+          chmod +x platform.sh
+          ./platform.sh up
+
+      # Ensure cads-tools network exists & allow for time for DB migrations etc
+      - name: Ensure cads-tools network exists
+        run: docker network inspect cads-tools >/dev/null 2>&1 || docker network create cads-tools
+      - name: Wait for platform to stabilise
+        run: sleep 15
+
+      # Run journey-tests inside Docker
+      - name: Run journey tests
+        working-directory: cads-journey-tests
+        env:
+          TEST_INPUT: ${{ inputs.test }}
+          TAG_INPUT: ${{ inputs.tag }}
+        run: |
+          FILTER=""
+
+          if [[ -n "$TEST_INPUT" ]]; then
+            FILTER="$TEST_INPUT"
+          fi
+
+          if [[ -n "$TAG_INPUT" ]]; then
+            if [[ -n "$FILTER" ]]; then
+              FILTER="$FILTER|$TAG_INPUT"
+            else
+              FILTER="$TAG_INPUT"
+            fi
+          fi
+
+          echo "Running tests with filter: $FILTER"
+
+          if [[ -z "$FILTER" ]]; then
+            docker compose -f docker-compose.yml up --build --abort-on-container-exit
+          else
+            docker compose -f docker-compose.yml run --rm --build journey-tests npx playwright test --grep="$FILTER"
+          fi
+      
+      # Upload Allure report
+      - name: Upload Allure report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: allure-report
+          path: cads-journey-tests/allure-report
+
+      # Upload Docker logs
+      - name: Upload Docker logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: docker-logs
+          path: |
+            cads-tools/harness/logs
+            cads-data-service/platform/logs
+            cads-mis/logs
+            cads-journey-tests/logs
+          if-no-files-found: ignore
+
+      # Stop journey tests containers
+      - name: Stop journey-tests containers
+        if: always()
+        working-directory: cads-journey-tests
+        run: docker compose down || true
+
+      # Stop platform (tools + backend + UI)
+      - name: Stop platform
+        if: always()
+        working-directory: cads-journey-tests/bin
+        run: ./platform.sh down
+
+      # Slack notification
+      - name: Post Slack Report
+        if: always()
+        env:
+          SLACK_WEBHOOK_URL: ${{ inputs.slack-webhook-url }}
+          BUILD_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        working-directory: cads-journey-tests
+        run: |
+          if [[ -z "$SLACK_WEBHOOK_URL" ]]; then
+            echo "Slack webhook not provided; skipping"
+            exit 0
+          fi
+          node post-slack-report.mjs
