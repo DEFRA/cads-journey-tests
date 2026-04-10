@@ -103,6 +103,10 @@ jobs:
               cads-tools
           fi
 
+      # FIX: Set ROOT_DIR so Localstack init scripts mount correctly
+      - name: Set ROOT_DIR for compose mounts
+        run: echo "ROOT_DIR=${{ github.workspace }}/cads-tools" >> $GITHUB_ENV
+
       # Debug networks
       - name: Debug networks
         run: docker network ls
