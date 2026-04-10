@@ -88,10 +88,10 @@ case "$COMMAND" in
     ensure_network
     start_tools
     start_backend
-    start_ui
+    #start_ui
     ;;
   down)
-    stop_ui
+    #stop_ui
     stop_backend
     stop_tools
     ;;
