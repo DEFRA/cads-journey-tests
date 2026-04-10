@@ -118,6 +118,10 @@ jobs:
       - name: Wait for platform to stabilise
         run: sleep 15
 
+      # Backend logs
+      - name: Backend logs
+        run: docker logs cads_cds || true
+
       # Run journey-tests inside Docker
       - name: Run journey tests
         working-directory: cads-journey-tests
