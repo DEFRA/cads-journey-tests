@@ -122,6 +122,10 @@ jobs:
       - name: Backend logs
         run: docker logs cads_cds || true
 
+      # Backend health logs
+      - name: Backend health endpoint debug
+        run: curl -v http://cads_cds:5555/health || true
+
       # Run journey-tests inside Docker
       - name: Run journey tests
         working-directory: cads-journey-tests
