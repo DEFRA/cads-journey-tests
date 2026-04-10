@@ -6,14 +6,15 @@ services:
     environment:
       ENVIRONMENT: docker
       PROFILE: ""
-      RUN_ID: "local-docker"
+      RUN_ID: "docker"
     env_file:
       - .env.docker
     depends_on: []
     networks:
       - cads-tools
-    volumes:
-      - .:/app
+    # No volumes — use the image exactly as CDP will
+    # volumes:
+    #   - .:/app
 
 networks:
   cads-tools:
