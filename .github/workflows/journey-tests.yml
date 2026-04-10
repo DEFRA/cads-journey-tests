@@ -195,7 +195,7 @@ jobs:
       - name: Stop journey-tests containers
         if: always()
         working-directory: cads-journey-tests
-        run: docker compose down || true
+        run: docker compose -p cads-tools down || true
 
       # Stop platform (tools + backend + UI)
       - name: Stop platform

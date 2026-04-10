@@ -65,7 +65,7 @@ start_backend() {
 stop_backend() {
   echo "[platform] Stopping backend..."
   cd "$BACKEND_DIR"
-  docker compose down || true
+  docker compose -p cads-tools down || true
   return $?
 }
 
@@ -79,7 +79,7 @@ start_ui() {
 stop_ui() {
   echo "[platform] Stopping UI..."
   cd "$UI_DIR"
-  docker compose down || true
+  docker compose -p cads-tools down || true
   return $?
 }
 
