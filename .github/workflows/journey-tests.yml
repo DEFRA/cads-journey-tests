@@ -94,7 +94,7 @@ jobs:
           chmod -R +x cads-mis/**/*.sh || true
           chmod -R +x cads-journey-tests/**/*.sh || true
 
-      # Create cads-tools network early
+      # Create cads-tools network early (other projects reference as external)
       - name: Ensure cads-tools network exists
         run: |
           if ! docker network inspect cads-tools >/dev/null 2>&1; then
