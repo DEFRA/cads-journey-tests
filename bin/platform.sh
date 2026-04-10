@@ -59,6 +59,10 @@ start_backend() {
     -f "$OVERRIDE_FILE" \
     up -d
 
+  echo "[DEBUG] Backend working directory: $(pwd)"
+  ls -1
+  echo "[DEBUG] Override file: $OVERRIDE_FILE"
+
   return $?
 }
 
