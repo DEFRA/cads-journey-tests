@@ -1,15 +1,18 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# Linux make this executable via: chmod +x platform.sh
-
-ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-
-BACKEND_DIR="$ROOT_DIR/../../cads-data-service"
-TOOLS_DIR="$ROOT_DIR/../../cads-tools"
-UI_DIR="$ROOT_DIR/../../cads-mis"
-
+# ------------------------------------------------------------
+# Resolve ROOT_DIR to the real cads-tools folder
+# Works locally AND in GitHub Actions
+# ------------------------------------------------------------
 export ROOT_DIR="$(cd "$(dirname "$0")/../../cads-tools" && pwd)"
+
+# ------------------------------------------------------------
+# Resolve other repo paths relative to cads-tools
+# ------------------------------------------------------------
+BACKEND_DIR="$ROOT_DIR/../cads-data-service"
+TOOLS_DIR="$ROOT_DIR"
+UI_DIR="$ROOT_DIR/../cads-mis"
 
 COMMAND="${1:-help}"
 MAC_OVERRIDE="${2:-}"
