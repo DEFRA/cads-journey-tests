@@ -9,6 +9,8 @@ BACKEND_DIR="$ROOT_DIR/../../cads-data-service"
 TOOLS_DIR="$ROOT_DIR/../../cads-tools"
 UI_DIR="$ROOT_DIR/../../cads-mis"
 
+export ROOT_DIR="$(cd "$(dirname "$0")/../../cads-tools" && pwd)"
+
 COMMAND="${1:-help}"
 MAC_OVERRIDE="${2:-}"
 

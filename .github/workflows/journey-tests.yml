@@ -129,6 +129,9 @@ jobs:
       # Check Localstack init scripts
       - name: Check Localstack init scripts
         run: docker compose -p cads-tools exec -T cads-localstack ls -R /etc/localstack/init || true
+      
+      - name: Check Localstack init scripts 2
+        run: docker inspect cads-localstack --format '{{ index .Config.Labels "com.docker.compose.project" }}'
 
       # List running containers
       - name: List running containers
