@@ -19,22 +19,6 @@ ensure_network() {
   fi
 }
 
-# Determine which override file to use
-compose_override() {
-  case "$MAC_OVERRIDE" in
-    --mac-intel)
-      echo "docker-compose.override.mac.intel.yml"
-      ;;
-    --mac-arm)
-      echo "docker-compose.override.mac.arm.yml"
-      ;;
-    *)
-      echo "docker-compose.override.yml"
-      ;;
-  esac
-  return 0
-}
-
 start_tools() {
   echo "[platform] Starting shared infra..."
   "$TOOLS_DIR/harness/run-harness.sh" up
@@ -56,7 +40,7 @@ start_backend() {
 
   docker compose -p cads-tools \
     -f docker-compose.yml \
-    -f "$OVERRIDE_FILE" \
+    -f docker-compose.ci-override.yml \
     up -d
 
   echo "[DEBUG] Backend working directory: $(pwd)"
