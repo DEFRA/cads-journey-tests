@@ -103,6 +103,9 @@ jobs:
               cads-tools
           fi
 
+      - name: Debug networks
+        run: docker network ls
+
       # Start platform (tools + backend + UI)
       - name: Start platform
         working-directory: cads-journey-tests/bin
