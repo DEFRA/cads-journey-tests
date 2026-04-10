@@ -122,6 +122,10 @@ jobs:
       - name: Backend logs
         run: docker logs cads_cds || true
 
+      # Check Localstack init scripts
+      - name: Check Localstack init scripts
+        run: docker compose -p cads-tools exec -T cads-localstack ls -R /etc/localstack/init || true
+
       # Backend health logs
       - name: Backend health endpoint debug
         run: docker compose -p cads-tools exec -T cads_cds curl -v http://localhost:5555/health
