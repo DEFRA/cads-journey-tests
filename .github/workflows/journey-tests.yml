@@ -103,6 +103,7 @@ jobs:
               cads-tools
           fi
 
+      # Debug networks
       - name: Debug networks
         run: docker network ls
 
@@ -145,6 +146,10 @@ jobs:
           else
             docker compose -f docker-compose.yml run --rm --build journey-tests npx playwright test --grep="$FILTER"
           fi
+        
+      # Debug networks
+      - name: Inspect cads-tools network
+        run: docker network inspect cads-tools
       
       # Upload Allure report
       - name: Upload Allure report
