@@ -15,9 +15,6 @@ services:
     depends_on: []
     networks:
       - cads-tools
-    # No volumes — use the image exactly as CDP will
-    # volumes:
-    #   - .:/app
 
 networks:
   cads-tools:

@@ -12,6 +12,13 @@ UI_DIR="$ROOT_DIR/../../cads-mis"
 COMMAND="${1:-help}"
 MAC_OVERRIDE="${2:-}"
 
+ensure_network() {
+  if ! docker network inspect cads-tools >/dev/null 2>&1; then
+    echo "[platform] Creating cads-tools network..."
+    docker network create cads-tools
+  fi
+}
+
 # Determine which override file to use
 compose_override() {
   case "$MAC_OVERRIDE" in
@@ -78,6 +85,7 @@ stop_ui() {
 
 case "$COMMAND" in
   up)
+    ensure_network
     start_tools
     start_backend
     start_ui
