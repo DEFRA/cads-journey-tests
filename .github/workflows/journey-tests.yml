@@ -152,7 +152,8 @@ jobs:
           if [[ -z "$FILTER" ]]; then
             docker compose -p cads-tools -f docker-compose.yml up --build --abort-on-container-exit
           else
-            docker compose -p cads-tools -f docker-compose.yml run --rm --build journey-tests sh -c "npx playwright test --grep='$FILTER'"
+            docker compose -p cads-tools -f docker-compose.yml run --rm --build journey-tests \
+              sh -c "npm ci && npx playwright test --grep='$FILTER'"
           fi
         
       # Debug networks (all)
