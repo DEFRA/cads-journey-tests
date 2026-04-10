@@ -151,6 +151,15 @@ jobs:
       - name: Inspect cads-tools network
         if: always()
         run: docker network inspect cads-tools
+      - name: Inspect cads-data-service_cads-tools network
+        if: always()
+        run: docker network inspect cads-data-service_cads-tools
+      - name: Inspect cads-mis_cads-tools network
+        if: always()
+        run: docker network inspect cads-mis_cads-tools
+      - name: Inspect cads-journey-tests_cads-tools network
+        if: always()
+        run: docker network inspect cads-journey-tests_cads-tools
       
       # Upload Allure report
       - name: Upload Allure report
