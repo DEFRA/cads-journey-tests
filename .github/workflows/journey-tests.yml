@@ -147,7 +147,7 @@ jobs:
             docker compose -p cads-tools -f docker-compose.yml run --rm --build journey-tests npx playwright test --grep="$FILTER"
           fi
         
-      # Debug networks
+      # Debug networks (all)
       - name: Inspect cads-tools network
         if: always()
         run: docker network inspect cads-tools
