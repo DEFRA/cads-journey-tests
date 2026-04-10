@@ -54,7 +54,7 @@ start_backend() {
   OVERRIDE_FILE=$(compose_override)
   echo "[platform] Using override: $OVERRIDE_FILE"
 
-  docker compose \
+  docker compose -p cads-tools \
     -f docker-compose.yml \
     -f "$OVERRIDE_FILE" \
     up -d
@@ -72,7 +72,7 @@ stop_backend() {
 start_ui() {
   echo "[platform] Starting UI..."
   cd "$UI_DIR"
-  docker compose up -d
+  docker compose -p cads-tools up -d
   return $?
 }
 

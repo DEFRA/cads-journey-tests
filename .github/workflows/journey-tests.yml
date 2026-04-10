@@ -142,9 +142,9 @@ jobs:
           echo "Running tests with filter: $FILTER"
 
           if [[ -z "$FILTER" ]]; then
-            docker compose -f docker-compose.yml up --build --abort-on-container-exit
+            docker compose -p cads-tools -f docker-compose.yml up --build --abort-on-container-exit
           else
-            docker compose -f docker-compose.yml run --rm --build journey-tests npx playwright test --grep="$FILTER"
+            docker compose -p cads-tools -f docker-compose.yml run --rm --build journey-tests npx playwright test --grep="$FILTER"
           fi
         
       # Debug networks
