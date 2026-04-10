@@ -96,7 +96,12 @@ jobs:
 
       # Create cads-tools network early
       - name: Ensure cads-tools network exists
-        run: docker network inspect cads-tools >/dev/null 2>&1 || docker network create cads-tools
+        run: |
+          if ! docker network inspect cads-tools >/dev/null 2>&1; then
+            docker network create \
+              --label com.docker.compose.network=cads-tools \
+              cads-tools
+          fi
 
       # Start platform (tools + backend + UI)
       - name: Start platform
