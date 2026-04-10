@@ -124,7 +124,7 @@ jobs:
 
       # Backend health logs
       - name: Backend health endpoint debug
-        run: curl -v http://cads_cds:5555/health || true
+        run: docker compose -p cads-tools exec -T cads_cds curl -v http://localhost:5555/health
 
       # Run journey-tests inside Docker
       - name: Run journey tests
@@ -152,7 +152,7 @@ jobs:
           if [[ -z "$FILTER" ]]; then
             docker compose -p cads-tools -f docker-compose.yml up --build --abort-on-container-exit
           else
-            docker compose -p cads-tools -f docker-compose.yml run --rm --build journey-tests npx playwright test --grep="$FILTER"
+            docker compose -p cads-tools -f docker-compose.yml run --rm --build journey-tests sh -c "npx playwright test --grep='$FILTER'"
           fi
         
       # Debug networks (all)
