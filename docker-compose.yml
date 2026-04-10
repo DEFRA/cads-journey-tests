@@ -8,6 +8,9 @@ services:
       PROFILE: ""
       RUN_ID: "docker"
     env_file:
+      - ./compose/aws.env
+      - ./compose/postgres.env
+      - ./compose/frontend.env
       - .env.docker
     depends_on: []
     networks:

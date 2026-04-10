@@ -94,6 +94,10 @@ jobs:
           chmod -R +x cads-mis/**/*.sh || true
           chmod -R +x cads-journey-tests/**/*.sh || true
 
+      # Create cads-tools network early
+      - name: Ensure cads-tools network exists
+        run: docker network inspect cads-tools >/dev/null 2>&1 || docker network create cads-tools
+
       # Start platform (tools + backend + UI)
       - name: Start platform
         working-directory: cads-journey-tests/bin
@@ -101,9 +105,7 @@ jobs:
           chmod +x platform.sh
           ./platform.sh up
 
-      # Ensure cads-tools network exists & allow for time for DB migrations etc
-      - name: Ensure cads-tools network exists
-        run: docker network inspect cads-tools >/dev/null 2>&1 || docker network create cads-tools
+      # Allow for time for DB migrations etc
       - name: Wait for platform to stabilise
         run: sleep 15
 
