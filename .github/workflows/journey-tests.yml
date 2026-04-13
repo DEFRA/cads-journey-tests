@@ -124,11 +124,14 @@ jobs:
 
       # Debug
       - name: Debug localstack
-        run: docker exec cads-localstack ls -R /docker-entrypoint-initaws.d
+        if: always()
+        run: docker logs cads-localstack || true
       - name: Debug LocalStack init (host)
+        if: always()
         run: ls -R $ROOT_DIR/infra/localstack/init
       - name: Debug LocalStack init (container)
-        run: docker exec cads-localstack ls -R /etc/localstack/init/ready.d
+        if: always()
+        run: docker exec cads-localstack ls -R /etc/localstack/init/ready.d || true
 
       # Backend logs
       - name: Backend logs
