@@ -26,12 +26,17 @@ else
   CDP=true ENVIRONMENT="$ENVIRONMENT" npx playwright test --config=playwright.config.ts --grep="$FILTER"
 fi
 
-npm run report:publish
-publish_exit_code=$?
+# Skip publishing when running in GitHub Actions
+if [ "$GITHUB_ACTIONS" = "true" ]; then
+  echo "Skipping test result publishing in CI"
+else
+  npm run report:publish
+  publish_exit_code=$?
 
-if [ $publish_exit_code -ne 0 ]; then
-  echo "failed to publish test results"
-  exit $publish_exit_code
+  if [ $publish_exit_code -ne 0 ]; then
+    echo "failed to publish test results"
+    exit $publish_exit_code
+  fi
 fi
 
 # At the end of the test run, if the suite has failed we write a file called 'FAILED'
