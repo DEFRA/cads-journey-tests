@@ -17,23 +17,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Test code and Create Test Coverage Reports
-        uses: actions/setup-node@v4
+        uses: actions/checkout@v4.2.0
+      - name: Code format and lint checks
+        uses: actions/setup-node@v4.2.0
         with:
           node-version-file: .nvmrc
           cache: npm
       - run: npm ci
       - run: npm run format:check
       - run: npm run lint
-  tests:
-    name: Run Journey Tests
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          repository: DEFRA/cads-journey-tests
-      - uses: ./run-journey-tests
-        with:
-          path: ./run-journey-tests

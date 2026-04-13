@@ -23,9 +23,17 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Check out code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v4.2.0
 
       - name: Build the test suite
         uses: DEFRA/cdp-build-action/build-test@main
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
+
+  journey-tests:
+    needs: build
+    uses: ./.github/workflows/journey-tests.yml
+    with:
+      test: ''
+      tag: ''
+    secrets: inherit

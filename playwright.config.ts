@@ -1,42 +1,60 @@
+import * as dotenv from 'dotenv'
+import * as fs from 'fs'
 import { defineConfig, devices } from '@playwright/test'
 import type { GitHubActionOptions } from '@estruyf/github-actions-reporter'
+import { ReporterDescription } from 'playwright/test'
 
 // Set Environment
-// process.env.ENVIRONMENT = 'dev'
-
 const ENV = process.env.ENVIRONMENT ?? 'local'
 const isLocal = ENV === 'local'
 
-const configByEnv = {
-  local: {
-    ui: 'http://localhost:3000',
-    api: 'http://localhost:5555',
-    apiExt: ''
-  },
-  docker: {
-    ui: 'http://127.0.0.1:3000',
-    api: 'http://127.0.0.1:5555',
-    apiExt: ''
-  },
-  dev: {
-    ui: 'https://cads-mis.dev.cdp-int.defra.cloud',
-    api: 'https://cads-data-service.dev.cdp-int.defra.cloud',
-    apiExt: 'https://ephemeral-protected.api.dev.cdp-int.defra.cloud'
-  },
-  test: {
-    ui: 'https://cads-mis.test.cdp-int.defra.cloud',
-    api: 'https://cads-data-service.test.cdp-int.defra.cloud',
-    apiExt: 'https://ephemeral-protected.api.test.cdp-int.defra.cloud'
-  }
+// Only load env files for local + docker
+let envFile: string | null = null
+
+if (ENV === 'local') envFile = '.env'
+if (ENV === 'docker') envFile = '.env.docker'
+
+if (envFile && fs.existsSync(envFile)) {
+  dotenv.config({ path: envFile })
 }
-const { ui, api, apiExt } = configByEnv[ENV as keyof typeof configByEnv]
+
+// Read values from environment variables
+const ui = process.env.CADS_MIP_FRONTEND_BASE_URL
+const api = process.env.CADS_CDS_BACKEND_BASE_URL
+const apiExt = process.env.CADS_CDS_BACKEND_EXTERNAL_BASE_URL ?? ''
+const isCDPEnvironment = ENV === 'dev' || ENV === 'test'
+
 process.env.apiURL = api
 process.env.apiURLExt = apiExt
 process.env.apiKey =
   !process.env.CI && ENV === 'dev' && process.env.CDP === undefined
     ? 'API_KEY'
     : undefined
-const isCDPEnvironment = ENV === 'dev' || ENV === 'test'
+
+const reporters: ReporterDescription[] = [
+  ['list'], // CLI console output
+  [
+    'html',
+    {
+      outputFolder: '/app/playwright-report/html',
+      open: isCDPEnvironment ? 'never' : 'on-failure'
+    }
+  ],
+  ['json', { outputFile: '/app/playwright-report/results.json' }],
+  ['allure-playwright', { reportDir: '/app/allure-report' }]
+]
+
+// Enable GitHub reporter ONLY inside GitHub Actions runner
+if (process.env.GITHUB_ACTIONS === 'true') {
+  reporters.push([
+    '@estruyf/github-actions-reporter',
+    <GitHubActionOptions>{
+      title: `Journey Tests on environment: ${ENV}`,
+      useDetails: true,
+      showError: true
+    }
+  ])
+}
 
 export default defineConfig({
   // Look for test files in the "tests" directory, relative to this configuration file.
@@ -56,27 +74,7 @@ export default defineConfig({
   workers: process.env.CI ? 1 : undefined,
 
   // Reporter to use
-  reporter: [
-    ['list'], // CLI console output
-    [
-      'html',
-      {
-        outputFolder: 'playwright-report/html',
-        open: isCDPEnvironment ? 'never' : 'on-failure'
-      }
-    ],
-    ['json', { outputFile: 'playwright-report/results.json' }],
-    ['allure-playwright', { reportDir: 'allure-report' }],
-    [
-      '@estruyf/github-actions-reporter',
-      <GitHubActionOptions>{
-        title: 'Journey Tests on environment: ' + ENV,
-        useDetails: true,
-        showError: true
-      }
-    ]
-    // ['junit', { outputFile: 'report/results.xml' }]
-  ],
+  reporter: reporters,
 
   use: {
     baseURL: ui,

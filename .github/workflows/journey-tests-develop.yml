@@ -1,0 +1,14 @@
+name: Daily Journey Tests (develop)
+
+on:
+  schedule:
+    - cron: "0 8 * * *"
+
+jobs:
+  run-develop-tests:
+    uses: ./.github/workflows/journey-tests.yml
+    with:
+      branch-set: develop
+      test: ''
+      tag: ''
+    secrets: inherit

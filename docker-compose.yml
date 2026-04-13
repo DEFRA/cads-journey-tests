@@ -1,0 +1,28 @@
+services:
+  journey-tests:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      ENVIRONMENT: docker
+      PROFILE: ""
+      RUN_ID: "docker"
+      GITHUB_ACTIONS: "${GITHUB_ACTIONS:-false}"
+    env_file:
+      - ./compose/aws.env
+      - ./compose/postgres.env
+      - ./compose/frontend.env
+      - .env.docker
+    depends_on: []
+    volumes:
+      - ./allure-results:/app/allure-results
+      - ./allure-report:/app/allure-report
+      - ./playwright-report:/app/playwright-report
+    networks:
+      - cads-tools
+
+networks:
+  cads-tools:
+    external: true
+  default:
+    external: true

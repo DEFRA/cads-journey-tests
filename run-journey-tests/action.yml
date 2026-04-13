@@ -1,16 +1,8 @@
-name: Run Journey Tests
+name: Run Journey Tests (CDP)
 
 inputs:
-  cads-frontend:
-    required: false
-    type: string
-    default: latest
-  cads-backend:
-    required: false
-    type: string
-    default: latest
   test:
-    description: "Choose Test Suite"
+    description: "Choose Test suite"
     type: choice
     required: false
     default: ''
@@ -18,7 +10,7 @@ inputs:
       - API
       - UI
   tag:
-    description: "Choose Test Group"
+    description: "Choose test group"
     type: choice
     required: false
     default: ''
@@ -31,94 +23,87 @@ inputs:
 runs:
   using: "composite"
   steps:
+    
+    # Checkout the journey-tests repo
     - uses: actions/checkout@v4
       with:
         repository: DEFRA/cads-journey-tests
+        path: cads-journey-tests
 
+    # Setup Node
     - uses: actions/setup-node@v4
       with:
-        node-version: 20
+        node-version-file: cads-journey-tests/.nvmrc
         cache: npm
-  
-    - name: Setup the tests
-      run: npm i
+
+    # Install dependencies
+    - name: Install dependencies
+      working-directory: cads-journey-tests
+      run: npm ci
       shell: bash
 
-    - name: Make LocalStack init script executable
-      run: chmod +x ./docker/scripts/localstack/init/start-localstack.sh
+    # Install Playwright browsers
+    - name: Install Playwright browsers
+      working-directory: cads-journey-tests
+      run: npx playwright install --with-deps
       shell: bash
 
-    - name: Start docker compose
+    # Debug environment variables injected by CDP
+    - name: Show environment variables
       shell: bash
       run: |
-        echo "Starting docker compose"
-        export CADS_FRONTEND_VERSION="${{ inputs.cads-frontend }}"
-        export CADS_BACKEND_VERSION="${{ inputs.cads-backend }}"
-        echo "CADS_FRONTEND_VERSION: $CADS_FRONTEND_VERSION"
-        echo "CADS_BACKEND_VERSION: $CADS_BACKEND_VERSION"
-        docker compose -f compose.common.yml -f compose.ci.yml up --wait-timeout 300 -d --quiet-pull
-        docker ps --format "table {{.Names}}\t{{.Ports}}"
+        echo "UI:  $CADS_MIP_FRONTEND_BASE_URL"
+        echo "API: $CADS_CDS_BACKEND_BASE_URL"
+        echo "API EXT: $CADS_CDS_BACKEND_EXTERNAL_BASE_URL"
 
-    - name: Install playwright browsers
+    # Run Playwright tests
+    - name: Run tests
+      working-directory: cads-journey-tests
       shell: bash
+      env:
+        ENVIRONMENT: dev   # CDP Portal will override this with dev/test/perf-test
       run: |
-        echo "Installing playwright browsers"
-        npx playwright install --with-deps
-    - name: Run the tests
-      shell: bash
-      run: |
-        TEST_INPUT="${{ inputs.test }}"
-        TAG_INPUT="${{ inputs.tag }}"
-
         FILTER=""
-
-        if [[ -n "$TEST_INPUT" ]]; then
-          FILTER="$TEST_INPUT"
+        if [[ -n "${{ inputs.test }}" ]]; then FILTER="${{ inputs.test }}"; fi
+        if [[ -n "${{ inputs.tag }}" ]]; then
+          if [[ -n "$FILTER" ]]; then FILTER="$FILTER|${{ inputs.tag }}"; else FILTER="${{ inputs.tag }}"; fi
         fi
 
-        if [[ -n "$TAG_INPUT" ]]; then
-          if [[ -n "$FILTER" ]]; then
-            FILTER="$FILTER|$TAG_INPUT"
-          else
-            FILTER="$TAG_INPUT"
-          fi
-        fi
+        echo "Running tests with filter: $FILTER"
 
         if [[ -z "$FILTER" ]]; then
-          echo "No filters provided. Running all tests"
-          ENVIRONMENT=docker npx playwright test --config=playwright.config.ts
+          npx playwright test --config=playwright.config.ts
         else
-          echo "Running filtered tests with grep: $FILTER"
-          ENVIRONMENT=docker npx playwright test --config=playwright.config.ts --grep="$FILTER"
+          npx playwright test --config=playwright.config.ts --grep="$FILTER"
         fi
-    - name: debug
+  
+    # Upload Allure report
+    - name: Upload Allure report
       if: always()
-      shell: bash
-      run: |
-        docker compose -f compose.common.yml -f compose.ci.yml logs > logs.txt
-        docker ps
+      uses: actions/upload-artifact@v4
+      with:
+        name: allure-report
+        path: cads-journey-tests/allure-report
+
+    # Upload Playwright HTML report
+    - name: Upload Playwright HTML report
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: playwright-report
+        path: cads-journey-tests/playwright-report/html
+
+    # Slack notification
     - name: Post Slack Report
       if: always()
+      working-directory: cads-journey-tests
       shell: bash
       env:
         SLACK_WEBHOOK_URL: ${{ inputs.slack-webhook-url }}
         BUILD_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
       run: |
-        echo "Slack env webhook provided: $([[ -n "$SLACK_WEBHOOK_URL" ]] && echo true || echo false)"
         if [[ -z "$SLACK_WEBHOOK_URL" ]]; then
-          echo "SLACK_WEBHOOK_URL not set; skipping Slack"
+          echo "Slack webhook not provided; skipping"
           exit 0
         fi
         node post-slack-report.mjs
-    - name: Upload playwright report
-      if: always()
-      uses: actions/upload-artifact@v4
-      with:
-        name: playwright report
-        path: ./playwright-report/html
-    - name: Upload docker compose logs
-      if: always()
-      uses: actions/upload-artifact@v4
-      with:
-        name: docker-compose-logs
-        path: ./logs.txt

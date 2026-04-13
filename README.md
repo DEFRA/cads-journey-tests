@@ -1,6 +1,7 @@
 cads-journey-tests
 
-A Playwright test suite for running end-to-end and API tests against the CADS journey application.
+A Playwright-based end-to-end and API test suite for the CADS platform.  
+Tests can be executed locally, in CI (GitHub Actions), or on the CDP Platform using the published Docker image.
 
 - [Local Development](#local-development)
   - [Requirements](#requirements)
@@ -20,8 +21,9 @@ A Playwright test suite for running end-to-end and API tests against the CADS jo
 
 - **.NET 10 SDK** - [Download](https://dotnet.microsoft.com/download/dotnet/10.0)
 - **Docker & Docker Compose** - [Download](https://www.docker.com/products/docker-desktop)
-- **Git** Cads Data Service- [Download](https://github.com/DEFRA/cads-data-service)
-- **Git** Cads Front-End- [Download](https://github.com/DEFRA/cads-mis)
+- **Git** Cads Data Service - [Download](https://github.com/DEFRA/cads-data-service)
+- **Git** Cads Front-End - [Download](https://github.com/DEFRA/cads-mis)
+- **Git** Cads Tools - [Download](https://github.com/DEFRA/cads-tools)
 
 #### Node.js
 
@@ -80,6 +82,7 @@ npx playwright test tests/front-end/features/home.spec.ts
 The test environment is configured via the `ENV` environment variable in `playwright.config.ts`:
 
 - `local` (default): Runs against `http://localhost:3000` (UI) and `http://localhost:5555` (API)
+- 'docker': Used when running inside the journey-tests Docker container
 - `dev`: Runs against development environment URLs
 
 When `ENV=local`, Playwright will automatically start the frontend and backend servers before running tests.
@@ -145,32 +148,218 @@ View the HTML report:
 npx playwright show-report
 ```
 
-### Requirements of CDP Environment Tests
+## Running on the CDP Platform
 
-1. Your service builds as a docker container using the `.github/workflows/publish.yml`
-   The workflow tags the docker images allowing the CDP Portal to identify how the container should be run on the platform.
-   It also ensures its published to the correct docker repository.
+The CDP Platform runs the published Docker image of this test suite.
 
-2. The Dockerfile's entrypoint script should return exit code of 0 if the test suite passes or 1/>0 if it fails
+**How it works**
 
-3. Test reports should be published to S3 using the script in `./bin/publish-tests.sh`
+- A new Docker image is built and published automatically when changes are merged into main.
+- CDP Portal always runs the latest published image.
+- CDP injects environment variables:
+  - CADS_MIP_FRONTEND_BASE_URL
+  - CADS_CDS_BACKEND_BASE_URL
+  - CADS_CDS_BACKEND_EXTERNAL_BASE_URL
+  - PROFILE (optional test filter)
+  - ENVIRONMENT (dev/test/perf-test)
+- The container runs `entrypoint.sh`, which:
+  - executes Playwright tests
+  - generates `allure-results/`
+  - builds the Allure HTML report (`allure-report/`)
+  - publishes the report via `./bin/publish-tests.sh`
+- CDP Portal displays the final HTML report
+
+### Requirements for CDP
+
+The Docker image must be published via `.github/workflows/publish.yml`.
+
+`entrypoint.sh` must exit with:
+
+- 0 on success
+- non-zero on failure
+
+`./bin/publish-tests.sh` must upload the Allure HTML report to S3.
+
+### Running the Test Suite via GitHub Workflow
+
+You can also run the test suite directly from GitHub using the composite action in:
+
+```
+Code
+./run-journey-tests/action.yml
+```
+
+This runs Playwright without Docker, using CDP environment variables if provided.
+
+Useful for:
+
+- smoke testing
+- running against dev/test environments
+- debugging failures outside CDP Portal
 
 ## Running on GitHub
 
-Alternatively you can run the test suite as a GitHub workflow.
-Test runs on GitHub are not able to connect to the CDP Test environments. Instead, they run the tests against a version of the services running in docker.
-A docker compose `compose.yml` is included as a starting point, which includes the databases (mongodb, redis) and infrastructure (localstack) pre-setup.
+CI runs the test suite inside Docker using docker compose.
+Reports are mounted out of the container and uploaded as artifacts.
 
-Steps:
+CI uploads:
 
-1. Edit the compose.yml to include your services.
-2. Modify the scripts in docker/scripts to pre-populate the database, if required and create any localstack resources.
-3. Test the setup locally with `docker compose up` and `npm run test`
-4. Set up the workflow trigger in `.github/workflows/journey-tests`.
+- allure-results/ (raw Allure data)
+- playwright-report/html/ (Playwright HTML report)
 
-By default, the provided workflow will run when triggered manually from GitHub or when triggered by another workflow.
+CI does not generate the Allure HTML report (allure-report/), because the entrypoint intentionally skips publishing when GITHUB_ACTIONS=true.
 
-If you want to use the repository exclusively for running docker composed based test suites consider disabling the publish.yml workflow.
+## Platform Orchestration (`bin/platform.sh`)
+
+The test suite includes a helper script located at:
+
+`bin/platform.sh`
+
+```
+
+This script provides a consistent way to start and stop the **local CADS platform**, including:
+
+- shared infrastructure (LocalStack, Redis, PostgreSQL, etc.)
+- shared OIDC service mock (`cads-oidc-mock`)
+- backend service (`cads-data-service`)
+- frontend service (`cads-mis`)
+
+It is used in **local development**, **GitHub Actions CI**, and **CDP‑style local simulation**.
+
+---
+
+### How `platform.sh` Works
+
+The script:
+
+1. Locates the `cads-tools` repository (shared infra)
+2. Resolves paths to:
+   - `cads-data-service` (backend)
+   - `cads-mis` (frontend)
+3. Ensures the shared Docker network `cads-tools` exists
+4. Selects the correct Docker Compose override file:
+   - `docker-compose.override.yml` (local)
+   - `docker-compose.override.mac.intel.yml` (Intel Macs)
+   - `docker-compose.override.mac.arm.yml` (Apple Silicon)
+   - `docker-compose.ci-override.yml` (GitHub Actions)
+5. Starts or stops:
+   - shared infra
+   - shared oidc
+   - backend
+   - frontend
+
+---
+```
+
+### Commands
+
+Start the full platform:
+
+```bash
+./bin/platform.sh up
+```
+
+Stop everything:
+
+```bash
+./bin/platform.sh down
+```
+
+Mac‑specific overrides:
+
+```
+./bin/platform.sh up --mac-intel
+./bin/platform.sh up --mac-arm
+```
+
+`bin/platform.sh` provides a **unified orchestration layer** for local and CI environments:
+
+- Ensures consistent Docker networking
+- Ensures correct override files
+- Starts backend, frontend, and shared infra
+- Makes local and CI environments match
+- Not used by CDP Portal (which runs the Docker image directly)
+
+This gives you:
+
+- Local parity with CI
+- CI parity with CDP
+- Predictable, reproducible test environments
+
+### How platform.sh Behaves in Each Environment
+
+#### Local Development
+
+When running locally:
+
+The script starts:
+
+- LocalStack
+- Redis
+- PostgreSQL
+- Backend (cads-data-service)
+- Frontend (cads-mis)
+
+Uses `docker-compose.override.yml` unless a Mac override is provided.
+
+Ensures the `cads-tools` Docker network exists.
+
+Allows you to run tests against a fully local CADS platform.
+
+Typical workflow:
+
+```
+./bin/platform.sh up
+npm run test
+./bin/platform.sh down
+```
+
+####GitHub Actions (CI)
+
+In CI:
+
+- CI=true is set automatically
+- The script switches to:
+
+```
+docker-compose.ci-override.yml
+```
+
+This ensures:
+
+- deterministic builds
+- no local-only overrides
+- correct networking
+- correct environment variables
+- reproducible test runs
+
+CI uses the script to start:
+
+- shared infra
+- backend
+- frontend
+
+Then the test suite runs inside Docker.
+
+After the run, CI calls:
+
+```
+./bin/platform.sh down
+```
+
+to clean up.
+
+#### CDP Platform
+
+Important:
+
+The CDP Platform **does NOT** use `platform.sh`.
+
+CDP Portal runs the **published Docker image** of the test suite directly:
+
+```
+docker run <image>
+```
 
 ## Licence
 

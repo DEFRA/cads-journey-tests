@@ -1,11 +1,36 @@
 #!/bin/sh
 
+# Linux make this executable via: chmod +x entrypoint.sh
+
 echo "run_id: $RUN_ID"
 
 # Pick up values from environment variables provided at container runtime.
 # EXPECTED ENV VARS:
 # - TEST_INPUT: optional test suite filter (e.g. "API" or "UI")
 # - ENVIRONMENT: target environment (e.g. "docker", "dev", "test")
+
+echo "------------------------------------------------------------"
+echo "[journey-tests] Environment variables in use:"
+echo "------------------------------------------------------------"
+
+echo "ENVIRONMENT:              ${ENVIRONMENT:-<not set>}"
+echo "PROFILE:                  ${PROFILE:-<not set>}"
+echo "CI:                       ${CI:-<not set>}"
+echo ""
+
+echo "CADS_MIP_FRONTEND_BASE_URL:         ${CADS_MIP_FRONTEND_BASE_URL:-<not set>}"
+echo "CADS_CDS_BACKEND_BASE_URL:          ${CADS_CDS_BACKEND_BASE_URL:-<not set>}"
+echo "CADS_CDS_BACKEND_EXTERNAL_BASE_URL: ${CADS_CDS_BACKEND_EXTERNAL_BASE_URL:-<not set>}"
+echo ""
+
+echo "GITHUB_ACTIONS:           ${GITHUB_ACTIONS:-<not set>}"
+echo "RUN_ID:                   ${RUN_ID:-<not set>}"
+echo ""
+
+echo "Node version:             $(node -v)"
+echo "NPM version:              $(npm -v)"
+echo "Working directory:        $(pwd)"
+echo "------------------------------------------------------------"
 
 TEST_INPUT="${PROFILE}"
 ENVIRONMENT="${ENVIRONMENT}"
@@ -24,12 +49,17 @@ else
   CDP=true ENVIRONMENT="$ENVIRONMENT" npx playwright test --config=playwright.config.ts --grep="$FILTER"
 fi
 
-npm run report:publish
-publish_exit_code=$?
+# Skip publishing when running in GitHub Actions
+if [ "$GITHUB_ACTIONS" = "true" ]; then
+  echo "Skipping test result publishing in CI"
+else
+  npm run report:publish
+  publish_exit_code=$?
 
-if [ $publish_exit_code -ne 0 ]; then
-  echo "failed to publish test results"
-  exit $publish_exit_code
+  if [ $publish_exit_code -ne 0 ]; then
+    echo "failed to publish test results"
+    exit $publish_exit_code
+  fi
 fi
 
 # At the end of the test run, if the suite has failed we write a file called 'FAILED'
