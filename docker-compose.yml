@@ -15,8 +15,10 @@ services:
       - .env.docker
     depends_on: []
     volumes:
+      - ./allure-results:/app/allure-results
       - ./allure-report:/app/allure-report
       - ./playwright-report:/app/playwright-report
+      - ./test-results:/app/test-results
     networks:
       - cads-tools
 
