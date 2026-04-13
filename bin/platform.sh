@@ -83,14 +83,28 @@ stop_backend() {
 start_ui() {
   echo "[platform] Starting UI..."
   cd "$UI_DIR"
-  docker compose -p cads-tools -f docker-compose.ci.yml up -d
+
+  if [ "${CI:-}" = "true" ]; then
+    echo "[platform] Using UI compose file: docker-compose.ci.yml"
+    docker compose -p cads-tools -f docker-compose.ci.yml up -d
+  else
+    echo "[platform] Using UI compose file: docker-compose.yml"
+    docker compose -p cads-tools -f docker-compose.yml up -d
+  fi
+
   return $?
 }
 
 stop_ui() {
   echo "[platform] Stopping UI..."
   cd "$UI_DIR"
-  docker compose -p cads-tools -f docker-compose.ci.yml down || true
+
+  if [ "${CI:-}" = "true" ]; then
+    docker compose -p cads-tools -f docker-compose.ci.yml down || true
+  else
+    docker compose -p cads-tools -f docker-compose.yml down || true
+  fi
+
   return $?
 }
 
