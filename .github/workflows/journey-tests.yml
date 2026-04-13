@@ -95,6 +95,12 @@ jobs:
           chmod -R +x cads-mis/**/*.sh || true
           chmod -R +x cads-journey-tests/**/*.sh || true
 
+      # Copy frontend.env into cads-mis
+      - name: Copy frontend.env into cads-mis
+        run: |
+          mkdir -p cads-mis/compose
+          cp cads-journey-tests/compose/frontend.env cads-mis/compose/frontend.env
+
       # Create cads-tools network early (other projects reference as external)
       - name: Ensure cads-tools network exists
         run: |
