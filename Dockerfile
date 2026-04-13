@@ -18,9 +18,7 @@ WORKDIR /app
 
 COPY . .
 
-RUN rm -rf allure-report allure-results playwright-report
-RUN mkdir -p /app/allure-report /app/playwright-report
-
+RUN rm -rf allure-report allure-results test-results playwright-report
 RUN chmod +x entrypoint.sh
 RUN chmod +x ./bin/publish-tests.sh
 RUN npm install \

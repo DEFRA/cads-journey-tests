@@ -146,11 +146,6 @@ jobs:
           mkdir -p cads-journey-tests/allure-report
           mkdir -p cads-journey-tests/playwright-report
 
-      - name: Debug working directory inside container
-        if: always()
-        run: |
-          docker compose -p cads-tools exec -T journey-tests sh -c "pwd && ls -R /app && ls -R /app/tests"
-
       - name: Run journey-tests inside Docker
         working-directory: cads-journey-tests
         env:
@@ -184,19 +179,28 @@ jobs:
         if: always()
         run: docker network inspect cads-tools
 
-      - name: Upload Allure report
+      - name: Upload Allure results
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: allure-report
-          path: cads-journey-tests/allure-report
+          name: allure-results
+          path: cads-journey-tests/allure-results
+          if-no-files-found: ignore
 
       - name: Upload Playwright HTML report
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: playwright-report
-          path: cads-journey-tests/playwright-report
+          path: cads-journey-tests/playwright-report/html
+          if-no-files-found: ignore
+
+      - name: Upload test-results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results
+          path: cads-journey-tests/test-results
           if-no-files-found: ignore
 
       - name: Collect Docker logs
