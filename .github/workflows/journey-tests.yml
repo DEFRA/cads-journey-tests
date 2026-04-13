@@ -122,6 +122,14 @@ jobs:
       - name: Wait for platform to stabilise
         run: sleep 15
 
+      # Debug
+      - name: Debug localstack
+        run: docker exec cads-localstack ls -R /docker-entrypoint-initaws.d
+      - name: Debug LocalStack init (host)
+        run: ls -R $ROOT_DIR/infra/localstack/init
+      - name: Debug LocalStack init (container)
+        run: docker exec cads-localstack ls -R /etc/localstack/init/ready.d
+
       # Backend logs
       - name: Backend logs
         run: docker logs cads_cds || true
