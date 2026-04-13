@@ -146,6 +146,11 @@ jobs:
           mkdir -p cads-journey-tests/allure-report
           mkdir -p cads-journey-tests/playwright-report
 
+      - name: Debug working directory inside container
+        if: always()
+        run: |
+          docker compose -p cads-tools exec -T journey-tests sh -c "pwd && ls -R /app && ls -R /app/tests"
+
       - name: Run journey-tests inside Docker
         working-directory: cads-journey-tests
         env:

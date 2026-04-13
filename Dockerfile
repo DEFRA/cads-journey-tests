@@ -17,7 +17,9 @@ RUN curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2
 WORKDIR /app
 
 COPY . .
+
 RUN rm -rf allure-report allure-results playwright-report
+RUN mkdir -p /app/allure-report /app/playwright-report
 
 RUN chmod +x entrypoint.sh
 RUN chmod +x ./bin/publish-tests.sh
