@@ -1,4 +1,4 @@
-name: Run Journey Tests
+name: Run Journey Tests (GitHub)
 
 on:  
 
@@ -88,7 +88,6 @@ jobs:
           ref: ${{ inputs.branch-set == 'main' && 'main' || github.ref }}
           path: cads-journey-tests
 
-      # Shell script permissions
       - name: Fix permissions for platform scripts
         run: |
           chmod -R +x cads-tools/**/*.sh || true
@@ -96,7 +95,6 @@ jobs:
           chmod -R +x cads-mis/**/*.sh || true
           chmod -R +x cads-journey-tests/**/*.sh || true
 
-      # Copy frontend.env into cads-mis
       - name: Copy frontend.env into cads-mis
         run: |
           mkdir -p cads-mis/compose
@@ -122,15 +120,12 @@ jobs:
           chmod +x platform.sh
           ./platform.sh up
 
-      # Allow for time for DB migrations etc
       - name: Wait for platform to stabilise
         run: sleep 15
 
-      # List running containers
       - name: List running containers
         run: docker ps -a
 
-      # Debug localstack
       - name: Debug localstack
         if: always()
         run: docker logs cads-localstack || true
@@ -141,20 +136,17 @@ jobs:
         if: always()
         run: docker exec cads-localstack ls -R /etc/localstack/init/ready.d || true
 
-      # Debug Backend
-      - name: Backend logs
+      - name: Debug: Backend logs
         run: docker logs cads_cds || true
-      - name: Backend health endpoint debug
+      - name: Debug: Backend health endpoint debug
         run: docker compose -p cads-tools exec -T cads_cds curl -v http://localhost:5555/health
 
-      # Ensure report directories exist
       - name: Ensure report directories exist
         run: |
           mkdir -p cads-journey-tests/allure-report
           mkdir -p cads-journey-tests/playwright-report
 
-      # Run journey-tests inside Docker
-      - name: Run journey tests
+      - name: Run journey-tests inside Docker
         working-directory: cads-journey-tests
         env:
           TEST_INPUT: ${{ inputs.test }}
@@ -183,12 +175,10 @@ jobs:
               sh -c "npm ci && npx playwright test --grep='$FILTER'"
           fi
         
-      # Debug cads-tools network
-      - name: Inspect cads-tools network
+      - name: Debug: Inspect cads-tools network
         if: always()
         run: docker network inspect cads-tools
 
-      # Upload Allure report
       - name: Upload Allure report
         if: always()
         uses: actions/upload-artifact@v4
@@ -196,7 +186,6 @@ jobs:
           name: allure-report
           path: cads-journey-tests/allure-report
 
-      # Upload Playwright report
       - name: Upload Playwright HTML report
         if: always()
         uses: actions/upload-artifact@v4
@@ -205,7 +194,6 @@ jobs:
           path: cads-journey-tests/playwright-report
           if-no-files-found: ignore
 
-      # Collect Docker logs
       - name: Collect Docker logs
         if: always()
         run: |
@@ -220,7 +208,6 @@ jobs:
             docker logs $c >> logs.txt 2>&1 || true
           done
 
-      # Upload docker logs
       - name: Upload docker logs
         if: always()
         uses: actions/upload-artifact@v4
@@ -234,8 +221,7 @@ jobs:
         working-directory: cads-journey-tests/bin
         run: ./platform.sh down
 
-      # Slack notification
-      - name: Post Slack Report
+      - name: Post Slack report
         if: always()
         env:
           SLACK_WEBHOOK_URL: ${{ inputs.slack-webhook-url }}

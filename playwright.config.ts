@@ -36,12 +36,12 @@ const reporters: ReporterDescription[] = [
   [
     'html',
     {
-      outputFolder: 'playwright-report/html',
+      outputFolder: '/app/playwright-report/html',
       open: isCDPEnvironment ? 'never' : 'on-failure'
     }
   ],
-  ['json', { outputFile: 'playwright-report/results.json' }],
-  ['allure-playwright', { reportDir: 'allure-report' }]
+  ['json', { outputFile: '/app/playwright-report/results.json' }],
+  ['allure-playwright', { reportDir: '/app/allure-report' }]
 ]
 
 // Enable GitHub reporter ONLY inside GitHub Actions runner
