@@ -195,14 +195,6 @@ jobs:
           path: cads-journey-tests/playwright-report/html
           if-no-files-found: ignore
 
-      - name: Upload test-results
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: test-results
-          path: cads-journey-tests/test-results
-          if-no-files-found: ignore
-
       - name: Collect Docker logs
         if: always()
         run: |
