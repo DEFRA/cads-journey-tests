@@ -2,6 +2,7 @@ import * as dotenv from 'dotenv'
 import * as fs from 'fs'
 import { defineConfig, devices } from '@playwright/test'
 import type { GitHubActionOptions } from '@estruyf/github-actions-reporter'
+import { ReporterDescription } from 'playwright/test'
 
 // Set Environment
 const ENV = process.env.ENVIRONMENT ?? 'local'
@@ -30,6 +31,31 @@ process.env.apiKey =
     ? 'API_KEY'
     : undefined
 
+const reporters: ReporterDescription[] = [
+  ['list'], // CLI console output
+  [
+    'html',
+    {
+      outputFolder: 'playwright-report/html',
+      open: isCDPEnvironment ? 'never' : 'on-failure'
+    }
+  ],
+  ['json', { outputFile: 'playwright-report/results.json' }],
+  ['allure-playwright', { reportDir: 'allure-report' }]
+]
+
+// Enable GitHub reporter ONLY inside GitHub Actions runner
+if (process.env.GITHUB_ACTIONS === 'true') {
+  reporters.push([
+    '@estruyf/github-actions-reporter',
+    <GitHubActionOptions>{
+      title: `Journey Tests on environment: ${ENV}`,
+      useDetails: true,
+      showError: true
+    }
+  ])
+}
+
 export default defineConfig({
   // Look for test files in the "tests" directory, relative to this configuration file.
   testDir: 'tests',
@@ -48,27 +74,7 @@ export default defineConfig({
   workers: process.env.CI ? 1 : undefined,
 
   // Reporter to use
-  reporter: [
-    ['list'], // CLI console output
-    [
-      'html',
-      {
-        outputFolder: 'playwright-report/html',
-        open: isCDPEnvironment ? 'never' : 'on-failure'
-      }
-    ],
-    ['json', { outputFile: 'playwright-report/results.json' }],
-    ['allure-playwright', { reportDir: 'allure-report' }],
-    [
-      '@estruyf/github-actions-reporter',
-      <GitHubActionOptions>{
-        title: 'Journey Tests on environment: ' + ENV,
-        useDetails: true,
-        showError: true
-      }
-    ]
-    // ['junit', { outputFile: 'report/results.xml' }]
-  ],
+  reporter: reporters,
 
   use: {
     baseURL: ui,

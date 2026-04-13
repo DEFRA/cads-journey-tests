@@ -2,7 +2,7 @@ name: Run Journey Tests
 
 inputs:
   test:
-    description: "Choose Test Suite"
+    description: "Choose Test suite"
     type: choice
     required: false
     default: ''
@@ -10,7 +10,7 @@ inputs:
       - API
       - UI
   tag:
-    description: "Choose Test Group"
+    description: "Choose test group"
     type: choice
     required: false
     default: ''
