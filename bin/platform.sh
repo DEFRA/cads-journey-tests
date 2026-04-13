@@ -83,14 +83,14 @@ stop_backend() {
 start_ui() {
   echo "[platform] Starting UI..."
   cd "$UI_DIR"
-  docker compose -p cads-tools -f docker-compose.yml -f docker-compose.ci.yml up -d
+  docker compose -p cads-tools -f docker-compose.ci.yml up -d
   return $?
 }
 
 stop_ui() {
   echo "[platform] Stopping UI..."
   cd "$UI_DIR"
-  docker compose -p cads-tools -f docker-compose.yml down || true
+  docker compose -p cads-tools -f docker-compose.ci.yml down || true
   return $?
 }
 
