@@ -211,18 +211,28 @@ jobs:
           path: cads-journey-tests/playwright-report
           if-no-files-found: ignore
 
-      # Upload Docker logs
-      - name: Upload Docker logs
+      # Collect Docker logs
+      - name: Collect Docker logs
+        if: always()
+        run: |
+          echo "Docker container logs" > logs.txt
+          echo "=====================" >> logs.txt
+          docker ps -a >> logs.txt
+
+          for c in $(docker ps -a --format "{{.Names}}"); do
+            echo "=====================" >> logs.txt
+            echo "CONTAINER: $c" >> logs.txt
+            echo "=====================" >> logs.txt
+            docker logs $c >> logs.txt 2>&1 || true
+          done
+
+      # Upload docker logs
+      - name: Upload docker logs
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: docker-logs
-          path: |
-            cads-tools/harness/logs
-            cads-data-service/platform/logs
-            cads-mis/logs
-            cads-journey-tests/logs
-          if-no-files-found: ignore
+          path: logs.txt
 
       # Stop journey tests containers
       - name: Stop journey-tests containers
