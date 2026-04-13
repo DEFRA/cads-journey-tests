@@ -83,14 +83,14 @@ stop_backend() {
 start_ui() {
   echo "[platform] Starting UI..."
   cd "$UI_DIR"
-  docker compose -p cads-tools up -d
+  docker compose -p cads-tools -f docker-compose.yml up -d
   return $?
 }
 
 stop_ui() {
   echo "[platform] Stopping UI..."
   cd "$UI_DIR"
-  docker compose -p cads-tools down || true
+  docker compose -p cads-tools -f docker-compose.yml down || true
   return $?
 }
 
@@ -99,10 +99,10 @@ case "$COMMAND" in
     ensure_network
     start_tools
     start_backend
-    #start_ui
+    start_ui
     ;;
   down)
-    #stop_ui
+    stop_ui
     stop_backend
     stop_tools
     ;;
