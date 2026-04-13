@@ -76,7 +76,9 @@ jobs:
         uses: actions/checkout@v4.2.0
         with:
           repository: DEFRA/cads-mis
-          ref: ${{ inputs.branch-set == 'main' && 'main' || 'develop' }}
+          # TODO: Revert to main/develop once ui merged
+          # ref: ${{ inputs.branch-set == 'main' && 'main' || 'develop' }}
+          ref: 'feature/ULITP-4787-aad-integration'
           path: cads-mis
 
       - name: Checkout cads-journey-tests

@@ -9,6 +9,29 @@ echo "run_id: $RUN_ID"
 # - TEST_INPUT: optional test suite filter (e.g. "API" or "UI")
 # - ENVIRONMENT: target environment (e.g. "docker", "dev", "test")
 
+echo "------------------------------------------------------------"
+echo "[journey-tests] Environment variables in use:"
+echo "------------------------------------------------------------"
+
+echo "ENVIRONMENT:              ${ENVIRONMENT:-<not set>}"
+echo "PROFILE:                  ${PROFILE:-<not set>}"
+echo "CI:                       ${CI:-<not set>}"
+echo ""
+
+echo "CADS_MIP_FRONTEND_BASE_URL:         ${CADS_MIP_FRONTEND_BASE_URL:-<not set>}"
+echo "CADS_CDS_BACKEND_BASE_URL:          ${CADS_CDS_BACKEND_BASE_URL:-<not set>}"
+echo "CADS_CDS_BACKEND_EXTERNAL_BASE_URL: ${CADS_CDS_BACKEND_EXTERNAL_BASE_URL:-<not set>}"
+echo ""
+
+echo "GITHUB_ACTIONS:           ${GITHUB_ACTIONS:-<not set>}"
+echo "RUN_ID:                   ${RUN_ID:-<not set>}"
+echo ""
+
+echo "Node version:             $(node -v)"
+echo "NPM version:              $(npm -v)"
+echo "Working directory:        $(pwd)"
+echo "------------------------------------------------------------"
+
 TEST_INPUT="${PROFILE}"
 ENVIRONMENT="${ENVIRONMENT}"
 
