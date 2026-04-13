@@ -136,9 +136,9 @@ jobs:
         if: always()
         run: docker exec cads-localstack ls -R /etc/localstack/init/ready.d || true
 
-      - name: Debug: Backend logs
+      - name: Debug Backend logs
         run: docker logs cads_cds || true
-      - name: Debug: Backend health endpoint debug
+      - name: Debug Backend health endpoint debug
         run: docker compose -p cads-tools exec -T cads_cds curl -v http://localhost:5555/health
 
       - name: Ensure report directories exist
@@ -175,7 +175,7 @@ jobs:
               sh -c "npm ci && npx playwright test --grep='$FILTER'"
           fi
         
-      - name: Debug: Inspect cads-tools network
+      - name: Debug Inspect cads-tools network
         if: always()
         run: docker network inspect cads-tools
 
