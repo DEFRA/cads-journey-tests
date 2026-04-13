@@ -159,6 +159,12 @@ jobs:
       - name: Backend health endpoint debug
         run: docker compose -p cads-tools exec -T cads_cds curl -v http://localhost:5555/health
 
+      # Ensure report directories exist
+      - name: Ensure report directories exist
+        run: |
+          mkdir -p cads-journey-tests/allure-report
+          mkdir -p cads-journey-tests/playwright-report
+
       # Run journey-tests inside Docker
       - name: Run journey tests
         working-directory: cads-journey-tests
@@ -233,12 +239,6 @@ jobs:
         with:
           name: docker-logs
           path: logs.txt
-
-      # Stop journey tests containers
-      - name: Stop journey-tests containers
-        if: always()
-        working-directory: cads-journey-tests
-        run: docker compose -p cads-tools down || true
 
       # Stop platform (tools + backend + UI)
       - name: Stop platform

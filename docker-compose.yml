@@ -17,7 +17,6 @@ services:
     volumes:
       - ./allure-report:/app/allure-report
       - ./playwright-report:/app/playwright-report
-      - ./logs:/app/logs
     networks:
       - cads-tools
 
