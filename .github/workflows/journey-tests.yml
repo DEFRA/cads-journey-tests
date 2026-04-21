@@ -41,6 +41,14 @@ on:
         required: false
         type: string
         default: ''
+      branch-set:
+        description: "Which branch set to test (develop or main)"
+        type: choice
+        required: false
+        default: develop
+        options:
+          - develop
+          - main
       slack-webhook-url:
         required: false
         type: string
