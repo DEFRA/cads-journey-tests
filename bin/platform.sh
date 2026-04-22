@@ -64,7 +64,7 @@ start_backend() {
   docker compose -p cads-tools \
     -f docker-compose.yml \
     -f "$OVERRIDE_FILE" \
-    up -d
+    up --build -d
 
   return $?
 }
@@ -82,10 +82,10 @@ start_ui() {
 
   if [ "${CI:-}" = "true" ]; then
     echo "[platform] Using UI compose file: docker-compose.ci.yml"
-    docker compose -p cads-tools -f docker-compose.ci.yml up -d
+    docker compose -p cads-tools -f docker-compose.ci.yml up --build -d
   else
     echo "[platform] Using UI compose file: docker-compose.yml"
-    docker compose -p cads-tools -f docker-compose.yml up -d
+    docker compose -p cads-tools -f docker-compose.yml up --build -d
   fi
 
   return $?
