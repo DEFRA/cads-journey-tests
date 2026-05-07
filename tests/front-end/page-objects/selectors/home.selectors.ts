@@ -6,14 +6,17 @@ type HomeSelectors = {
 }
 
 const homeSelectorsByEnv: Record<TestEnv, HomeSelectors> = {
+  docker: {
+    startNowButton: '.govuk-button'
+  },
   local: {
     startNowButton: '.govuk-button'
   },
   dev: {
-    startNowButton: ''
+    startNowButton: '.govuk-button'
   },
   test: {
-    startNowButton: ''
+    startNowButton: '.govuk-button'
   }
 }
 

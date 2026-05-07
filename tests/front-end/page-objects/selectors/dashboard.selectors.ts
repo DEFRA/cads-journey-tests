@@ -7,17 +7,21 @@ type DashboardSelectors = {
 }
 
 const dashboardSelectorsByEnv: Record<TestEnv, DashboardSelectors> = {
+  docker: {
+    breadcrumbs: '.govuk-breadcrumbs__list-item',
+    reports: '.govuk-summary-card__title'
+  },
   local: {
     breadcrumbs: '.govuk-breadcrumbs__list-item',
     reports: '.govuk-summary-card__title'
   },
   dev: {
-    breadcrumbs: '',
-    reports: ''
+    breadcrumbs: '.govuk-breadcrumbs__list-item',
+    reports: '.govuk-summary-card__title'
   },
   test: {
-    breadcrumbs: '',
-    reports: ''
+    breadcrumbs: '.govuk-breadcrumbs__list-item',
+    reports: '.govuk-summary-card__title'
   }
 }
 

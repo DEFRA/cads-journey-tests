@@ -11,6 +11,14 @@ type LoginSelectors = {
 }
 
 const loginSelectorsByEnv: Record<TestEnv, LoginSelectors> = {
+  docker: {
+    usernameInput: '#Username',
+    passwordInput: '#Password',
+    loginButton: 'Login',
+    signInButton: 'Sign in',
+    signedOutButton: 'Sign out',
+    hereLink: 'here'
+  },
   local: {
     usernameInput: '#Username',
     passwordInput: '#Password',
@@ -20,20 +28,20 @@ const loginSelectorsByEnv: Record<TestEnv, LoginSelectors> = {
     hereLink: 'here'
   },
   dev: {
-    usernameInput: '',
-    passwordInput: '',
-    loginButton: '',
-    signInButton: '',
-    signedOutButton: '',
-    hereLink: ''
+    usernameInput: '#Username',
+    passwordInput: '#Password',
+    loginButton: 'Login',
+    signInButton: 'Sign in',
+    signedOutButton: 'Sign out',
+    hereLink: 'here'
   },
   test: {
-    usernameInput: '',
-    passwordInput: '',
-    loginButton: '',
-    signInButton: '',
-    signedOutButton: '',
-    hereLink: ''
+    usernameInput: '#Username',
+    passwordInput: '#Password',
+    loginButton: 'Login',
+    signInButton: 'Sign in',
+    signedOutButton: 'Sign out',
+    hereLink: 'here'
   }
 }
 
