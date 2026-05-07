@@ -36,11 +36,11 @@ const reporters: ReporterDescription[] = [
   [
     'html',
     {
-      outputFolder: '/app/playwright-report/html',
+      outputFolder: './playwright-report/html',
       open: isCDPEnvironment ? 'never' : 'on-failure'
     }
   ],
-  ['json', { outputFile: '/app/playwright-report/results.json' }],
+  ['json', { outputFile: './playwright-report/results.json' }],
   ['allure-playwright', { reportDir: '/app/allure-report' }]
 ]
 
@@ -84,9 +84,16 @@ export default defineConfig({
   },
   // Configure projects for major browsers.
   projects: [
+    // Auth setup that writes `playwright/.auth/user.json`
+    { name: 'setup', testDir: 'tests/fixtures', testMatch: 'setup.ts' },
     {
       name: 'chromium',
-      use: { ...devices['Desktop Chrome'] }
+      use: {
+        ...devices['Desktop Chrome'],
+        storageState: 'playwright/.auth/user.json'
+      },
+      dependencies: ['setup'],
+      testIgnore: ['**/login.spec.ts']
     }
   ],
   // Run your local dev server before starting the tests.

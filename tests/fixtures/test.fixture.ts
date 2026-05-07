@@ -4,6 +4,8 @@ import { frontendTests } from '../fixtures/frontend.fixture'
 
 export const test = mergeTests(backendTests, frontendTests)
 
+// test.use({ storageState: 'playwright/.auth/user.json' })
+
 test.afterEach(async ({ page }) => {
   await page.close()
 })

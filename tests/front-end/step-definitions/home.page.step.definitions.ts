@@ -15,4 +15,8 @@ export class HomePageStepDefinitions {
     await expect(this.homePage.heading).toBeVisible()
     await expect(this.homePage.heading).toHaveText('Home')
   }
+
+  async NavigateToDashboardPage() {
+    await this.homePage.startNowButton.click()
+  }
 }
