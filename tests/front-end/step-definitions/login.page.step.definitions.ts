@@ -1,5 +1,6 @@
 import { LoginPage } from '../page-objects/login.page'
 import { expect } from '@playwright/test'
+import { getEnv } from '../../../configs/env'
 
 export class LoginPageStepDefinitions {
   private readonly loginPage: LoginPage
@@ -12,9 +13,18 @@ export class LoginPageStepDefinitions {
   }
 
   async ILoginWithValidCredentials(username: string, password: string) {
-    await this.loginPage.usernameInput.fill(username)
-    await this.loginPage.passwordInput.fill(password)
-    await this.loginPage.loginButton.click()
+    const env = getEnv()
+    if (env === 'local') {
+      await this.loginPage.usernameInput.fill(username)
+      await this.loginPage.passwordInput.fill(password)
+      await this.loginPage.loginButton.click()
+    } else {
+      await this.loginPage.usernameInput.fill(username)
+      await this.loginPage.nextButton.click()
+      await this.loginPage.passwordInput.fill(password)
+      await this.loginPage.nextButton.click()
+      await this.loginPage.nextButton.click()
+    }
   }
 
   async ISignedOutSuccessfullyFromTheApplication() {

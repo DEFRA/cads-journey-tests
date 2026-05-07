@@ -10,11 +10,11 @@ export class LoginPage extends BasePage {
   public readonly signInButton: Locator
   public readonly signedOutButton: Locator
   public readonly hereLink: Locator
+  public readonly nextButton: Locator
 
   constructor(page: Page) {
     super(page)
     const env = getEnv()
-    console.log('env', env)
     const selectors = getLoginSelectors(env)
     this.usernameInput = page.locator(selectors.usernameInput)
     this.passwordInput = page.locator(selectors.passwordInput)
@@ -24,6 +24,7 @@ export class LoginPage extends BasePage {
       name: selectors.signedOutButton
     })
     this.hereLink = page.getByRole('link', { name: selectors.hereLink })
+    this.nextButton = page.locator(selectors.nextButton)
   }
 
   public async navigateToLoginPage() {

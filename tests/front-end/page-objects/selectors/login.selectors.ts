@@ -8,6 +8,7 @@ type LoginSelectors = {
   signInButton: string
   signedOutButton: string
   hereLink: string
+  nextButton: string
 }
 
 const loginSelectorsByEnv: Record<TestEnv, LoginSelectors> = {
@@ -17,7 +18,8 @@ const loginSelectorsByEnv: Record<TestEnv, LoginSelectors> = {
     loginButton: 'Login',
     signInButton: 'Sign in',
     signedOutButton: 'Sign out',
-    hereLink: 'here'
+    hereLink: 'here',
+    nextButton: ''
   },
   local: {
     usernameInput: '#Username',
@@ -25,23 +27,26 @@ const loginSelectorsByEnv: Record<TestEnv, LoginSelectors> = {
     loginButton: 'Login',
     signInButton: 'Sign in',
     signedOutButton: 'Sign out',
-    hereLink: 'here'
+    hereLink: 'here',
+    nextButton: ''
   },
   dev: {
-    usernameInput: '#Username',
-    passwordInput: '#Password',
+    usernameInput: '[name="loginfmt"]',
+    passwordInput: '[name="passwd"]',
     loginButton: 'Login',
     signInButton: 'Sign in',
     signedOutButton: 'Sign out',
-    hereLink: 'here'
+    hereLink: 'here',
+    nextButton: '[type="submit"]'
   },
   test: {
-    usernameInput: '#Username',
-    passwordInput: '#Password',
+    usernameInput: '[name="loginfmt"]',
+    passwordInput: '[name="passwd"]',
     loginButton: 'Login',
     signInButton: 'Sign in',
     signedOutButton: 'Sign out',
-    hereLink: 'here'
+    hereLink: 'here',
+    nextButton: '[type="submit"]'
   }
 }
 
