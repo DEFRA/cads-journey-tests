@@ -14,6 +14,7 @@ export class LoginPage extends BasePage {
   constructor(page: Page) {
     super(page)
     const env = getEnv()
+    console.log('env', env)
     const selectors = getLoginSelectors(env)
     this.usernameInput = page.locator(selectors.usernameInput)
     this.passwordInput = page.locator(selectors.passwordInput)
