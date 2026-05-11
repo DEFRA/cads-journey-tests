@@ -90,7 +90,8 @@ export default defineConfig({
       args: [
         '--no-sandbox',
         '--disable-dev-shm-usage',
-        '--ignore-certificate-errors'
+        '--ignore-certificate-errors',
+        '--disable-features=UseChromeOSDirectVideoDecoder'
       ]
     }
   },
