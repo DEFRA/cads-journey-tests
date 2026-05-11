@@ -90,7 +90,12 @@ export default defineConfig({
       name: 'chromium',
       use: {
         ...devices['Desktop Chrome'],
-        storageState: 'playwright/.auth/user.json'
+        storageState: 'playwright/.auth/user.json',
+        launchOptions: {
+          args: process.env.HTTP_PROXY
+            ? [`--proxy-server=${process.env.HTTP_PROXY}`]
+            : []
+        }
       },
       dependencies: ['setup'],
       testIgnore: ['**/login.spec.ts']
