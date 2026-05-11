@@ -30,7 +30,7 @@ process.env.apiKey =
   !process.env.CI && ENV === 'dev' && process.env.CDP === undefined
     ? 'API_KEY'
     : undefined
-const proxy = process.env.HTTPS_PROXY || process.env.HTTP_PROXY
+// const proxy = process.env.HTTPS_PROXY || process.env.HTTP_PROXY
 const reporters: ReporterDescription[] = [
   ['list'], // CLI console output
   [
@@ -87,7 +87,7 @@ export default defineConfig({
         '--no-sandbox',
         '--disable-dev-shm-usage',
         '--ignore-certificate-errors',
-        `--proxy-server=${proxy}`
+        `--proxy-server=${process.env.CDP_HTTP_PROXY || process.env.CDP_HTTPS_PROXY}`
       ]
     }
   },
