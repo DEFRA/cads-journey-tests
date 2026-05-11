@@ -85,7 +85,10 @@ export default defineConfig({
     trace: 'retain-on-failure',
     video: 'retain-on-failure',
     ignoreHTTPSErrors: true,
-    proxy: proxy ? { server: proxy } : undefined
+    proxy: proxy ? { server: proxy } : undefined,
+    launchOptions: {
+      args: ['--disable-http2', '--ignore-certificate-errors']
+    }
   },
   // Configure projects for major browsers.
   projects: [
