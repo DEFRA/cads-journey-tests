@@ -30,7 +30,10 @@ process.env.apiKey =
   !process.env.CI && ENV === 'dev' && process.env.CDP === undefined
     ? 'API_KEY'
     : undefined
-
+const proxy = process.env.HTTPS_PROXY || process.env.HTTP_PROXY
+if (proxy) {
+  console.log('Proxy:', proxy)
+}
 const reporters: ReporterDescription[] = [
   ['list'], // CLI console output
   [
@@ -80,7 +83,9 @@ export default defineConfig({
     baseURL: ui,
     screenshot: 'only-on-failure',
     trace: 'retain-on-failure',
-    video: 'retain-on-failure'
+    video: 'retain-on-failure',
+    ignoreHTTPSErrors: true,
+    proxy: proxy ? { server: proxy } : undefined
   },
   // Configure projects for major browsers.
   projects: [
@@ -90,13 +95,7 @@ export default defineConfig({
       name: 'chromium',
       use: {
         ...devices['Desktop Chrome'],
-        storageState: 'playwright/.auth/user.json',
-        ignoreHTTPSErrors: true,
-        launchOptions: {
-          args: process.env.HTTP_PROXY
-            ? [`--proxy-server=${process.env.HTTP_PROXY}`]
-            : []
-        }
+        storageState: 'playwright/.auth/user.json'
       },
       dependencies: ['setup'],
       testIgnore: ['**/login.spec.ts']
