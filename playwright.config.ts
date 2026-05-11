@@ -85,13 +85,13 @@ export default defineConfig({
     trace: 'retain-on-failure',
     video: 'retain-on-failure',
     ignoreHTTPSErrors: true,
-    proxy: proxy ? { server: proxy } : undefined,
     launchOptions: {
       args: [
         '--no-sandbox',
         '--disable-dev-shm-usage',
         '--ignore-certificate-errors',
-        '--disable-features=UseChromeOSDirectVideoDecoder'
+        '--disable-http2',
+        ...(proxy ? [`--proxy-server=${proxy}`] : [])
       ]
     }
   },
