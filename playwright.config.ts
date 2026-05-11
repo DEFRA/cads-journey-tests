@@ -87,7 +87,7 @@ export default defineConfig({
         '--no-sandbox',
         '--disable-dev-shm-usage',
         '--ignore-certificate-errors',
-        ...(proxy ? [`--proxy-server=${proxy}`] : [])
+        `--proxy-server=${proxy}`
       ]
     }
   },
