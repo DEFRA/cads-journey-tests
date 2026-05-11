@@ -87,7 +87,11 @@ export default defineConfig({
     ignoreHTTPSErrors: true,
     proxy: proxy ? { server: proxy } : undefined,
     launchOptions: {
-      args: ['--disable-features=NetworkService', '--ignore-certificate-errors']
+      args: [
+        '--no-sandbox',
+        '--disable-dev-shm-usage',
+        '--ignore-certificate-errors'
+      ]
     }
   },
   // Configure projects for major browsers.
