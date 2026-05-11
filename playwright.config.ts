@@ -91,6 +91,7 @@ export default defineConfig({
       use: {
         ...devices['Desktop Chrome'],
         storageState: 'playwright/.auth/user.json',
+        ignoreHTTPSErrors: true,
         launchOptions: {
           args: process.env.HTTP_PROXY
             ? [`--proxy-server=${process.env.HTTP_PROXY}`]
