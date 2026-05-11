@@ -30,10 +30,8 @@ process.env.apiKey =
   !process.env.CI && ENV === 'dev' && process.env.CDP === undefined
     ? 'API_KEY'
     : undefined
-const proxy = process.env.HTTPS_PROXY || process.env.HTTP_PROXY
-if (proxy) {
-  console.log('Proxy:', proxy)
-}
+const rawProxy = process.env.HTTPS_PROXY || process.env.HTTP_PROXY
+const proxy = rawProxy?.replace(/^https?:\/\//, '')?.replace(/\/$/, '')
 const reporters: ReporterDescription[] = [
   ['list'], // CLI console output
   [
