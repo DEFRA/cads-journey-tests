@@ -3,6 +3,8 @@ import * as fs from 'fs'
 import { defineConfig, devices } from '@playwright/test'
 import type { GitHubActionOptions } from '@estruyf/github-actions-reporter'
 import { ReporterDescription } from 'playwright/test'
+import { ProxyAgent, setGlobalDispatcher } from 'undici'
+import { bootstrap, type ProxyAgentConfigurationType } from 'global-agent'
 
 // Set Environment
 const ENV = process.env.ENVIRONMENT ?? 'local'
@@ -31,6 +33,17 @@ process.env.apiKey =
     ? 'API_KEY'
     : undefined
 // const proxy = process.env.HTTPS_PROXY || process.env.HTTP_PROXY
+const dispatcher = new ProxyAgent({
+  uri: 'http://localhost:3128'
+})
+setGlobalDispatcher(dispatcher)
+bootstrap()
+;(
+  globalThis as typeof globalThis & {
+    GLOBAL_AGENT: ProxyAgentConfigurationType
+  }
+).GLOBAL_AGENT.HTTP_PROXY = 'http://localhost:3128'
+
 const reporters: ReporterDescription[] = [
   ['list'], // CLI console output
   [
@@ -80,16 +93,7 @@ export default defineConfig({
     baseURL: ui,
     screenshot: 'only-on-failure',
     trace: 'retain-on-failure',
-    video: 'retain-on-failure',
-    ignoreHTTPSErrors: true,
-    launchOptions: {
-      args: [
-        '--no-sandbox',
-        '--disable-dev-shm-usage',
-        '--ignore-certificate-errors',
-        '--proxy-server=http://localhost:3128'
-      ]
-    }
+    video: 'retain-on-failure'
   },
   // Configure projects for major browsers.
   projects: [
