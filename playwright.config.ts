@@ -94,11 +94,15 @@ export default defineConfig({
       args: [
         '--no-sandbox',
         '--disable-dev-shm-usage',
-        '--ignore-certificate-errors',
-        '--disable-features=msSmartScreenProtection'
+        '--ignore-certificate-errors'
       ]
     },
-    proxy: proxy ? { server: proxy } : undefined
+    proxy: proxy
+      ? {
+          server: proxy,
+          bypass: '.cdp-int.defra.cloud,cads-mis.dev.cdp-int.defra.cloud'
+        }
+      : undefined
   },
   // Configure projects for major browsers.
   projects: [
