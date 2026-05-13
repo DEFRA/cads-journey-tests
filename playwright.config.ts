@@ -3,6 +3,8 @@ import * as fs from 'fs'
 import { defineConfig, devices } from '@playwright/test'
 import type { GitHubActionOptions } from '@estruyf/github-actions-reporter'
 import { ReporterDescription } from 'playwright/test'
+import { ProxyAgent, setGlobalDispatcher } from 'undici'
+import { bootstrap, type ProxyAgentConfigurationType } from 'global-agent'
 
 // Set Environment
 const ENV = process.env.ENVIRONMENT ?? 'local'
@@ -30,6 +32,17 @@ process.env.apiKey =
   !process.env.CI && ENV === 'dev' && process.env.CDP === undefined
     ? 'API_KEY'
     : undefined
+
+const dispatcher = new ProxyAgent({
+  uri: 'http://localhost:3128'
+})
+setGlobalDispatcher(dispatcher)
+bootstrap()
+;(
+  globalThis as typeof globalThis & {
+    GLOBAL_AGENT: ProxyAgentConfigurationType
+  }
+).GLOBAL_AGENT.HTTP_PROXY = 'http://localhost:3128'
 
 const rawProxy = process.env.HTTP_PROXY || process.env.HTTPS_PROXY
 
