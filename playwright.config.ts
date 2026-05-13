@@ -31,7 +31,13 @@ process.env.apiKey =
     ? 'API_KEY'
     : undefined
 
-const proxy = process.env.HTTP_PROXY
+const rawProxy = process.env.HTTP_PROXY || process.env.HTTPS_PROXY
+
+console.log('Raw proxy:', rawProxy ?? '<not set>')
+
+const proxy = rawProxy && rawProxy !== 'undefined' ? rawProxy : undefined
+
+console.log('Processed proxy:', proxy ?? '<not set>')
 
 const reporters: ReporterDescription[] = [
   ['list'], // CLI console output
