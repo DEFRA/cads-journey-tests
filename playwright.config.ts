@@ -110,11 +110,9 @@ export default defineConfig({
         '--ignore-certificate-errors'
       ]
     },
-    proxy: proxy
-      ? {
-          server: 'http://localhost:3128'
-        }
-      : undefined
+    proxy: {
+      server: 'http://localhost:3128'
+    }
   },
   // Configure projects for major browsers.
   projects: [
