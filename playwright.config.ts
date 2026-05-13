@@ -87,7 +87,7 @@ export default defineConfig({
         '--no-sandbox',
         '--disable-dev-shm-usage',
         '--ignore-certificate-errors',
-        `--proxy-server=${process.env.CDP_HTTP_PROXY || process.env.CDP_HTTPS_PROXY}`
+        '--proxy-server=http://localhost:3128'
       ]
     }
   },
