@@ -89,10 +89,10 @@ export default defineConfig({
         '--no-sandbox',
         '--disable-dev-shm-usage',
         '--ignore-certificate-errors',
-        '--disable-features=msSmartScreenProtection',
-        ...(proxy ? [`--proxy-server=${proxy}`] : [])
+        '--disable-features=msSmartScreenProtection'
       ]
-    }
+    },
+    proxy: proxy ? { server: proxy } : undefined
   },
   // Configure projects for major browsers.
   projects: [
