@@ -99,8 +99,7 @@ export default defineConfig({
     },
     proxy: proxy
       ? {
-          server: proxy,
-          bypass: '.cdp-int.defra.cloud,cads-mis.dev.cdp-int.defra.cloud'
+          server: 'http://localhost:3128'
         }
       : undefined
   },
