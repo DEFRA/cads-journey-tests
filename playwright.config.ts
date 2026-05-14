@@ -78,9 +78,18 @@ export default defineConfig({
 
   use: {
     baseURL: ui,
+    ignoreHTTPSErrors: true,
     screenshot: 'only-on-failure',
     trace: 'retain-on-failure',
-    video: 'retain-on-failure'
+    video: 'retain-on-failure',
+    proxy: { server: 'http://localhost:3128' },
+    launchOptions: {
+      args: [
+        '--no-sandbox',
+        '--disable-dev-shm-usage',
+        '--ignore-certificate-errors'
+      ]
+    }
   },
   // Configure projects for major browsers.
   projects: [
@@ -90,24 +99,7 @@ export default defineConfig({
       name: 'chromium',
       use: {
         ...devices['Desktop Chrome'],
-        storageState: 'playwright/.auth/user.json',
-        launchOptions: {
-          args: [
-            '--headless', // Use headless mode
-            '--no-sandbox',
-            '--disable-infobars',
-            '--disable-gpu',
-            '--window-size=1920,1080',
-            '--enable-features=NetworkService,NetworkServiceInProcess',
-            '--password-store=basic',
-            '--use-mock-keychain',
-            '--dns-prefetch-disable',
-            '--disable-background-networking',
-            '--disable-remote-fonts',
-            '--ignore-certificate-errors',
-            '--disable-dev-shm-usage'
-          ]
-        }
+        storageState: 'playwright/.auth/user.json'
       },
       dependencies: ['setup'],
       testIgnore: ['**/login.spec.ts']

@@ -29,6 +29,20 @@ export class LoginPage extends BasePage {
 
   public async navigateToLoginPage() {
     await this.goto('/')
-    await this.signInButton.click()
+    if (getEnv() !== 'local') {
+      await Promise.all([
+        this.page.waitForURL(/login\.microsoftonline\.com/, {
+          timeout: 90_000
+        }),
+        this.signInButton.click()
+      ])
+
+      await this.usernameInput.waitFor({
+        state: 'visible',
+        timeout: 90_000
+      })
+    } else {
+      await this.signInButton.click()
+    }
   }
 }
