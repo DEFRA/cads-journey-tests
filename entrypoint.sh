@@ -35,14 +35,6 @@ echo "------------------------------------------------------------"
 TEST_INPUT="${PROFILE}"
 ENVIRONMENT="${ENVIRONMENT}"
 
-# Configure proxy for Playwright container if CDP provides one
-if [ -n "$CDP_HTTP_PROXY" ]; then
-  echo "Configuring proxy for Playwright"
-  export HTTP_PROXY="$CDP_HTTP_PROXY"
-  export HTTPS_PROXY="$CDP_HTTPS_PROXY"
-  export NODE_TLS_REJECT_UNAUTHORIZED=0
-fi
-
 FILTER=""
 
 if [ -n "$TEST_INPUT" ]; then
