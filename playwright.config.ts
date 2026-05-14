@@ -82,7 +82,7 @@ export default defineConfig({
     screenshot: 'only-on-failure',
     trace: 'retain-on-failure',
     video: 'retain-on-failure',
-    proxy: { server: 'http://localhost:3128' },
+    proxy: isCDPEnvironment ? { server: 'http://localhost:3128' } : undefined,
     launchOptions: {
       args: [
         '--no-sandbox',
