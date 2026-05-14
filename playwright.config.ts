@@ -90,7 +90,24 @@ export default defineConfig({
       name: 'chromium',
       use: {
         ...devices['Desktop Chrome'],
-        storageState: 'playwright/.auth/user.json'
+        storageState: 'playwright/.auth/user.json',
+        launchOptions: {
+          args: [
+            '--headless', // Use headless mode
+            '--no-sandbox',
+            '--disable-infobars',
+            '--disable-gpu',
+            '--window-size=1920,1080',
+            '--enable-features=NetworkService,NetworkServiceInProcess',
+            '--password-store=basic',
+            '--use-mock-keychain',
+            '--dns-prefetch-disable',
+            '--disable-background-networking',
+            '--disable-remote-fonts',
+            '--ignore-certificate-errors',
+            '--disable-dev-shm-usage'
+          ]
+        }
       },
       dependencies: ['setup'],
       testIgnore: ['**/login.spec.ts']
