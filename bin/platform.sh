@@ -15,8 +15,8 @@ fi
 BACKEND_DIR="$ROOT_DIR/../cads-data-service"
 TOOLS_DIR="$ROOT_DIR"
 UI_DIR="$ROOT_DIR/../cads-mis"
-SEED_SOURCE_DIR="$ROOT_DIR/../cads-data-seed/sql"
-SEED_TARGET_DIR="$ROOT_DIR/cads-data-seed/sql"
+SEED_SOURCE_DIR="${GITHUB_WORKSPACE:-$(pwd)}/cads-data-seed/sql"
+SEED_TARGET_DIR="$ROOT_DIR/../cads-data-seed/sql"
 
 COMMAND="${1:-help}"
 MAC_OVERRIDE="${2:-}"
@@ -57,15 +57,19 @@ stop_tools() {
 }
 
 copy_seed_data() {
-  if [ -d "$SEED_SOURCE_DIR" ]; then
-    echo "[platform] Copying seed data..."
-    rm -rf "$SEED_TARGET_DIR"
-    mkdir -p "$SEED_TARGET_DIR"
-    cp -R "$SEED_SOURCE_DIR"/. "$SEED_TARGET_DIR"/
-  else
-    echo "[platform] Seed directory not found: $SEED_SOURCE_DIR"
+  echo "[platform] Copying seed data..."
+  echo "[platform] Source: $SEED_SOURCE_DIR"
+  echo "[platform] Target: $SEED_TARGET_DIR"
+
+  if [ ! -d "$SEED_SOURCE_DIR" ]; then
+    echo "[platform] ERROR: Seed source does not exist: $SEED_SOURCE_DIR"
     exit 1
   fi
+
+  mkdir -p "$SEED_TARGET_DIR"
+  cp -R "$SEED_SOURCE_DIR"/. "$SEED_TARGET_DIR"/
+
+  echo "[platform] Seed data copied."
 }
 
 start_backend() {
