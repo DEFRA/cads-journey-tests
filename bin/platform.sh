@@ -120,11 +120,11 @@ stop_ui() {
 
 case "$COMMAND" in
   up)
+    copy_seed_data
     ensure_network
     start_tools
     start_backend
     start_ui
-    copy_seed_data
     ;;
   down)
     stop_ui
