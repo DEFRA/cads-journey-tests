@@ -82,6 +82,7 @@ export default defineConfig({
     screenshot: 'only-on-failure',
     trace: 'retain-on-failure',
     video: 'retain-on-failure',
+    acceptDownloads: true,
     proxy: isCDPEnvironment ? { server: 'http://localhost:3128' } : undefined,
     launchOptions: {
       args: [
