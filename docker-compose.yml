@@ -20,9 +20,12 @@ services:
       - ./playwright-report:/app/playwright-report
     networks:
       - cads-tools
+      - cads-data-seed
 
 networks:
   cads-tools:
+    external: true
+  cads-data-seed:
     external: true
   default:
     external: true
