@@ -118,7 +118,12 @@ jobs:
               --label com.docker.compose.network=cads-tools \
               cads-tools
           fi
-      
+
+      - name: Verify sql folder
+        run: |
+          ls -la cads-data-seed
+          ls -la cads-data-seed/sql
+
       # Create cads-data-seed network early (other projects reference as external)
       - name: Ensure cads-data-seed network exists
         run: |
