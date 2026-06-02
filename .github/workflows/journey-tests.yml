@@ -69,12 +69,13 @@ jobs:
           ref: ${{ inputs.branch-set == 'main' && 'main' || 'main' }}
           path: cads-tools
       
-      - name: Checkout cads-data-seed
-        uses: actions/checkout@v4.2.0
+      - name: Check out cads data seed
+        uses: actions/checkout@v4
         with:
           repository: DEFRA/cads-data-seed
-          ref: ${{ inputs.branch-set == 'main' && 'main' || 'main' }}
           path: cads-data-seed
+          ref: main
+          token: ${{ secrets.CADS_DATA_SEED_PAT_TOKEN }}
 
       - name: Checkout cads-data-service
         uses: actions/checkout@v4.2.0
