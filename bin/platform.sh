@@ -16,7 +16,7 @@ BACKEND_DIR="$ROOT_DIR/../cads-data-service"
 TOOLS_DIR="$ROOT_DIR"
 UI_DIR="$ROOT_DIR/../cads-mis"
 SEED_SOURCE_DIR="$ROOT_DIR/../cads-data-seed/sql"
-SEED_TARGET_DIR="$ROOT_DIR/sql"
+SEED_TARGET_DIR="$ROOT_DIR/cads-data-seed/sql"
 
 COMMAND="${1:-help}"
 MAC_OVERRIDE="${2:-}"
