@@ -49,6 +49,8 @@ else
   CDP=true ENVIRONMENT="$ENVIRONMENT" npx playwright test --config=playwright.config.ts --grep="$FILTER"
 fi
 
+test_exit_code=$?
+
 # Skip publishing when running in GitHub Actions
 if [ "$GITHUB_ACTIONS" = "true" ]; then
   echo "Skipping test result publishing in CI"
@@ -63,9 +65,15 @@ else
 fi
 
 # At the end of the test run, if the suite has failed we write a file called 'FAILED'
-if [ -f FAILED ]; then
-  echo "test suite failed"
-  cat ./FAILED
+if [ -f FAILED ] || [ "$test_exit_code" -ne 0 ]; then
+
+  if [ -f FAILED ]; then
+    echo "test suite failed"
+    cat ./FAILED
+  else
+    echo "Authentication failed"
+  fi
+
   exit 1
 fi
 

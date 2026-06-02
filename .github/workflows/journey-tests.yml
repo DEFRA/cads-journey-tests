@@ -68,6 +68,13 @@ jobs:
           repository: DEFRA/cads-tools
           ref: ${{ inputs.branch-set == 'main' && 'main' || 'main' }}
           path: cads-tools
+      
+      - name: Checkout cads-data-seed
+        uses: actions/checkout@v4.2.0
+        with:
+          repository: DEFRA/cads-data-seed
+          ref: ${{ inputs.branch-set == 'main' && 'main' || 'main' }}
+          path: cads-data-seed
 
       - name: Checkout cads-data-service
         uses: actions/checkout@v4.2.0
