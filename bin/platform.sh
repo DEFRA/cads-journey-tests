@@ -15,6 +15,8 @@ fi
 BACKEND_DIR="$ROOT_DIR/../cads-data-service"
 TOOLS_DIR="$ROOT_DIR"
 UI_DIR="$ROOT_DIR/../cads-mis"
+SEED_SOURCE_DIR="$ROOT_DIR/../cads-data-seed/sql"
+SEED_TARGET_DIR="$ROOT_DIR/sql"
 
 COMMAND="${1:-help}"
 MAC_OVERRIDE="${2:-}"
@@ -52,6 +54,18 @@ stop_tools() {
   echo "[platform] Stopping shared infra..."
   "$TOOLS_DIR/harness/run-harness.sh" down
   return $?
+}
+
+copy_seed_data() {
+  if [ -d "$SEED_SOURCE_DIR" ]; then
+    echo "[platform] Copying seed data..."
+    rm -rf "$SEED_TARGET_DIR"
+    mkdir -p "$SEED_TARGET_DIR"
+    cp -R "$SEED_SOURCE_DIR"/. "$SEED_TARGET_DIR"/
+  else
+    echo "[platform] Seed directory not found: $SEED_SOURCE_DIR"
+    exit 1
+  fi
 }
 
 start_backend() {
@@ -110,6 +124,7 @@ case "$COMMAND" in
     start_tools
     start_backend
     start_ui
+    copy_seed_data
     ;;
   down)
     stop_ui
