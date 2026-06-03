@@ -15,8 +15,6 @@ fi
 BACKEND_DIR="$ROOT_DIR/../cads-data-service"
 TOOLS_DIR="$ROOT_DIR"
 UI_DIR="$ROOT_DIR/../cads-mis"
-SEED_SOURCE_DIR="${GITHUB_WORKSPACE:-$(pwd)}/cads-data-seed/sql"
-SEED_TARGET_DIR="$ROOT_DIR/../cads-data-seed/sql"
 
 COMMAND="${1:-help}"
 MAC_OVERRIDE="${2:-}"
@@ -54,22 +52,6 @@ stop_tools() {
   echo "[platform] Stopping shared infra..."
   "$TOOLS_DIR/harness/run-harness.sh" down
   return $?
-}
-
-copy_seed_data() {
-  echo "[platform] Copying seed data..."
-  echo "[platform] Source: $SEED_SOURCE_DIR"
-  echo "[platform] Target: $SEED_TARGET_DIR"
-
-  if [ ! -d "$SEED_SOURCE_DIR" ]; then
-    echo "[platform] ERROR: Seed source does not exist: $SEED_SOURCE_DIR"
-    exit 1
-  fi
-
-  mkdir -p "$SEED_TARGET_DIR"
-  cp -R "$SEED_SOURCE_DIR"/. "$SEED_TARGET_DIR"/
-
-  echo "[platform] Seed data copied."
 }
 
 start_backend() {
@@ -124,7 +106,6 @@ stop_ui() {
 
 case "$COMMAND" in
   up)
-    copy_seed_data
     ensure_network
     start_tools
     start_backend
