@@ -1,6 +1,6 @@
 name: Run Journey Tests (GitHub)
 
-on:  
+on:
 
   workflow_dispatch:
     inputs:
@@ -68,7 +68,7 @@ jobs:
           repository: DEFRA/cads-tools
           ref: ${{ inputs.branch-set == 'main' && 'main' || 'main' }}
           path: cads-tools
-      
+
       - name: Checkout cads-data-seed
         uses: actions/checkout@v4
         with:
@@ -142,6 +142,32 @@ jobs:
       - name: Wait for platform to stabilise
         run: sleep 15
 
+      - name: Seed SQL files into LocalStack S3
+        if: ${{ hashFiles('cads-data-seed/sql/**/*.sql') != '' }}
+        env:
+          AWS_ACCESS_KEY_ID: test
+          AWS_SECRET_ACCESS_KEY: test
+          AWS_DEFAULT_REGION: eu-west-2
+          AWS_REQUEST_CHECKSUM_CALCULATION: when_required
+          AWS_RESPONSE_CHECKSUM_VALIDATION: when_required
+          ENDPOINT: http://localhost:4566   # host -> mapped LocalStack port
+          BUCKET: cads-internal-bucket
+        run: |
+          set -euo pipefail
+          echo "[seed] Ensuring bucket ${BUCKET} exists..."
+          aws --endpoint-url "${ENDPOINT}" --no-sign-request \
+            s3 mb "s3://${BUCKET}" 2>/dev/null || true
+
+          echo "[seed] Syncing SQL seed data into LocalStack S3..."
+          aws --endpoint-url "${ENDPOINT}" s3 sync cads-data-seed/sql "s3://${BUCKET}/sql" \
+            --exclude "*" \
+            --include "*.sql" \
+            --delete \
+            --no-sign-request
+
+          echo "[seed] Files in bucket:"
+          aws --endpoint-url "${ENDPOINT}" s3 ls "s3://${BUCKET}/sql/" --recursive
+
       - name: List running containers
         run: docker ps -a
 
@@ -193,7 +219,7 @@ jobs:
             docker compose -p cads-tools -f docker-compose.yml run --rm --build journey-tests \
               sh -c "npm ci && npx playwright test --grep='$FILTER'"
           fi
-        
+
       - name: Debug Inspect cads-tools network
         if: always()
         run: docker network inspect cads-tools
