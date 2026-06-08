@@ -143,7 +143,8 @@ jobs:
         run: sleep 15
 
       - name: Seed SQL files into LocalStack S3
-        if: ${{ hashFiles('cads-data-seed/sql/**/*.sql') != '' }}
+        # if: ${{ hashFiles('cads-data-seed/sql/**/*.sql') != '' }}
+        if: ${{ false }} # disabled
         env:
           AWS_ACCESS_KEY_ID: test
           AWS_SECRET_ACCESS_KEY: test
