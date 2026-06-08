@@ -70,7 +70,8 @@ jobs:
           path: cads-tools
 
       - name: Checkout cads-data-seed
-        uses: actions/checkout@v4
+        uses: actions/checkout@v4.2.0
+        if: ${{ false }} # disabled
         with:
           repository: DEFRA/cads-data-seed
           path: cads-data-seed
@@ -119,15 +120,6 @@ jobs:
               cads-tools
           fi
 
-      # Create cads-data-seed network early (other projects reference as external)
-      - name: Ensure cads-data-seed network exists
-        run: |
-          if ! docker network inspect cads-data-seed >/dev/null 2>&1; then
-            docker network create \
-              --label com.docker.compose.network=cads-data-seed \
-              cads-data-seed
-          fi
-
       # FIX: Set ROOT_DIR so Localstack init scripts mount correctly
       - name: Set ROOT_DIR for compose mounts
         run: echo "ROOT_DIR=${{ github.workspace }}/cads-tools" >> $GITHUB_ENV
@@ -143,8 +135,8 @@ jobs:
         run: sleep 15
 
       - name: Seed SQL files into LocalStack S3
-        # if: ${{ hashFiles('cads-data-seed/sql/**/*.sql') != '' }}
         if: ${{ false }} # disabled
+        # if: ${{ hashFiles('cads-data-seed/sql/**/*.sql') != '' }}
         env:
           AWS_ACCESS_KEY_ID: test
           AWS_SECRET_ACCESS_KEY: test
