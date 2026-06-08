@@ -17,5 +17,6 @@ FAILED
 /postgres-data
 /pgadmin-data
 /test-results
+/playwright
 .env
 !.gitkeep
