@@ -13,6 +13,7 @@ echo "------------------------------------------------------------"
 echo "[journey-tests] Environment variables in use:"
 echo "------------------------------------------------------------"
 
+echo "ENV:                      ${ENV:-<not set>}"
 echo "ENVIRONMENT:              ${ENVIRONMENT:-<not set>}"
 echo "PROFILE:                  ${PROFILE:-<not set>}"
 echo "CI:                       ${CI:-<not set>}"
