@@ -1,25 +1,24 @@
 name: Run Journey Tests (GitHub)
 
 on:
-
   workflow_dispatch:
     inputs:
       test:
         description: "Choose test suite"
         type: choice
         required: false
-        default: ''
+        default: ""
         options:
-          - ''
+          - ""
           - API
           - UI
       tag:
         description: "Choose test group"
         type: choice
         required: false
-        default: ''
+        default: ""
         options:
-          - ''
+          - ""
           - Smoke
           - E2E
       branch-set:
@@ -36,11 +35,11 @@ on:
       test:
         required: false
         type: string
-        default: ''
+        default: ""
       tag:
         required: false
         type: string
-        default: ''
+        default: ""
       branch-set:
         required: false
         type: string
@@ -60,7 +59,6 @@ jobs:
     timeout-minutes: 45
 
     steps:
-
       # Checkout all 4 required repositories
       - name: Checkout cads-tools
         uses: actions/checkout@v4.2.0
@@ -112,12 +110,12 @@ jobs:
           cp cads-journey-tests/compose/frontend.env cads-mis/compose/frontend.env
 
       # Create cads-tools network early (other projects reference as external)
-      - name: Ensure cads-tools network exists
+      - name: Ensure cads-network exists
         run: |
-          if ! docker network inspect cads-tools >/dev/null 2>&1; then
+          if ! docker network inspect cads-network >/dev/null 2>&1; then
             docker network create \
-              --label com.docker.compose.network=cads-tools \
-              cads-tools
+              --label com.docker.compose.network=cads-network \
+              cads-network
           fi
 
       # FIX: Set ROOT_DIR so Localstack init scripts mount correctly
@@ -143,7 +141,7 @@ jobs:
           AWS_DEFAULT_REGION: eu-west-2
           AWS_REQUEST_CHECKSUM_CALCULATION: when_required
           AWS_RESPONSE_CHECKSUM_VALIDATION: when_required
-          ENDPOINT: http://localhost:4566   # host -> mapped LocalStack port
+          ENDPOINT: http://localhost:4566 # host -> mapped LocalStack port
           BUCKET: cads-internal-bucket
         run: |
           set -euo pipefail
@@ -177,7 +175,7 @@ jobs:
       - name: Debug Backend logs
         run: docker logs cads_cds || true
       - name: Debug Backend health endpoint debug
-        run: docker compose -p cads-tools exec -T cads_cds curl -v http://localhost:5555/health
+        run: docker compose -p cads exec -T cads_cds curl -v http://localhost:5555/health
 
       - name: Ensure report directories exist
         run: |
@@ -207,15 +205,15 @@ jobs:
           echo "Running tests with filter: $FILTER"
 
           if [[ -z "$FILTER" ]]; then
-            docker compose -p cads-tools -f docker-compose.yml up --build --abort-on-container-exit
+            docker compose -p cads -f docker-compose.yml up --build --abort-on-container-exit
           else
-            docker compose -p cads-tools -f docker-compose.yml run --rm --build journey-tests \
+            docker compose -p cads -f docker-compose.yml run --rm --build journey-tests \
               sh -c "npm ci && npx playwright test --grep='$FILTER'"
           fi
 
-      - name: Debug Inspect cads-tools network
+      - name: Debug Inspect cads-network network
         if: always()
-        run: docker network inspect cads-tools
+        run: docker network inspect cads-network
 
       - name: Upload Allure results
         if: always()
