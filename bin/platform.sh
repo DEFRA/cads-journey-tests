@@ -12,7 +12,8 @@ fi
 # ------------------------------------------------------------
 # Resolve other repo paths relative to cads-tools
 # ------------------------------------------------------------
-BACKEND_DIR="$ROOT_DIR/../cads-data-service"
+CDS_DIR="$ROOT_DIR/../cads-data-service"
+CADS_BRIDGE_DIR="$ROOT_DIR/../cads-bridge"
 TOOLS_DIR="$ROOT_DIR"
 UI_DIR="$ROOT_DIR/../cads-mis"
 
@@ -20,9 +21,9 @@ COMMAND="${1:-help}"
 MAC_OVERRIDE="${2:-}"
 
 ensure_network() {
-  if ! docker network inspect cads-tools >/dev/null 2>&1; then
-    echo "[platform] Creating cads-tools network..."
-    docker network create cads-tools
+  if ! docker network inspect cads-network >/dev/null 2>&1; then
+    echo "[platform] Creating cads-network..."
+    docker network create cads-network
   fi
 }
 
@@ -54,14 +55,14 @@ stop_tools() {
   return $?
 }
 
-start_backend() {
-  echo "[platform] Starting backend..."
-  cd "$BACKEND_DIR"
+start_cds() {
+  echo "[platform] Starting cds..."
+  cd "$CDS_DIR"
 
   OVERRIDE_FILE=$(compose_override)
   echo "[platform] Using override: $OVERRIDE_FILE"
 
-  docker compose -p cads-tools \
+  docker compose -p cads \
     -f docker-compose.yml \
     -f "$OVERRIDE_FILE" \
     up --build -d
@@ -69,10 +70,10 @@ start_backend() {
   return $?
 }
 
-stop_backend() {
-  echo "[platform] Stopping backend..."
-  cd "$BACKEND_DIR"
-  docker compose -p cads-tools down || true
+stop_cds() {
+  echo "[platform] Stopping cds..."
+  cd "$CDS_DIR"
+  docker compose -p cads down || true
   return $?
 }
 
@@ -82,10 +83,10 @@ start_ui() {
 
   if [ "${CI:-}" = "true" ]; then
     echo "[platform] Using UI compose file: docker-compose.ci.yml"
-    docker compose -p cads-tools -f docker-compose.ci.yml up --build -d
+    docker compose -p cads -f docker-compose.ci.yml up --build -d
   else
     echo "[platform] Using UI compose file: docker-compose.yml"
-    docker compose -p cads-tools -f docker-compose.yml up --build -d
+    docker compose -p cads -f docker-compose.yml up --build -d
   fi
 
   return $?
@@ -96,11 +97,33 @@ stop_ui() {
   cd "$UI_DIR"
 
   if [ "${CI:-}" = "true" ]; then
-    docker compose -p cads-tools -f docker-compose.ci.yml down || true
+    docker compose -p cads -f docker-compose.ci.yml down || true
   else
-    docker compose -p cads-tools -f docker-compose.yml down || true
+    docker compose -p cads -f docker-compose.yml down || true
   fi
 
+  return $?
+}
+
+start_bridge() {
+  echo "[platform] starting bridge..."
+
+  cd "$CADS_BRIDGE_DIR"
+  OVERRIDE_FILE=$(compose_override)
+  echo "[platform] Using bridge override: $OVERRIDE_FILE"
+
+  docker compose -p cads \
+    -f docker-compose.yml \
+    -f "$OVERRIDE_FILE" \
+    up --build -d
+
+  return $?
+}
+
+stop_bridge() {
+  echo "[platform] Stopping bridge..."
+  cd "$CADS_BRIDGE_DIR"
+  docker compose -p cads -f docker-compose.yml down || true
   return $?
 }
 
@@ -108,17 +131,17 @@ case "$COMMAND" in
   up)
     ensure_network
     start_tools
-    start_backend
+    start_cds
     start_ui
     ;;
   down)
     stop_ui
-    stop_backend
+    stop_cds
     stop_tools
     ;;
   *)
     echo "Usage:"
-    echo "  ./platform.sh up [override]       # Start UI + backend + tools"
+    echo "  ./platform.sh up [override]       # Start UI + cds + tools"
     echo "  ./platform.sh down                # Stop everything"
     echo ""
     echo "Overrides:"

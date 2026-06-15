@@ -19,10 +19,10 @@ services:
       - ./allure-report:/app/allure-report
       - ./playwright-report:/app/playwright-report
     networks:
-      - cads-tools
+      - cads-network
 
 networks:
-  cads-tools:
+  cads-network:
     external: true
   default:
     external: true
