@@ -4,13 +4,13 @@ import { getHomeSelectors } from './selectors/home.selectors'
 import { getEnv } from '../../../configs/env'
 
 export class HomePage extends BasePage {
-  public readonly startNowButton: Locator
+  public readonly signInButton: Locator
 
   constructor(page: Page) {
     super(page)
     const env = getEnv()
     const selectors = getHomeSelectors(env)
-    this.startNowButton = page.locator(selectors.startNowButton)
+    this.signInButton = page.locator(selectors.signInButton)
   }
 
   public async navigateToHomePage() {

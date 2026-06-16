@@ -17,6 +17,6 @@ export class HomePageStepDefinitions {
   }
 
   async NavigateToDashboardPage() {
-    await this.homePage.startNowButton.click()
+    await this.homePage.signInButton.click()
   }
 }

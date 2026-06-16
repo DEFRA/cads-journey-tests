@@ -5,6 +5,5 @@ test.describe('UI', () => {
     await dashboardPageStepDefinitions.INaviagteToDashboardPage()
     await dashboardPageStepDefinitions.IHaveLandedOnTheDashboardPage()
     await dashboardPageStepDefinitions.TheDashboardPageDisplaysCorrectContent()
-    // await dashboardPageStepDefinitions.TheDashboardPageNavigatesToCorrectReport()
   })
 })

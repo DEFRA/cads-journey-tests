@@ -5,8 +5,9 @@ export class CadsDataService extends BaseClient {
   async get<T>(
     url: string,
     statusCode: StatusCodes,
-    options?: object
+    options?: object,
+    params?: { [key: string]: string | number | boolean }
   ): Promise<T> {
-    return await super.get<T>(url, statusCode, options)
+    return await super.get<T>(url, statusCode, options, params)
   }
 }

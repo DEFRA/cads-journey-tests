@@ -10,21 +10,22 @@ export abstract class BaseClient {
 
   // eslint-disable-next-line
   private prepareRemoteRequest(url: string, options?: any) {
-    if (process.env.apiKey !== 'undefined' && process.env.CDP === undefined) {
-      if (options !== undefined && options !== null) {
-        if (!options.headers) {
-          options.headers = {}
-        }
-        options.headers['Content-Type'] = 'application/json'
-        options.headers['x-api-key'] = process.env.apiKey
-      } else {
-        options = {
-          headers: {
-            'Content-Type': 'application/json',
-            'x-api-key': process.env.apiKey
-          }
+    if (options !== undefined && options !== null) {
+      if (!options.headers) {
+        options.headers = {}
+      }
+      options.headers['Content-Type'] = 'application/json'
+      options.headers.Authorization = `Basic ${process.env.AUTH_BASIC_TOKEN}`
+    } else {
+      options = {
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Basic ${process.env.AUTH_BASIC_TOKEN}`
         }
       }
+    }
+    if (process.env.apiKey !== 'undefined' && process.env.CDP === undefined) {
+      options.headers['x-api-key'] = process.env.apiKey
       // APIRequestContext removes /cads-data-service from the endpoint
       const absoluteUrl = '/cads-data-service' + url
       const apiKeyOptions = options
@@ -37,7 +38,8 @@ export abstract class BaseClient {
   protected async get<T>(
     url: string,
     statusCode: StatusCodes,
-    options?: object
+    options?: object,
+    params?: { [key: string]: string | number | boolean }
   ) {
     const { apiKeyOptions, absoluteUrl } = this.prepareRemoteRequest(
       url,
@@ -45,7 +47,10 @@ export abstract class BaseClient {
     )
     options = apiKeyOptions
     url = absoluteUrl
-    const response = await this.apiContext.get(url, options)
+    const response = await this.apiContext.get(url, {
+      ...options,
+      ...(params ? { params } : {})
+    })
     expect(response.status()).toEqual(statusCode)
     return (await response.json()) as T
   }

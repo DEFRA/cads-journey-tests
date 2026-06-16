@@ -2,21 +2,24 @@
 import type { TestEnv } from '../../../../configs/env'
 
 type HomeSelectors = {
-  startNowButton: string
+  signInButton: string
 }
 
 const homeSelectorsByEnv: Record<TestEnv, HomeSelectors> = {
   docker: {
-    startNowButton: '.govuk-button'
+    signInButton: '.govuk-button--start'
   },
   local: {
-    startNowButton: '.govuk-button'
+    signInButton: '.govuk-button--start'
   },
   dev: {
-    startNowButton: '.govuk-button'
+    signInButton: '.govuk-button--start'
   },
   test: {
-    startNowButton: '.govuk-button'
+    signInButton: '.govuk-button--start'
+  },
+  'ext-test': {
+    signInButton: '.govuk-button--start'
   }
 }
 

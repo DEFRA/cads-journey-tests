@@ -47,6 +47,15 @@ const loginSelectorsByEnv: Record<TestEnv, LoginSelectors> = {
     signedOutButton: 'Sign out',
     hereLink: 'here',
     nextButton: '[type="submit"]'
+  },
+  'ext-test': {
+    usernameInput: '[name="loginfmt"]',
+    passwordInput: '[name="passwd"]',
+    loginButton: 'Login',
+    signInButton: 'Sign in',
+    signedOutButton: 'Sign out',
+    hereLink: 'here',
+    nextButton: '[type="submit"]'
   }
 }
 
