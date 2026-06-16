@@ -1,4 +1,4 @@
-import { expect, APIRequestContext } from '@playwright/test'
+import { expect, APIRequestContext, test } from '@playwright/test'
 import { LocationsResponse } from '../../types/responses/locationsResponse.type'
 import { StatusCodes } from 'http-status-codes'
 import { CadsDataService } from '../api/cads.data.service.client'
@@ -48,6 +48,10 @@ export class LocationspiStepDefinitions {
   async getLocationsWithCPHAndModifiedDate() {
     const cph = await this.getExpectedCPH()
     const lastModifiedDate = await this.getExpectedLastModifiedDate()
+    await test.step('getLocationsWithCPHAndModifiedDate', async () => {
+      console.info('CPH: ' + cph)
+      console.info('Last Modified Date: ' + lastModifiedDate)
+    })
     const response = await this.cadsDataService.get<LocationsResponse[]>(
       EndPoints.Locations,
       StatusCodes.OK,
