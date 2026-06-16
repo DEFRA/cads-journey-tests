@@ -1,0 +1,33 @@
+export type LocationsResponse = {
+  lidIdentifier: string
+  lidFullIdentifier: string
+  lidSubIdentifier: string
+  lidEffectiveFromDate: string
+  lidEffectiveToDate: string
+  lidCurrentModifiedDate: string
+  ltyShortDescription: string
+  ltyLongDescription: string
+  locMapReference: string
+  locEffectiveFrom: string
+  locEffectiveTo: string
+  locCessationReason: string
+  locComments: string
+  locSourceIdentifier: string
+  locTelNumber: string
+  locMobileNumber: string
+  locFaxNumber: string
+  locEmailAddress: string
+  locCurrentModifiedDate: string
+  locReasonCode: string
+  locVersion: number
+  ctyName: string
+  ctyVetAreaDesc: string
+  ctyPassportAreaDesc: string
+  ctyAdminOffice: string
+  ctyBcmsTeam: string
+  ctyInspectionArea: string
+  ctyDataMgtAreaDesc: string
+  ctyCurrentStatus: string
+  lifDescription: string
+  importedDate: string
+}

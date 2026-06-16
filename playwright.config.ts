@@ -22,7 +22,7 @@ if (envFile && fs.existsSync(envFile)) {
 const ui = process.env.CADS_MIP_FRONTEND_BASE_URL
 const api = process.env.CADS_CDS_BACKEND_BASE_URL
 const apiExt = process.env.CADS_CDS_BACKEND_EXTERNAL_BASE_URL ?? ''
-const isCDPEnvironment = ENV === 'dev' || ENV === 'test'
+const isCDPEnvironment = ENV === 'dev' || ENV === 'test' || ENV === 'ext-test'
 
 process.env.apiURL = api
 process.env.apiURLExt = apiExt

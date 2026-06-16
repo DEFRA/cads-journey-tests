@@ -27,6 +27,11 @@ const dashboardSelectorsByEnv: Record<TestEnv, DashboardSelectors> = {
     breadcrumbs: '.govuk-breadcrumbs__list-item',
     reports: '.govuk-summary-card__title',
     reportTitles: 'report-item-title'
+  },
+  'ext-test': {
+    breadcrumbs: '.govuk-breadcrumbs__list-item',
+    reports: '.govuk-summary-card__title',
+    reportTitles: 'report-item-title'
   }
 }
 

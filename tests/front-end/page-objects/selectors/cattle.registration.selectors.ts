@@ -40,6 +40,13 @@ const cattleRegistrationSelectorsByEnv: Record<
     downloadButton: 'Download',
     reportDownloadSuccessBanner: '.govuk-notification-banner--success',
     requestAnotherReportLink: '.govuk-notification-banner__link'
+  },
+  'ext-test': {
+    yearDropdown: '#year',
+    monthDropdown: '#month',
+    downloadButton: 'Download',
+    reportDownloadSuccessBanner: '.govuk-notification-banner--success',
+    requestAnotherReportLink: '.govuk-notification-banner__link'
   }
 }
 
