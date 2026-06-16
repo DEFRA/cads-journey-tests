@@ -1,5 +1,5 @@
 // config/env.ts
-export type TestEnv = 'local' | 'dev' | 'test' | 'docker'
+export type TestEnv = 'local' | 'dev' | 'test' | 'docker' | 'ext-test'
 
 export function getEnv(): TestEnv {
   const env = process.env.ENVIRONMENT as TestEnv | undefined
@@ -8,7 +8,7 @@ export function getEnv(): TestEnv {
 
   if (env === 'docker') return 'local'
 
-  if (!['local', 'dev', 'test'].includes(env)) {
+  if (!['local', 'dev', 'test', 'ext-test'].includes(env)) {
     throw new Error(`Unsupported TEST_ENV: ${env}`)
   }
 

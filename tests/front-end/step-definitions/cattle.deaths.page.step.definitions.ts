@@ -25,7 +25,7 @@ export class CattleDeathsPageStepDefinitions {
 
   async INaviagteToCattleDeathsPage() {
     await this.cattleDeathsPage.goto('/')
-    await this.homePage.startNowButton.click()
+    await this.homePage.dashboardTab.click()
     await this.dashboardPage.getReport(REPORT_TITLES.GB_CATTLE_DEATHS).click()
   }
 
