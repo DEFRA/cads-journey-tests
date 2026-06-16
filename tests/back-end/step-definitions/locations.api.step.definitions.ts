@@ -42,8 +42,7 @@ export class LocationspiStepDefinitions {
     return process.env.ENVIRONMENT === 'docker' ||
       process.env.ENVIRONMENT === 'local'
       ? (await this.getLocations())[0].loc_current_modified_date
-      : (await this.getLocationsIdentifiersFromJson())[0]
-          .loc_current_modified_date
+      : (await this.getLocationsIdentifiersFromJson())[0].loc_modified_date
   }
 
   async getLocationsWithCPHAndModifiedDate() {
