@@ -8,7 +8,7 @@ services:
       PROFILE: ""
       RUN_ID: "docker"
       GITHUB_ACTIONS: "${GITHUB_ACTIONS:-false}"
-      BASIC_AUTH_TOKEN: "${BASIC_AUTH_TOKEN}"
+      AUTH_BASIC_TOKEN: "${AUTH_BASIC_TOKEN}"
     env_file:
       - ./compose/aws.env
       - ./compose/postgres.env

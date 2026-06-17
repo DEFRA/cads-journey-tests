@@ -187,7 +187,7 @@ jobs:
         env:
           TEST_INPUT: ${{ inputs.test }}
           TAG_INPUT: ${{ inputs.tag }}
-          BASIC_AUTH_TOKEN: ${{ secrets.AUTH_BASIC_TOKEN }}
+          AUTH_BASIC_TOKEN: ${{ secrets.AUTH_BASIC_TOKEN }}
         run: |
           FILTER=""
 
