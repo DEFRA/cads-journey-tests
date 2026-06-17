@@ -81,9 +81,10 @@ export class LocationspiStepDefinitions {
   }
 
   async getLocationsWithModifiedDate() {
-    const isCDPEnvironment =
+    const isCDPEnvironment = !(
       process.env.ENVIRONMENT === 'docker' ||
       process.env.ENVIRONMENT === 'local'
+    )
     const modifiedDate = await this.getExpectedLastModifiedDate()
     const locationsIdentifiersCount = isCDPEnvironment
       ? 1
