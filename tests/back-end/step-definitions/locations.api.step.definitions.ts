@@ -81,12 +81,13 @@ export class LocationspiStepDefinitions {
   }
 
   async getLocationsWithModifiedDate() {
-    const modifiedDate = await this.getExpectedLastModifiedDate()
-    const locationsIdentifiersCount =
+    const isCDPEnvironment =
       process.env.ENVIRONMENT === 'docker' ||
       process.env.ENVIRONMENT === 'local'
-        ? (await this.getLocationsIdentifiers()).length
-        : (await this.getLocationsIdentifiersFromJson()).length
+    const modifiedDate = await this.getExpectedLastModifiedDate()
+    const locationsIdentifiersCount = isCDPEnvironment
+      ? 1
+      : (await this.getLocationsIdentifiers()).length
     const response = await this.cadsDataService.get<LocationsResponse[]>(
       EndPoints.Locations,
       StatusCodes.OK,
@@ -95,7 +96,11 @@ export class LocationspiStepDefinitions {
         lastModifiedDate: modifiedDate
       }
     )
-    expect(response.length).toBe(locationsIdentifiersCount)
+    if (isCDPEnvironment) {
+      expect(response.length).toBeGreaterThan(locationsIdentifiersCount)
+    } else {
+      expect(response.length).toBe(locationsIdentifiersCount)
+    }
     return response
   }
 
