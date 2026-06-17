@@ -82,8 +82,11 @@ export class LocationspiStepDefinitions {
 
   async getLocationsWithModifiedDate() {
     const modifiedDate = await this.getExpectedLastModifiedDate()
-    const locationsIdentifiersCount = (await this.getLocationsIdentifiers())
-      .length
+    const locationsIdentifiersCount =
+      process.env.ENVIRONMENT === 'docker' ||
+      process.env.ENVIRONMENT === 'local'
+        ? (await this.getLocationsIdentifiers()).length
+        : (await this.getLocationsIdentifiersFromJson()).length
     const response = await this.cadsDataService.get<LocationsResponse[]>(
       EndPoints.Locations,
       StatusCodes.OK,
