@@ -1,4 +1,4 @@
-import { expect, APIRequestContext } from '@playwright/test'
+import { expect, APIRequestContext, test } from '@playwright/test'
 import { StatusCodes } from 'http-status-codes'
 
 export abstract class BaseClient {
@@ -47,9 +47,17 @@ export abstract class BaseClient {
     )
     options = apiKeyOptions
     url = absoluteUrl
+    await test.step('getLocationsWithCPHAndModifiedDate', async () => {
+      console.info('Options: ' + JSON.stringify(options))
+      console.info('Params: ' + JSON.stringify(params))
+      console.info('Url: ' + url)
+    })
     const response = await this.apiContext.get(url, {
       ...options,
       ...(params ? { params } : {})
+    })
+    await test.step('getLocationsWithCPHAndModifiedDate', async () => {
+      console.info('Response: ' + JSON.stringify(response))
     })
     expect(response.status()).toEqual(statusCode)
     return (await response.json()) as T
