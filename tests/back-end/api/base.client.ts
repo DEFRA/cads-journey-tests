@@ -58,6 +58,7 @@ export abstract class BaseClient {
     })
     await test.step('getLocationsWithCPHAndModifiedDate', async () => {
       console.info('Response: ' + JSON.stringify(response))
+      console.info('Response body: ' + JSON.stringify(await response.json()))
     })
     expect(response.status()).toEqual(statusCode)
     return (await response.json()) as T
