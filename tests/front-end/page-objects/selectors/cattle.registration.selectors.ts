@@ -1,4 +1,3 @@
-// selectors/login.selectors.ts
 import type { TestEnv } from '../../../../configs/env'
 
 type CattleRegistrationSelectors = {
