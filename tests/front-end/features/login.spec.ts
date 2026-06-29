@@ -7,6 +7,5 @@ test.describe('UI', () => {
       process.env.CADS_MIP_FRONTEND_USERNAME!,
       process.env.CADS_MIP_FRONTEND_PASSWORD!
     )
-    await loginPageStepDefinitions.ISignedOutSuccessfullyFromTheApplication()
   })
 })

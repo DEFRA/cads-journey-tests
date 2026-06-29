@@ -6,7 +6,7 @@ import { getSignOutSelectors } from './selectors/sign.out.selectors'
 export class SignOutPage extends BasePage {
   public readonly logOutPage: Locator
   public readonly clickHereLink: Locator
-
+  public readonly userTableRow: Locator
   constructor(page: Page) {
     super(page)
     const env = getEnv()
@@ -15,5 +15,6 @@ export class SignOutPage extends BasePage {
     this.clickHereLink = page.getByRole('link', {
       name: selectors.clickHereLink
     })
+    this.userTableRow = page.locator(selectors.userTableRow)
   }
 }
