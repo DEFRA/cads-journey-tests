@@ -67,6 +67,13 @@ jobs:
           ref: ${{ inputs.branch-set == 'main' && 'main' || 'main' }}
           path: cads-tools
 
+      - name: Checkout cads-bridge
+        uses: actions/checkout@v4.2.0
+        with:
+          repository: DEFRA/cads-bridge
+          ref: main
+          path: cads-bridge
+
       - name: Checkout cads-data-seed
         uses: actions/checkout@v4.2.0
         if: ${{ false }} # disabled
