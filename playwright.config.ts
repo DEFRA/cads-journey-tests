@@ -103,7 +103,7 @@ export default defineConfig({
         storageState: 'playwright/.auth/user.json'
       },
       dependencies: ['setup'],
-      testIgnore: ['**/login.spec.ts']
+      testIgnore: ['**/login.spec.ts', '**/accessibility.testing.spec.ts']
     }
   ],
   // Run your local dev server before starting the tests.

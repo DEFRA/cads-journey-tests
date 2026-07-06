@@ -1,20 +1,20 @@
 import { expect } from '@playwright/test'
 import { SignOutPage } from '../page-objects/sign.out.page'
 import { HomePage } from '../page-objects/home.page'
-import { TestEnv } from '../../../configs/env'
+import { getEnv, TestEnv } from '../../../configs/env'
 
 export class SignOutPageStepDefinitions {
   private readonly signOutPage: SignOutPage
   private readonly homePage: HomePage
   private readonly env: TestEnv
-  constructor(signOutPage: SignOutPage, homePage: HomePage, env: TestEnv) {
+  constructor(signOutPage: SignOutPage, homePage: HomePage) {
     this.signOutPage = signOutPage
     this.homePage = homePage
-    this.env = env
+    this.env = getEnv()
   }
 
   async ISignedOutSuccessfullyFromTheApplication() {
-    if (this.env === 'local') {
+    if (this.env === 'local' || this.env === 'docker') {
       await this.signOutPage.signOutLink.click()
       await this.signOutPage.clickHereLink.click()
       await expect(this.homePage.heading).toHaveText('Home')
