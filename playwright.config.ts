@@ -103,7 +103,21 @@ export default defineConfig({
         storageState: 'playwright/.auth/user.json'
       },
       dependencies: ['setup'],
-      testIgnore: ['**/login.spec.ts', '**/accessibility.testing.spec.ts']
+      testIgnore: [
+        '**/login.spec.ts',
+        '**/accessibility.testing.spec.ts',
+        '**/lighthouse.testing.spec.ts'
+      ]
+    },
+    {
+      name: 'Accessibility Testing',
+      testMatch: [
+        '**/accessibility.testing.spec.ts',
+        '**/lighthouse.testing.spec.ts'
+      ],
+      use: {
+        ...devices['Desktop Chrome']
+      }
     }
   ],
   // Run your local dev server before starting the tests.
