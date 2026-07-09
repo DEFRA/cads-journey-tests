@@ -109,16 +109,26 @@ export default defineConfig({
         '**/lighthouse.testing.spec.ts'
       ]
     },
-    {
-      name: 'Accessibility Testing',
-      testMatch: [
-        '**/accessibility.testing.spec.ts',
-        '**/lighthouse.testing.spec.ts'
-      ],
-      use: {
-        ...devices['Desktop Chrome']
-      }
-    }
+    ...(isCDPEnvironment || ENV === 'docker'
+      ? []
+      : [
+          {
+            name: 'Lighthouse Testing',
+            testMatch: ['**/lighthouse.testing.spec.ts'],
+            use: {
+              ...devices['Desktop Chrome']
+            }
+          },
+          {
+            name: 'Playwright Accessibility Testing',
+            testMatch: ['**/accessibility.testing.spec.ts'],
+            use: {
+              ...devices['Desktop Chrome'],
+              storageState: 'playwright/.auth/user.json'
+            },
+            dependencies: ['setup']
+          }
+        ])
   ],
   // Run your local dev server before starting the tests.
   // Include these *only if LOCAL=true*
