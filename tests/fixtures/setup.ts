@@ -1,6 +1,5 @@
+import { AuthFile } from '../utils/enums'
 import { test as setup } from './test.fixture'
-
-const authFile = 'playwright/.auth/user.json'
 
 setup(
   'authenticate',
@@ -11,6 +10,6 @@ setup(
       process.env.CADS_MIP_FRONTEND_PASSWORD!
     )
     await dashboardPageStepDefinitions.IHaveLandedOnTheDashboardPage()
-    await page.context().storageState({ path: authFile })
+    await page.context().storageState({ path: AuthFile.User })
   }
 )

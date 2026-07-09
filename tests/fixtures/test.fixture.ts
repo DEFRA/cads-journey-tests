@@ -8,4 +8,4 @@ test.afterEach(async ({ page }) => {
   await page.close()
 })
 
-export { expect } from '@playwright/test'
+export { expect, chromium } from '@playwright/test'
