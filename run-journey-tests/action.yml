@@ -66,9 +66,8 @@ runs:
         FILTER=""
         if [[ -n "${{ inputs.test }}" ]]; then FILTER="@${{ inputs.test }}"; fi
         if [[ -n "${{ inputs.tag }}" ]]; then
-          if [[ -n "$FILTER" ]]; then FILTER="$FILTER|@${{ inputs.tag }}"; else FILTER="@${{ inputs.tag }}"; fi
+          if [[ -n "$FILTER" ]]; then FILTER="(?=.*$FILTER)(?=.*@${{ inputs.tag }})"; else FILTER="@${{ inputs.tag }}"; fi
         fi
-
         echo "Running tests with filter: $FILTER"
 
         if [[ -z "$FILTER" ]]; then

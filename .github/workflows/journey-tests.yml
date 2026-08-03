@@ -216,7 +216,7 @@ jobs:
             docker compose -p cads -f docker-compose.yml up --build --abort-on-container-exit
           else
             docker compose -p cads -f docker-compose.yml run --rm --build journey-tests \
-              sh -c "npm ci && npx playwright test --grep='$FILTER'"
+              sh -c "npm ci && npx playwright test --grep='(?=.*$FILTER)(?=.*@${{ inputs.tag }})'"
           fi
 
       - name: Debug Inspect cads-network network
