@@ -199,14 +199,14 @@ jobs:
           FILTER=""
 
           if [[ -n "$TEST_INPUT" ]]; then
-            FILTER="$TEST_INPUT"
+            FILTER="@$TEST_INPUT"
           fi
 
           if [[ -n "$TAG_INPUT" ]]; then
             if [[ -n "$FILTER" ]]; then
-              FILTER="$FILTER|$TAG_INPUT"
+              FILTER="@$FILTER,@$TAG_INPUT"
             else
-              FILTER="$TAG_INPUT"
+              FILTER="@$TAG_INPUT"
             fi
           fi
 
