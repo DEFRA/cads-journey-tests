@@ -1,11 +1,15 @@
 import { test } from '../../fixtures/test.fixture'
 
-test.describe('API', () => {
-  test('Locations endpoint filter by CPH and modified date returns 200 OK status code', async ({
-    locationsApiStepDefinitions
-  }) => {
-    await locationsApiStepDefinitions.getLocationsWithCPHAndModifiedDate()
-  })
+test.describe('Locations API Journey Tests @API', () => {
+  test(
+    'Locations endpoint filter by CPH and modified date returns 200 OK status code',
+    {
+      tag: ['@Smoke']
+    },
+    async ({ locationsApiStepDefinitions }) => {
+      await locationsApiStepDefinitions.getLocationsWithCPHAndModifiedDate()
+    }
+  )
 
   test('Locations endpoint filter by CPH returns 200 OK status code', async ({
     locationsApiStepDefinitions

@@ -64,9 +64,9 @@ runs:
         ENVIRONMENT: dev   # CDP Portal will override this with dev/test/perf-test
       run: |
         FILTER=""
-        if [[ -n "${{ inputs.test }}" ]]; then FILTER="${{ inputs.test }}"; fi
+        if [[ -n "${{ inputs.test }}" ]]; then FILTER="@${{ inputs.test }}"; fi
         if [[ -n "${{ inputs.tag }}" ]]; then
-          if [[ -n "$FILTER" ]]; then FILTER="$FILTER|${{ inputs.tag }}"; else FILTER="${{ inputs.tag }}"; fi
+          if [[ -n "$FILTER" ]]; then FILTER="$FILTER|@${{ inputs.tag }}"; else FILTER="@${{ inputs.tag }}"; fi
         fi
 
         echo "Running tests with filter: $FILTER"

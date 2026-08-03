@@ -1,6 +1,6 @@
 import { test } from '../../fixtures/test.fixture'
 
-test.describe('UI', () => {
+test.describe('Administration Journey Tests @UI', () => {
   test('Administration page', async ({
     administrationPageStepDefinitions,
     homePageStepDefinitions

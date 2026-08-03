@@ -1,6 +1,6 @@
 import { test } from '../../fixtures/test.fixture'
 
-test.describe('UI', () => {
+test.describe('Cattle Imports Journey Tests @UI', () => {
   test('Imports - Download report', async ({
     cattleImportsPageStepDefinitions
   }) => {
