@@ -133,11 +133,13 @@ case "$COMMAND" in
     start_tools
     start_cds
     start_ui
+    start_bridge
     ;;
   down)
     stop_ui
     stop_cds
     stop_tools
+    stop_bridge
     ;;
   *)
     echo "Usage:"
