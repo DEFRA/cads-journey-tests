@@ -180,7 +180,7 @@ jobs:
         run: docker exec cads-localstack ls -R /etc/localstack/init/ready.d || true
 
       - name: Debug Backend logs
-        run: docker logs cads_cds || true
+        run: docker compose -p cads logs cads_cds || true
       - name: Debug Backend health endpoint debug
         run: docker compose -p cads exec -T cads_cds curl -v http://localhost:5555/health
 
