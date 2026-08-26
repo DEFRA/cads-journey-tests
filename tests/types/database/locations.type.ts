@@ -6,6 +6,7 @@ export type Locations = {
   loc_cty_id: number
   loc_receive_labels_flag: string
   loc_effective_from: string
+  /** Formatted as YYYY-MM-DD, e.g. 1998-01-17 */
   loc_effective_to: string
   loc_cessation_reason: string
   loc_premises_type: string

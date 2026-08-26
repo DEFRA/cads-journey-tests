@@ -7,7 +7,6 @@ import { ReporterDescription } from 'playwright/test'
 // Set Environment
 const ENV = process.env.ENVIRONMENT ?? 'local'
 const isLocal = ENV === 'local'
-
 // Only load env files for local + docker
 let envFile: string | null = null
 
@@ -105,9 +104,17 @@ export default defineConfig({
       dependencies: ['setup'],
       testIgnore: [
         '**/login.spec.ts',
+        '**/locations.api.spec.ts',
         '**/accessibility.testing.spec.ts',
         '**/lighthouse.testing.spec.ts'
       ]
+    },
+    {
+      name: 'Locations API',
+      testMatch: ['**/locations.api.spec.ts'],
+      use: {
+        ...devices['Desktop Chrome']
+      }
     },
     ...(isCDPEnvironment || ENV === 'docker'
       ? []

@@ -7,6 +7,7 @@ export type LocationsIndentifier = {
   lid_sub_identifier: string | null
   lid_effective_to_date: string | null
   lid_current_status: number
+  /** Formatted as YYYY-MM-DD, e.g. 1998-01-17 */
   lid_current_modified_date: string
   lid_current_user: string
   lid_current_pid: number

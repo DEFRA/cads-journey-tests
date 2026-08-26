@@ -32,10 +32,19 @@ export class LocationspiStepDefinitions {
   }
 
   async getExpectedCPH() {
+    const locationsIdentifiers = await this.getLocationsIdentifiers()
     return process.env.ENVIRONMENT === 'docker' ||
       process.env.ENVIRONMENT === 'local'
-      ? (await this.getLocationsIdentifiers())[0].lid_full_identifier
-      : (await this.getLocationsIdentifiersFromJson())[0].lid_full_identifier
+      ? {
+          cph: locationsIdentifiers[0].lid_full_identifier,
+          modifiedDate: locationsIdentifiers[0].lid_current_modified_date
+        }
+      : {
+          cph: (await this.getLocationsIdentifiersFromJson())[0]
+            .lid_full_identifier,
+          modifiedDate: (await this.getLocationsIdentifiersFromJson())[0]
+            .loc_modified_date
+        }
   }
 
   async getExpectedLastModifiedDate() {
@@ -46,8 +55,10 @@ export class LocationspiStepDefinitions {
   }
 
   async getLocationsWithCPHAndModifiedDate() {
-    const cph = await this.getExpectedCPH()
-    const lastModifiedDate = await this.getExpectedLastModifiedDate()
+    const { cph, modifiedDate } = await this.getExpectedCPH()
+    const lastModifiedDate = (await this.getLocations()).filter(
+      (location) => location.loc_effective_to === modifiedDate
+    )[0].loc_current_modified_date
     await test.step('getLocationsWithCPHAndModifiedDate', async () => {
       console.info('CPH: ' + cph)
       console.info('Last Modified Date: ' + lastModifiedDate)
@@ -66,7 +77,7 @@ export class LocationspiStepDefinitions {
   }
 
   async getLocationsWithCPH() {
-    const cph = await this.getExpectedCPH()
+    const { cph } = await this.getExpectedCPH()
     const response = await this.cadsDataService.get<LocationsResponse[]>(
       EndPoints.Locations,
       StatusCodes.OK,
@@ -88,7 +99,9 @@ export class LocationspiStepDefinitions {
     const modifiedDate = await this.getExpectedLastModifiedDate()
     const locationsIdentifiersCount = isCDPEnvironment
       ? 1
-      : (await this.getLocationsIdentifiers()).length
+      : (await this.getLocations()).filter(
+          (location) => location.loc_current_modified_date === modifiedDate
+        ).length
     const response = await this.cadsDataService.get<LocationsResponse[]>(
       EndPoints.Locations,
       StatusCodes.OK,
