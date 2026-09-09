@@ -15,7 +15,7 @@ export class HealthApiStepDefinitions {
   async getRequestToHealthEndpointReturns200StatusCode() {
     const env = getEnv()
     if (env !== 'ext-test') {
-      const cognitoAccessToken = env === 'dev' ? true : false
+      const cognitoAccessToken = env === 'dev'
       const response = await this.cadsDataService.get<HealthResponse>(
         EndPoints.Health,
         StatusCodes.OK,

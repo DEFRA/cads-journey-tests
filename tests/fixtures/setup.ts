@@ -8,12 +8,12 @@ setup(
       console.info('ENV: ' + process.env.ENVIRONMENT)
       console.info('URL: ' + process.env.CADS_MIP_FRONTEND_BASE_URL)
     })
-    /*await loginPageStepDefinitions.INaviagteToLoginPage()
+    await loginPageStepDefinitions.INaviagteToLoginPage()
     await loginPageStepDefinitions.ILoginWithValidCredentials(
       process.env.CADS_MIP_FRONTEND_USERNAME!,
       process.env.CADS_MIP_FRONTEND_PASSWORD!
     )
     await dashboardPageStepDefinitions.IHaveLandedOnTheDashboardPage()
-    await page.context().storageState({ path: AuthFile.User })*/
+    await page.context().storageState({ path: AuthFile.User })
   }
 )
