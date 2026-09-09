@@ -6,8 +6,15 @@ export class CadsDataService extends BaseClient {
     url: string,
     statusCode: StatusCodes,
     options?: object,
-    params?: { [key: string]: string | number | boolean }
+    params?: { [key: string]: string | number | boolean },
+    cognitoAccessToken: boolean = false
   ): Promise<T> {
-    return await super.get<T>(url, statusCode, options, params)
+    return await super.get<T>(
+      url,
+      statusCode,
+      options,
+      params,
+      cognitoAccessToken
+    )
   }
 }
