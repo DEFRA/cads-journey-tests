@@ -35,7 +35,7 @@ export abstract class BaseClient {
     return body.access_token
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  /* eslint-disable @typescript-eslint/no-explicit-any */
   private async prepareRemoteRequest(
     url: string,
     options?: any,
