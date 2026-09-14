@@ -8,21 +8,56 @@ export abstract class BaseClient {
     this.apiContext = apiContext
   }
 
-  // eslint-disable-next-line
-  private prepareRemoteRequest(url: string, options?: any) {
+  private async getCognitoAccessToken(): Promise<string> {
+    const response = await this.apiContext.post(
+      `https://cads-data-service-${process.env.COGNITO_ENVIRONMENT}.auth.eu-west-2.amazoncognito.com/oauth2/token`,
+      {
+        headers: {
+          Authorization: `Basic ${process.env.AUTH_BASIC_COGNITO_TOKEN}`,
+          'Content-Type': 'application/x-www-form-urlencoded'
+        },
+        form: {
+          grant_type: 'client_credentials',
+          client_id: process.env.COGNITO_CLIENT_ID!,
+          client_secret: process.env.COGNITO_CLIENT_SECRET!
+        }
+      }
+    )
+
+    if (!response.ok()) {
+      throw new Error(
+        `Failed to retrieve token (${response.status()}): ${await response.text()}`
+      )
+    }
+
+    const body = await response.json()
+
+    return body.access_token
+  }
+
+  /* eslint-disable @typescript-eslint/no-explicit-any */
+  private async prepareRemoteRequest(
+    url: string,
+    options?: any,
+    cognitoAccessToken: boolean = false
+  ) {
     if (options !== undefined && options !== null) {
       if (!options.headers) {
         options.headers = {}
       }
       options.headers['Content-Type'] = 'application/json'
-      options.headers.Authorization = `Basic ${process.env.AUTH_BASIC_TOKEN}`
     } else {
       options = {
         headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Basic ${process.env.AUTH_BASIC_TOKEN}`
+          'Content-Type': 'application/json'
         }
       }
+    }
+    if (cognitoAccessToken) {
+      const cognitoAccessToken = await this.getCognitoAccessToken()
+      options.headers.Authorization = `Bearer ${cognitoAccessToken}`
+    } else {
+      options.headers.Authorization = `Basic ${process.env.AUTH_BASIC_TOKEN}`
     }
     if (process.env.apiKey !== 'undefined' && process.env.CDP === undefined) {
       options.headers['x-api-key'] = process.env.apiKey
@@ -39,11 +74,13 @@ export abstract class BaseClient {
     url: string,
     statusCode: StatusCodes,
     options?: object,
-    params?: { [key: string]: string | number | boolean }
+    params?: { [key: string]: string | number | boolean },
+    cognitoAccessToken: boolean = false
   ) {
-    const { apiKeyOptions, absoluteUrl } = this.prepareRemoteRequest(
+    const { apiKeyOptions, absoluteUrl } = await this.prepareRemoteRequest(
       url,
-      options
+      options,
+      cognitoAccessToken
     )
     options = apiKeyOptions
     url = absoluteUrl
@@ -67,11 +104,13 @@ export abstract class BaseClient {
   protected async post<T>(
     url: string,
     statusCode: StatusCodes,
-    options?: object
+    options?: object,
+    cognitoAccessToken: boolean = false
   ) {
-    const { apiKeyOptions, absoluteUrl } = this.prepareRemoteRequest(
+    const { apiKeyOptions, absoluteUrl } = await this.prepareRemoteRequest(
       url,
-      options
+      options,
+      cognitoAccessToken
     )
     options = apiKeyOptions
     url = absoluteUrl
@@ -81,7 +120,7 @@ export abstract class BaseClient {
   }
 
   protected async postWithResponseReturn(url: string, options?: object) {
-    const { apiKeyOptions, absoluteUrl } = this.prepareRemoteRequest(
+    const { apiKeyOptions, absoluteUrl } = await this.prepareRemoteRequest(
       url,
       options
     )
@@ -93,11 +132,13 @@ export abstract class BaseClient {
   protected async put<T>(
     url: string,
     statusCode: StatusCodes,
-    options?: object
+    options?: object,
+    cognitoAccessToken: boolean = false
   ) {
-    const { apiKeyOptions, absoluteUrl } = this.prepareRemoteRequest(
+    const { apiKeyOptions, absoluteUrl } = await this.prepareRemoteRequest(
       url,
-      options
+      options,
+      cognitoAccessToken
     )
     options = apiKeyOptions
     url = absoluteUrl
