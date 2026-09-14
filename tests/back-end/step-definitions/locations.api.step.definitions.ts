@@ -33,8 +33,7 @@ export class LocationspiStepDefinitions {
 
   async getExpectedCPH() {
     const locationsIdentifiers = await this.getLocationsIdentifiers()
-    return process.env.ENVIRONMENT === 'docker' ||
-      process.env.ENVIRONMENT === 'local'
+    return !this.cadsDataService.isCDPEnvironment
       ? {
           cph: locationsIdentifiers[0].lid_full_identifier,
           modifiedDate: locationsIdentifiers[0].lid_current_modified_date
@@ -48,17 +47,18 @@ export class LocationspiStepDefinitions {
   }
 
   async getExpectedLastModifiedDate() {
-    return process.env.ENVIRONMENT === 'docker' ||
-      process.env.ENVIRONMENT === 'local'
-      ? (await this.getLocations())[0].loc_current_modified_date
-      : (await this.getLocationsIdentifiersFromJson())[0].loc_modified_date
+    return this.cadsDataService.isCDPEnvironment
+      ? (await this.getLocationsIdentifiersFromJson())[0].loc_modified_date
+      : (await this.getLocations())[0].loc_current_modified_date
   }
 
   async getLocationsWithCPHAndModifiedDate() {
     const { cph, modifiedDate } = await this.getExpectedCPH()
-    const lastModifiedDate = (await this.getLocations()).filter(
-      (location) => location.loc_effective_to === modifiedDate
-    )[0].loc_current_modified_date
+    const lastModifiedDate = this.cadsDataService.isCDPEnvironment
+      ? modifiedDate
+      : (await this.getLocations()).filter(
+          (location) => location.loc_effective_to === modifiedDate
+        )[0].loc_current_modified_date
     await test.step('getLocationsWithCPHAndModifiedDate', async () => {
       console.info('CPH: ' + cph)
       console.info('Last Modified Date: ' + lastModifiedDate)
@@ -97,7 +97,7 @@ export class LocationspiStepDefinitions {
       process.env.ENVIRONMENT === 'local'
     )
     const modifiedDate = await this.getExpectedLastModifiedDate()
-    const locationsIdentifiersCount = isCDPEnvironment
+    const locationsIdentifiersCount = this.cadsDataService.isCDPEnvironment
       ? 1
       : (await this.getLocations()).filter(
           (location) => location.loc_current_modified_date === modifiedDate
