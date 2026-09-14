@@ -3,9 +3,14 @@ import { StatusCodes } from 'http-status-codes'
 
 export abstract class BaseClient {
   protected readonly apiContext: APIRequestContext
+  readonly isCDPEnvironment: boolean
 
   constructor(apiContext: APIRequestContext) {
     this.apiContext = apiContext
+    this.isCDPEnvironment = !(
+      process.env.ENVIRONMENT === 'docker' ||
+      process.env.ENVIRONMENT === 'local'
+    )
   }
 
   private async getCognitoAccessToken(): Promise<string> {
