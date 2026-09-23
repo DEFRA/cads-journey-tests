@@ -17,4 +17,13 @@ export class CadsDataService extends BaseClient {
       cognitoAccessToken
     )
   }
+
+  async post<T>(
+    url: string,
+    statusCode: StatusCodes,
+    options?: object,
+    cognitoAccessToken: boolean = false
+  ): Promise<T> {
+    return await super.post<T>(url, statusCode, options, cognitoAccessToken)
+  }
 }

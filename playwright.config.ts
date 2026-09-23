@@ -96,7 +96,7 @@ export default defineConfig({
     // Auth setup that writes `playwright/.auth/user.json`
     { name: 'setup', testDir: 'tests/fixtures', testMatch: 'setup.ts' },
     {
-      name: 'chromium',
+      name: 'UI',
       use: {
         ...devices['Desktop Chrome'],
         storageState: 'playwright/.auth/user.json'
@@ -104,14 +104,14 @@ export default defineConfig({
       dependencies: ['setup'],
       testIgnore: [
         '**/login.spec.ts',
-        '**/locations.api.spec.ts',
+        '**/tests/back-end/**/*.spec.ts',
         '**/accessibility.testing.spec.ts',
         '**/lighthouse.testing.spec.ts'
       ]
     },
     {
-      name: 'Locations API',
-      testMatch: ['**/locations.api.spec.ts'],
+      name: 'API',
+      testMatch: ['**/tests/back-end/**/*.spec.ts'],
       use: {
         ...devices['Desktop Chrome']
       }
