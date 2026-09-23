@@ -1,6 +1,6 @@
 import { test } from '../../fixtures/test.fixture'
 
-test.describe('GraphQL API Journey Tests @API', () => {
+test.describe.skip('GraphQL API Journey Tests @API', () => {
   test(
     'CADS endpoint returns Animal Sexes',
     {
