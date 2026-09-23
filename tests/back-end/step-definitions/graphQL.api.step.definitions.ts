@@ -27,7 +27,7 @@ export class GraphQlApiStepDefinitions {
     const response = await this.graphqlClient.execute<AnimalSexesResponse>(
       'cads',
       query,
-      { sex: sex }
+      { sex }
     )
     expect(response.data).toBeDefined()
     expect(response.data?.animalSexes.nodes.length).toBeGreaterThan(0)
