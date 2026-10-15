@@ -21,3 +21,27 @@ export async function uploadFile(fileName: string) {
 
   return result
 }
+
+type S3Object = {
+  lastModified: string
+  size: number
+  key: string
+}
+
+export async function getCadsExternalBucket(): Promise<S3Object[]> {
+  const result = await executeAwsCommand(
+    `aws s3 ls s3://cads-external-bucket/ --endpoint-url=${process.env.AWS_S3_BUCKET_ENDPOINT!} --profile localstack --recursive`
+  )
+
+  return result
+    .split('\n')
+    .filter((line) => line.trim() !== '')
+    .map((line) => {
+      const [date, time, size, ...key] = line.trim().split(/\s+/)
+      return {
+        lastModified: `${date} ${time}`,
+        size: Number(size),
+        key: key.join(' ')
+      }
+    })
+}
