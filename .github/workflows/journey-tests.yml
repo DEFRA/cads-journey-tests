@@ -78,7 +78,6 @@ jobs:
 
       - name: Checkout cads-data-seed
         uses: actions/checkout@v4.2.0
-        if: ${{ false }} # disabled
         with:
           repository: DEFRA/cads-data-seed
           path: cads-data-seed

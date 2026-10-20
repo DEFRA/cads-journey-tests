@@ -54,9 +54,12 @@ export class LocationspiStepDefinitions {
 
   async getLocationsWithCPHAndModifiedDate() {
     const { cph, modifiedDate } = await this.getExpectedCPH()
+    await test.step('Modified Date', async () => {
+      console.info('Modified Date: ' + modifiedDate)
+    })
     await test.step('Locations', async () => {
       console.info(
-        'Locations: ' +
+        'Locations-loc_effective_to: ' +
           (await this.getLocations())
             .map((location) => location.loc_effective_to)
             .toString()
