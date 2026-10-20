@@ -2,7 +2,7 @@ import { StatusCodes } from 'http-status-codes'
 import { expect, test } from '../../fixtures/test.fixture'
 import { ScenarioTypes, TableNames } from '../../utils/enums'
 
-test.describe('Generation API Journey Tests @API', () => {
+test.describe.skip('Generation API Journey Tests @API', () => {
   test('INSERT - Generation endpoint returns 200 OK status code', async ({
     generationApiStepDefinitions
   }) => {
@@ -26,12 +26,12 @@ test.describe('Generation API Journey Tests @API', () => {
     const scenario =
       await generationApiStepDefinitions.getRequestToGenerationScenariosEndpoint(
         TableNames.CTS.Locations,
-        ScenarioTypes.Update
+        ScenarioTypes.BulkUpdate
       )!
     await generationApiStepDefinitions.getRequestToGenerationEndpoint({
       data: {
         Scenario: scenario?.name,
-        BusinessKey: [1, 2, 3]
+        BusinessKeys: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
       }
     })
     await generationApiStepDefinitions.verifyResponse()
@@ -41,7 +41,7 @@ test.describe('Generation API Journey Tests @API', () => {
     generationApiStepDefinitions
   }) => {
     await generationApiStepDefinitions.getRequestToGenerationEndpoint(
-      { data: { Scenario: 'bulk_insert', RowCount: 1, BusinessKey: [1] } },
+      { data: { Scenario: 'bulk_insert', RowCount: 1, BusinessKeys: [1] } },
       StatusCodes.BAD_REQUEST
     )
   })

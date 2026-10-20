@@ -1,6 +1,8 @@
 import { exec } from 'node:child_process'
 import { promisify } from 'node:util'
 import { FileNames } from './enums'
+import { CadsDataService } from '../back-end/api/cads.data.service.client'
+import { APIRequestContext } from '@playwright/test'
 
 const execAsync = promisify(exec)
 
@@ -29,9 +31,12 @@ type S3Object = {
 }
 
 export async function getCadsExternalBucket(): Promise<S3Object[]> {
-  const result = await executeAwsCommand(
-    `aws s3 ls s3://cads-external-bucket/ --endpoint-url=${process.env.AWS_S3_BUCKET_ENDPOINT!} --profile localstack --recursive`
-  )
+  const apiContext: APIRequestContext = {} as APIRequestContext
+  const cadsDataService = new CadsDataService(apiContext)
+  const command = !cadsDataService.isCDPEnvironment
+    ? `aws s3 ls s3://cads-external-bucket/ --endpoint-url=${process.env.AWS_S3_BUCKET_ENDPOINT!} --profile localstack --recursive`
+    : `aws s3 ls s3:${process.env.AWS_S3_BUCKET_NAME!} --profile localstack --recursive`
+  const result = await executeAwsCommand(command)
 
   return result
     .split('\n')

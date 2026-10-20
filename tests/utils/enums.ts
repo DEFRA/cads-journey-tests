@@ -19,7 +19,7 @@ export enum AuthFile {
 
 export enum ScenarioTypes {
   BulkInsert = 'bulk',
-  Update = 'update'
+  BulkUpdate = 'update'
 }
 
 export enum FileNames {
