@@ -55,7 +55,7 @@ export class LocationspiStepDefinitions {
   async getLocationsWithCPHAndModifiedDate() {
     const { cph, modifiedDate } = await this.getExpectedCPH()
     await test.step('Locations', async () => {
-      console.info('Locations: ' + (await this.getLocations()))
+      console.info('Locations: ' + (await this.getLocations()).map(location => location.loc_current_modified_date).toString())
     })
     const lastModifiedDate = this.cadsDataService.isCDPEnvironment
       ? modifiedDate
