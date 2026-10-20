@@ -50,8 +50,11 @@ export class GenerationApiStepDefinitions {
   }
 
   async generateCSVFile() {
-    const outputPath = path.join(process.cwd(), this.response?.filename!)
-    fs.writeFileSync(outputPath, this.response?.content!, {
+    if (!this.response?.filename || !this.response?.content) {
+      throw new Error('Generation response filename and content are required')
+    }
+    const outputPath = path.join(process.cwd(), this.response.filename)
+    fs.writeFileSync(outputPath, this.response.content, {
       encoding: 'utf-8'
     })
     console.log(`CSV created: ${outputPath}`)

@@ -26,13 +26,17 @@ export class UploadApiStepDefinitions {
 
   async verifyUpload(scenarioType: ScenarioTypes) {
     switch (scenarioType) {
-      case ScenarioTypes.BulkInsert:
+      case ScenarioTypes.BulkInsert: {
+        if (!this.response?.fileName) {
+          throw new Error('Upload response fileName is required')
+        }
         const s3Bucket = await getCadsExternalBucket()
         const file = s3Bucket.find((file) =>
-          file.key.includes(this.response?.fileName!)
+          file.key.includes(this.response!.fileName)
         )
         expect(file).toBeDefined()
         break
+      }
       case ScenarioTypes.BulkUpdate:
         break
     }

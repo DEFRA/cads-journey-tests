@@ -1,5 +1,5 @@
 import { StatusCodes } from 'http-status-codes'
-import { expect, test } from '../../fixtures/test.fixture'
+import { test } from '../../fixtures/test.fixture'
 import { ScenarioTypes, TableNames } from '../../utils/enums'
 
 test.describe.skip('Upload API Journey Tests @API', () => {
