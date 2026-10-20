@@ -58,7 +58,7 @@ export class LocationspiStepDefinitions {
       console.info(
         'Locations: ' +
           (await this.getLocations())
-            .map((location) => location.loc_current_modified_date)
+            .map((location) => location.loc_effective_to)
             .toString()
       )
     })
