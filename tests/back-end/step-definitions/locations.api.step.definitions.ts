@@ -31,12 +31,12 @@ export class LocationspiStepDefinitions {
     return JSON.parse(data).locations
   }
 
-  async getExpectedCPH() {
+  async getExpectedCPH(position: number = 0) {
     const locationsIdentifiers = await this.getLocationsIdentifiers()
     return !this.cadsDataService.isCDPEnvironment
       ? {
-          cph: locationsIdentifiers[0].lid_full_identifier,
-          modifiedDate: locationsIdentifiers[0].lid_current_modified_date
+          cph: locationsIdentifiers[position].lid_full_identifier,
+          modifiedDate: locationsIdentifiers[position].lid_current_modified_date
         }
       : {
           cph: (await this.getLocationsIdentifiersFromJson())[0]
@@ -53,7 +53,18 @@ export class LocationspiStepDefinitions {
   }
 
   async getLocationsWithCPHAndModifiedDate() {
-    const { cph, modifiedDate } = await this.getExpectedCPH()
+    const { cph, modifiedDate } = await this.getExpectedCPH(2)
+    await test.step('Modified Date', async () => {
+      console.info('Modified Date: ' + modifiedDate)
+    })
+    await test.step('Locations', async () => {
+      console.info(
+        'Locations-loc_effective_to: ' +
+          (await this.getLocations())
+            .map((location) => location.loc_effective_to)
+            .toString()
+      )
+    })
     const lastModifiedDate = this.cadsDataService.isCDPEnvironment
       ? modifiedDate
       : (await this.getLocations()).filter(

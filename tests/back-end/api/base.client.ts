@@ -89,7 +89,7 @@ export abstract class BaseClient {
     )
     options = apiKeyOptions
     url = absoluteUrl
-    await test.step('getLocationsWithCPHAndModifiedDate', async () => {
+    await test.step('Options, Params, and Url:', async () => {
       console.info('Options: ' + JSON.stringify(options))
       console.info('Params: ' + JSON.stringify(params))
       console.info('Url: ' + url)
@@ -98,12 +98,21 @@ export abstract class BaseClient {
       ...options,
       ...(params ? { params } : {})
     })
-    await test.step('getLocationsWithCPHAndModifiedDate', async () => {
-      console.info('Response: ' + JSON.stringify(response))
-      console.info('Response body: ' + JSON.stringify(await response.json()))
+    const bodyText = await response.text()
+    await test.step('Response:', async () => {
+      console.info('Response status: ' + response.status())
+      console.info('Response body: ' + bodyText)
     })
     expect(response.status()).toEqual(statusCode)
-    return (await response.json()) as T
+    return this.parseResponseBody<T>(bodyText)
+  }
+
+  private parseResponseBody<T>(bodyText: string): T {
+    try {
+      return JSON.parse(bodyText) as T
+    } catch {
+      return bodyText as T
+    }
   }
 
   protected async post<T>(

@@ -16,14 +16,15 @@ export class HealthApiStepDefinitions {
     const env = getEnv()
     if (env !== 'ext-test') {
       const cognitoAccessToken = env === 'dev'
-      const response = await this.cadsDataService.get<HealthResponse>(
+      const response = await this.cadsDataService.get<HealthResponse | string>(
         EndPoints.Health,
         StatusCodes.OK,
         undefined,
         undefined,
         cognitoAccessToken
       )
-      expect(response.status).toBe('Healthy')
+      const status = typeof response === 'string' ? response : response.status
+      expect(status).toBe('Healthy')
     }
   }
 }
