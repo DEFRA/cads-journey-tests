@@ -185,31 +185,6 @@ jobs:
       - name: Debug Backend health endpoint debug
         run: docker compose -p cads exec -T cads_cds curl -v http://localhost:5555/health
 
-      - name: Debug Bridge status
-        if: always()
-        run: |
-          docker ps -a --filter name=cads-bridge || true
-          docker inspect cads-bridge --format '{{.State.Status}} networks={{range $k, $_ := .NetworkSettings.Networks}}{{$k}} {{end}}' || true
-          docker logs cads-bridge 2>&1 | tail -100 || true
-
-      - name: Verify cads-bridge DNS on cads-network
-        run: |
-          set -euo pipefail
-          echo "All bridge-related containers:"
-          docker ps -a --filter name=bridge --format 'table {{.Names}}\t{{.Status}}\t{{.Ports}}' || true
-          echo "Containers on cads-network:"
-          docker network inspect cads-network --format '{{range .Containers}}{{.Name}} {{end}}'
-          if ! docker inspect -f '{{.State.Running}}' cads-bridge 2>/dev/null | grep -q true; then
-            echo "ERROR: cads-bridge container is not running"
-            docker logs cads-bridge 2>&1 | tail -200 || true
-            exit 1
-          fi
-          docker network connect cads-network cads-bridge 2>/dev/null || true
-          echo "Resolving cads-bridge from cads-cds:"
-          docker exec cads-cds getent hosts cads-bridge
-          echo "Resolving cads-bridge from a throwaway container:"
-          docker run --rm --network cads-network alpine:3.20 getent hosts cads-bridge
-
       - name: Ensure report directories exist
         run: |
           mkdir -p cads-journey-tests/allure-report
@@ -238,12 +213,10 @@ jobs:
 
           echo "Running tests with filter: $FILTER"
 
-          # Use a dedicated compose project so platform containers
-          # (cds/mis/bridge/localstack/etc.) are not treated as orphans.
           if [[ -z "$FILTER" ]]; then
-            docker compose -p cads-journey-tests -f docker-compose.yml up --build --abort-on-container-exit
+            docker compose -p cads -f docker-compose.yml up --build --abort-on-container-exit
           else
-            docker compose -p cads-journey-tests -f docker-compose.yml run --rm --build journey-tests \
+            docker compose -p cads -f docker-compose.yml run --rm --build journey-tests \
               sh -c "npm ci && npx playwright test --grep='(?=.*$FILTER)(?=.*@${{ inputs.tag }})'"
           fi
 

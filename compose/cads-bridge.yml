@@ -1,0 +1,5 @@
+# Fix ASPNETCORE_URLS from cads-bridge CI override (quoted value breaks Kestrel bind).
+services:
+  cads_bridge:
+    environment:
+      ASPNETCORE_URLS: http://0.0.0.0:5550

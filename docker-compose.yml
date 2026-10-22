@@ -25,4 +25,3 @@ services:
 networks:
   cads-network:
     external: true
-    name: cads-network
