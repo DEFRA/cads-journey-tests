@@ -2,7 +2,7 @@ import { StatusCodes } from 'http-status-codes'
 import { test } from '../../fixtures/test.fixture'
 import { ScenarioTypes, TableNames } from '../../utils/enums'
 
-test.describe.skip('Upload API Journey Tests @API', () => {
+test.describe('Upload API Journey Tests @API', () => {
   test('Upload endpoint Bulk Insert returns 200 OK status code', async ({
     generationApiStepDefinitions,
     uploadApiStepDefinitions
@@ -141,7 +141,7 @@ test.describe.skip('Upload API Journey Tests @API', () => {
           content: response.content
         }
       },
-      StatusCodes.BAD_REQUEST
+      StatusCodes.CONFLICT
     )
   })
   test('Upload endpoint duplicate Bulk Update returns 400 BAD REQUEST status code', async ({
@@ -174,7 +174,7 @@ test.describe.skip('Upload API Journey Tests @API', () => {
           content: response.content
         }
       },
-      StatusCodes.BAD_REQUEST
+      StatusCodes.CONFLICT
     )
   })
 })

@@ -15,7 +15,7 @@ export class UploadApiStepDefinitions {
 
   async getRequestToUploadEndpoint(
     request: UploadRequest,
-    statusCode: number = StatusCodes.ACCEPTED
+    statusCode: number = StatusCodes.CREATED
   ) {
     this.response = await this.cadsDataService.post<UploadResponse>(
       EndPoints.Upload,

@@ -16,9 +16,14 @@ async function executeAwsCommand(command: string) {
   return stdout.trim()
 }
 
+/** Use env credentials when present (Docker); otherwise the local `localstack` AWS profile. */
+function awsAuthFlags() {
+  return process.env.AWS_ACCESS_KEY_ID ? '' : '--profile localstack'
+}
+
 export async function uploadFile(fileName: string) {
   const result = await executeAwsCommand(
-    `aws s3 cp ${FileNames.Path!}${fileName} s3://cads-external-bucket/cads/cts/bulk/${fileName} --endpoint-url=${process.env.AWS_S3_BUCKET_ENDPOINT!} --profile localstack`
+    `aws s3 cp ${FileNames.Path!}${fileName} s3://cads-external-bucket/cads/cts/bulk/${fileName} --endpoint-url=${process.env.AWS_S3_BUCKET_ENDPOINT!} ${awsAuthFlags()}`.trim()
   )
 
   return result
@@ -33,9 +38,10 @@ type S3Object = {
 export async function getCadsExternalBucket(): Promise<S3Object[]> {
   const apiContext: APIRequestContext = {} as APIRequestContext
   const cadsDataService = new CadsDataService(apiContext)
+  const auth = awsAuthFlags()
   const command = !cadsDataService.isCDPEnvironment
-    ? `aws s3 ls s3://cads-external-bucket/ --endpoint-url=${process.env.AWS_S3_BUCKET_ENDPOINT!} --profile localstack --recursive`
-    : `aws s3 ls s3:${process.env.AWS_S3_BUCKET_NAME!} --profile localstack --recursive`
+    ? `aws s3 ls s3://cads-external-bucket/ --endpoint-url=${process.env.AWS_S3_BUCKET_ENDPOINT!} ${auth} --recursive`.trim()
+    : `aws s3 ls s3:${process.env.AWS_S3_BUCKET_NAME!} ${auth} --recursive`.trim()
   const result = await executeAwsCommand(command)
 
   return result

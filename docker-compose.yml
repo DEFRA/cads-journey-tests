@@ -25,5 +25,3 @@ services:
 networks:
   cads-network:
     external: true
-  default:
-    external: true

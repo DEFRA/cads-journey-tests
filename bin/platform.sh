@@ -16,6 +16,7 @@ CDS_DIR="$ROOT_DIR/../cads-data-service"
 CADS_BRIDGE_DIR="$ROOT_DIR/../cads-bridge"
 TOOLS_DIR="$ROOT_DIR"
 UI_DIR="$ROOT_DIR/../cads-mis"
+JOURNEY_TESTS_DIR="$ROOT_DIR/../cads-journey-tests"
 
 COMMAND="${1:-help}"
 MAC_OVERRIDE="${2:-}"
@@ -112,10 +113,13 @@ start_bridge() {
   OVERRIDE_FILE=$(compose_override)
   echo "[platform] Using bridge override: $OVERRIDE_FILE"
 
-  docker compose -p cads \
-    -f docker-compose.yml \
-    -f "$OVERRIDE_FILE" \
-    up --build -d
+  COMPOSE_FILES=(-f docker-compose.yml -f "$OVERRIDE_FILE")
+  if [ "${CI:-}" = "true" ] && [ -f "$JOURNEY_TESTS_DIR/compose/cads-bridge.yml" ]; then
+    COMPOSE_FILES+=(-f "$JOURNEY_TESTS_DIR/compose/cads-bridge.yml")
+  fi
+
+  # Dedicated compose project so CDS/UI/journey-tests cannot tear bridge down.
+  docker compose -p cads-bridge "${COMPOSE_FILES[@]}" up --build -d
 
   return $?
 }
@@ -123,7 +127,7 @@ start_bridge() {
 stop_bridge() {
   echo "[platform] Stopping bridge..."
   cd "$CADS_BRIDGE_DIR"
-  docker compose -p cads -f docker-compose.yml down || true
+  docker compose -p cads-bridge -f docker-compose.yml down || true
   return $?
 }
 
