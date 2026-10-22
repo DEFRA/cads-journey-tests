@@ -185,6 +185,13 @@ jobs:
       - name: Debug Backend health endpoint debug
         run: docker compose -p cads exec -T cads_cds curl -v http://localhost:5555/health
 
+      - name: Debug Bridge status
+        if: always()
+        run: |
+          docker ps -a --filter name=cads-bridge || true
+          docker inspect cads-bridge --format '{{.State.Status}} networks={{range $k, $_ := .NetworkSettings.Networks}}{{$k}} {{end}}' || true
+          docker logs cads-bridge 2>&1 | tail -100 || true
+
       - name: Ensure report directories exist
         run: |
           mkdir -p cads-journey-tests/allure-report
@@ -213,10 +220,12 @@ jobs:
 
           echo "Running tests with filter: $FILTER"
 
+          # Use a dedicated compose project so platform containers
+          # (cds/mis/bridge/localstack/etc.) are not treated as orphans.
           if [[ -z "$FILTER" ]]; then
-            docker compose -p cads -f docker-compose.yml up --build --abort-on-container-exit
+            docker compose -p cads-journey-tests -f docker-compose.yml up --build --abort-on-container-exit
           else
-            docker compose -p cads -f docker-compose.yml run --rm --build journey-tests \
+            docker compose -p cads-journey-tests -f docker-compose.yml run --rm --build journey-tests \
               sh -c "npm ci && npx playwright test --grep='(?=.*$FILTER)(?=.*@${{ inputs.tag }})'"
           fi
 

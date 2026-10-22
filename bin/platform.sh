@@ -105,6 +105,26 @@ stop_ui() {
   return $?
 }
 
+wait_for_bridge() {
+  echo "[platform] Waiting for cads-bridge to be ready..."
+  for _ in $(seq 1 30); do
+    if docker inspect -f '{{.State.Running}}' cads-bridge 2>/dev/null | grep -q true; then
+      if docker inspect cads-bridge \
+        --format '{{range $k, $_ := .NetworkSettings.Networks}}{{$k}}{{"\n"}}{{end}}' \
+        2>/dev/null | grep -qx 'cads-network'; then
+        echo "[platform] cads-bridge is running on cads-network"
+        return 0
+      fi
+    fi
+    sleep 2
+  done
+
+  echo "[platform] ERROR: cads-bridge is not running on cads-network"
+  docker ps -a --filter name=cads-bridge || true
+  docker logs cads-bridge 2>/dev/null | tail -100 || true
+  return 1
+}
+
 start_bridge() {
   echo "[platform] starting bridge..."
 
@@ -112,18 +132,21 @@ start_bridge() {
   OVERRIDE_FILE=$(compose_override)
   echo "[platform] Using bridge override: $OVERRIDE_FILE"
 
-  docker compose -p cads \
+  # Use a dedicated compose project so CDS/UI/journey-tests
+  # `docker compose -p cads ...` commands cannot tear bridge down.
+  docker compose -p cads-bridge \
     -f docker-compose.yml \
     -f "$OVERRIDE_FILE" \
     up --build -d
 
+  wait_for_bridge
   return $?
 }
 
 stop_bridge() {
   echo "[platform] Stopping bridge..."
   cd "$CADS_BRIDGE_DIR"
-  docker compose -p cads -f docker-compose.yml down || true
+  docker compose -p cads-bridge -f docker-compose.yml down || true
   return $?
 }
 
