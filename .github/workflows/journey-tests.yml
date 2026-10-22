@@ -195,9 +195,16 @@ jobs:
       - name: Verify cads-bridge DNS on cads-network
         run: |
           set -euo pipefail
-          docker network connect cads-network cads-bridge 2>/dev/null || true
+          echo "All bridge-related containers:"
+          docker ps -a --filter name=bridge --format 'table {{.Names}}\t{{.Status}}\t{{.Ports}}' || true
           echo "Containers on cads-network:"
           docker network inspect cads-network --format '{{range .Containers}}{{.Name}} {{end}}'
+          if ! docker inspect -f '{{.State.Running}}' cads-bridge 2>/dev/null | grep -q true; then
+            echo "ERROR: cads-bridge container is not running"
+            docker logs cads-bridge 2>&1 | tail -200 || true
+            exit 1
+          fi
+          docker network connect cads-network cads-bridge 2>/dev/null || true
           echo "Resolving cads-bridge from cads-cds:"
           docker exec cads-cds getent hosts cads-bridge
           echo "Resolving cads-bridge from a throwaway container:"

@@ -16,6 +16,7 @@ CDS_DIR="$ROOT_DIR/../cads-data-service"
 CADS_BRIDGE_DIR="$ROOT_DIR/../cads-bridge"
 TOOLS_DIR="$ROOT_DIR"
 UI_DIR="$ROOT_DIR/../cads-mis"
+JOURNEY_TESTS_DIR="$ROOT_DIR/../cads-journey-tests"
 
 COMMAND="${1:-help}"
 MAC_OVERRIDE="${2:-}"
@@ -107,44 +108,61 @@ stop_ui() {
 
 wait_for_bridge() {
   echo "[platform] Waiting for cads-bridge to be ready..."
-  for _ in $(seq 1 30); do
+  for _ in $(seq 1 45); do
     if docker inspect -f '{{.State.Running}}' cads-bridge 2>/dev/null | grep -q true; then
-      # Ensure bridge is attached to the shared network (idempotent).
       docker network connect cads-network cads-bridge 2>/dev/null || true
-      if docker inspect cads-bridge \
-        --format '{{range $k, $_ := .NetworkSettings.Networks}}{{$k}}{{"\n"}}{{end}}' \
-        2>/dev/null | grep -qx 'cads-network'; then
-        if docker exec cads-cds getent hosts cads-bridge >/dev/null 2>&1 \
-          || docker exec cads-mis getent hosts cads-bridge >/dev/null 2>&1; then
-          echo "[platform] cads-bridge is running and DNS-resolvable on cads-network"
-          return 0
-        fi
-        echo "[platform] cads-bridge is on cads-network; waiting for DNS..."
+      if docker exec cads-cds getent hosts cads-bridge >/dev/null 2>&1; then
+        echo "[platform] cads-bridge is running and DNS-resolvable on cads-network"
+        docker exec cads-cds getent hosts cads-bridge || true
+        return 0
       fi
+      echo "[platform] cads-bridge is running; waiting for DNS on cads-network..."
+    else
+      echo "[platform] cads-bridge not running yet..."
+      docker ps -a --filter name=cads-bridge --format 'table {{.Names}}\t{{.Status}}' || true
     fi
     sleep 2
   done
 
   echo "[platform] ERROR: cads-bridge is not running/resolvable on cads-network"
   docker ps -a --filter name=cads-bridge || true
-  docker inspect cads-bridge --format '{{json .NetworkSettings.Networks}}' 2>/dev/null || true
-  docker logs cads-bridge 2>/dev/null | tail -100 || true
+  docker compose -p cads-bridge ps || true
+  docker inspect cads-bridge --format '{{json .State}} {{json .NetworkSettings.Networks}}' 2>/dev/null || true
+  docker logs cads-bridge 2>/dev/null | tail -200 || true
   return 1
 }
 
 start_bridge() {
   echo "[platform] starting bridge..."
+  echo "[platform] CADS_BRIDGE_DIR=$CADS_BRIDGE_DIR"
+
+  if [ ! -d "$CADS_BRIDGE_DIR" ]; then
+    echo "[platform] ERROR: cads-bridge directory not found at $CADS_BRIDGE_DIR"
+    return 1
+  fi
 
   cd "$CADS_BRIDGE_DIR"
   OVERRIDE_FILE=$(compose_override)
   echo "[platform] Using bridge override: $OVERRIDE_FILE"
+  echo "[platform] CI=${CI:-<unset>}"
 
-  # Use a dedicated compose project so CDS/UI/journey-tests
-  # `docker compose -p cads ...` commands cannot tear bridge down.
-  docker compose -p cads-bridge \
-    -f docker-compose.yml \
-    -f "$OVERRIDE_FILE" \
-    up --build -d
+  if [ ! -f "$OVERRIDE_FILE" ]; then
+    echo "[platform] ERROR: bridge override file not found: $OVERRIDE_FILE"
+    return 1
+  fi
+
+  COMPOSE_FILES=(-f docker-compose.yml -f "$OVERRIDE_FILE")
+  if [ "${CI:-}" = "true" ] && [ -f "$JOURNEY_TESTS_DIR/compose/bridge.ci-fix.yml" ]; then
+    echo "[platform] Applying journey-tests bridge CI fixes"
+    COMPOSE_FILES+=(-f "$JOURNEY_TESTS_DIR/compose/bridge.ci-fix.yml")
+  fi
+
+  # Dedicated compose project so CDS/UI/journey-tests cannot tear bridge down.
+  docker compose -p cads-bridge "${COMPOSE_FILES[@]}" up --build -d
+
+  echo "[platform] Bridge compose ps:"
+  docker compose -p cads-bridge ps || true
+  docker ps -a --filter name=cads-bridge || true
 
   wait_for_bridge
   return $?
