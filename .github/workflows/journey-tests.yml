@@ -192,6 +192,17 @@ jobs:
           docker inspect cads-bridge --format '{{.State.Status}} networks={{range $k, $_ := .NetworkSettings.Networks}}{{$k}} {{end}}' || true
           docker logs cads-bridge 2>&1 | tail -100 || true
 
+      - name: Verify cads-bridge DNS on cads-network
+        run: |
+          set -euo pipefail
+          docker network connect cads-network cads-bridge 2>/dev/null || true
+          echo "Containers on cads-network:"
+          docker network inspect cads-network --format '{{range .Containers}}{{.Name}} {{end}}'
+          echo "Resolving cads-bridge from cads-cds:"
+          docker exec cads-cds getent hosts cads-bridge
+          echo "Resolving cads-bridge from a throwaway container:"
+          docker run --rm --network cads-network alpine:3.20 getent hosts cads-bridge
+
       - name: Ensure report directories exist
         run: |
           mkdir -p cads-journey-tests/allure-report

@@ -109,18 +109,25 @@ wait_for_bridge() {
   echo "[platform] Waiting for cads-bridge to be ready..."
   for _ in $(seq 1 30); do
     if docker inspect -f '{{.State.Running}}' cads-bridge 2>/dev/null | grep -q true; then
+      # Ensure bridge is attached to the shared network (idempotent).
+      docker network connect cads-network cads-bridge 2>/dev/null || true
       if docker inspect cads-bridge \
         --format '{{range $k, $_ := .NetworkSettings.Networks}}{{$k}}{{"\n"}}{{end}}' \
         2>/dev/null | grep -qx 'cads-network'; then
-        echo "[platform] cads-bridge is running on cads-network"
-        return 0
+        if docker exec cads-cds getent hosts cads-bridge >/dev/null 2>&1 \
+          || docker exec cads-mis getent hosts cads-bridge >/dev/null 2>&1; then
+          echo "[platform] cads-bridge is running and DNS-resolvable on cads-network"
+          return 0
+        fi
+        echo "[platform] cads-bridge is on cads-network; waiting for DNS..."
       fi
     fi
     sleep 2
   done
 
-  echo "[platform] ERROR: cads-bridge is not running on cads-network"
+  echo "[platform] ERROR: cads-bridge is not running/resolvable on cads-network"
   docker ps -a --filter name=cads-bridge || true
+  docker inspect cads-bridge --format '{{json .NetworkSettings.Networks}}' 2>/dev/null || true
   docker logs cads-bridge 2>/dev/null | tail -100 || true
   return 1
 }
