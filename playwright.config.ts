@@ -106,7 +106,8 @@ export default defineConfig({
         '**/login.spec.ts',
         '**/tests/back-end/**/*.spec.ts',
         '**/accessibility.testing.spec.ts',
-        '**/lighthouse.testing.spec.ts'
+        '**/lighthouse.testing.spec.ts',
+        '**/upload.api.spec.ts'
       ]
     },
     {
@@ -134,6 +135,13 @@ export default defineConfig({
               storageState: 'playwright/.auth/user.json'
             },
             dependencies: ['setup']
+          },
+          {
+            name: 'Upload API Testing',
+            testMatch: ['**/upload.api.spec.ts'],
+            use: {
+              ...devices['Desktop Chrome']
+            }
           }
         ])
   ],

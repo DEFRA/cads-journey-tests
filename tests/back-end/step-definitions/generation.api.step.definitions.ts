@@ -7,6 +7,7 @@ import { GenerationResponse } from '../../types/responses/generationResponse.typ
 import { GenerationScenariosResponse } from '../../types/responses/generationScenariosResponse.type'
 import fs from 'fs'
 import path from 'path'
+import { getCadsExternalBucket } from '../../utils/aws'
 
 export class GenerationApiStepDefinitions {
   private readonly cadsDataService: CadsDataService
@@ -35,12 +36,22 @@ export class GenerationApiStepDefinitions {
     request: GenerationRequest,
     statusCode: number = StatusCodes.OK
   ) {
-    this.response = await this.cadsDataService.post<GenerationResponse>(
-      EndPoints.Generation,
-      statusCode,
-      request
-    )
-    return this.response
+    let filenameExists = true
+    while (filenameExists) {
+      this.response = await this.cadsDataService.post<GenerationResponse>(
+        EndPoints.Generation,
+        statusCode,
+        request
+      )
+      const s3Bucket = await getCadsExternalBucket()
+      const file = s3Bucket.find((file) =>
+        file.key.includes(this.response!.filename)
+      )
+      if (!file) {
+        filenameExists = false
+      }
+    }
+    return this.response!
   }
 
   async verifyResponse() {

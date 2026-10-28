@@ -1,4 +1,9 @@
-export type GraphQLEndpoint = 'cads' | 'cts' | 'cts-audit' | 'cts-transactions'
+export type GraphQLEndpoint =
+  | 'cads'
+  | 'cts'
+  | 'cts-audit'
+  | 'cts-transactions'
+  | 'file-import-batch'
 
 export const GraphQLSchema = {
   AnimalSexes: {
@@ -45,4 +50,9 @@ export interface AnimalSexesResponse {
       sex: string
     }[]
   }
+}
+
+export interface FileImportBatchResponse {
+  id: string
+  status: string
 }
