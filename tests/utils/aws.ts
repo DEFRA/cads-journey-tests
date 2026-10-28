@@ -5,6 +5,8 @@ import { CadsDataService } from '../back-end/api/cads.data.service.client'
 import { APIRequestContext } from '@playwright/test'
 
 const execAsync = promisify(exec)
+const apiContext: APIRequestContext = {} as APIRequestContext
+const cadsDataService = new CadsDataService(apiContext)
 
 async function executeAwsCommand(command: string) {
   const { stdout, stderr } = await execAsync(command)
@@ -18,7 +20,9 @@ async function executeAwsCommand(command: string) {
 
 /** Use env credentials when present (Docker); otherwise the local `localstack` AWS profile. */
 function awsAuthFlags() {
-  return process.env.AWS_ACCESS_KEY_ID ? '' : '--profile localstack'
+  return process.env.AWS_ACCESS_KEY_ID && !cadsDataService.isCDPEnvironment
+    ? ''
+    : '--profile localstack'
 }
 
 export async function uploadFile(fileName: string) {
@@ -36,8 +40,8 @@ type S3Object = {
 }
 
 export async function getCadsExternalBucket(): Promise<S3Object[]> {
-  const apiContext: APIRequestContext = {} as APIRequestContext
-  const cadsDataService = new CadsDataService(apiContext)
+  //const apiContext: APIRequestContext = {} as APIRequestContext
+  //const cadsDataService = new CadsDataService(apiContext)
   const auth = awsAuthFlags()
   const command = !cadsDataService.isCDPEnvironment
     ? `aws s3 ls s3://cads-external-bucket/ --endpoint-url=${process.env.AWS_S3_BUCKET_ENDPOINT!} ${auth} --recursive`.trim()
