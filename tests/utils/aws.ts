@@ -98,8 +98,7 @@ type S3Object = {
 }
 
 export async function getCadsExternalBucket(): Promise<S3Object[]> {
-  // List under the bulk upload prefix — matches where uploadFile writes objects.
-  const uri = resolveBucketUri(true)
+  const uri = resolveBucketUri(false)
   const command = buildAwsCommand([
     'aws',
     's3',
