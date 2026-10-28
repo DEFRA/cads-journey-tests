@@ -1,4 +1,5 @@
 import {
+  FileImportBatchResponse,
   GraphQLEndpoint,
   GraphQLRequest,
   GraphQLResponse,
@@ -6,7 +7,6 @@ import {
 } from './graphql.types'
 import { CadsDataService } from '../back-end/api/cads.data.service.client'
 import { StatusCodes } from 'http-status-codes'
-import { FileImportBatchResponse } from './graphql.types'
 
 export enum fileImportBatchStatuses {
   Success = 'SUCCESS',
