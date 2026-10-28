@@ -6,6 +6,15 @@ import {
 } from './graphql.types'
 import { CadsDataService } from '../back-end/api/cads.data.service.client'
 import { StatusCodes } from 'http-status-codes'
+import { FileImportBatchResponse } from './graphql.types'
+
+export enum fileImportBatchStatuses {
+  Success = 'SUCCESS',
+  Failed = 'FAILED',
+  Pending = 'PENDING',
+  InProgress = 'IN_PROGRESS',
+  Cancelled = 'CANCELLED'
+}
 
 export class GraphQLClient extends CadsDataService {
   getEndpoint(endpoint: GraphQLEndpoint): string {
@@ -13,7 +22,8 @@ export class GraphQLClient extends CadsDataService {
       cads: '/graphql/cads',
       cts: '/graphql/cts',
       'cts-audit': '/graphql/cts-audit',
-      'cts-transactions': '/graphql/cts-transactions'
+      'cts-transactions': '/graphql/cts-transactions',
+      'file-import-batch': '/graphql/file-import-batch'
     }
 
     return `${endpoints[endpoint]}`
@@ -65,5 +75,55 @@ export class GraphQLClient extends CadsDataService {
     )
 
     return response
+  }
+
+  async getfileImportBatchStatus(
+    batchId: string
+  ): Promise<fileImportBatchStatuses> {
+    const startTime = Date.now()
+    const timeoutMs = 120_000
+    const intervalMs = 2_000
+    while (Date.now() - startTime < timeoutMs) {
+      const response = await this.execute<FileImportBatchResponse>(
+        'file-import-batch',
+        `
+        query {
+          fileImportBatch(id: ${batchId}) {
+            status
+          }
+        }
+      `,
+        { batchId }
+      )
+
+      const status = response.data?.status as fileImportBatchStatuses
+
+      console.log(`Batch ${batchId} status: ${status}`)
+
+      switch (status) {
+        case fileImportBatchStatuses.Success:
+          return status
+        case fileImportBatchStatuses.Failed:
+          throw new Error(`File import batch ${batchId} failed`)
+        case fileImportBatchStatuses.Pending:
+        case fileImportBatchStatuses.InProgress:
+          break
+
+        default:
+          throw new Error(`Unexpected batch status: ${status}`)
+      }
+
+      const remainingMs = timeoutMs - (Date.now() - startTime)
+
+      if (remainingMs <= 0) break
+
+      await new Promise((resolve) =>
+        setTimeout(resolve, Math.min(intervalMs, remainingMs))
+      )
+    }
+
+    throw new Error(
+      `File import batch ${batchId} timed out after ${timeoutMs}ms`
+    )
   }
 }
