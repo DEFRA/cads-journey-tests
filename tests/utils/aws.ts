@@ -40,8 +40,6 @@ type S3Object = {
 }
 
 export async function getCadsExternalBucket(): Promise<S3Object[]> {
-  //const apiContext: APIRequestContext = {} as APIRequestContext
-  //const cadsDataService = new CadsDataService(apiContext)
   const auth = awsAuthFlags()
   const command = !cadsDataService.isCDPEnvironment
     ? `aws s3 ls s3://cads-external-bucket/ --endpoint-url=${process.env.AWS_S3_BUCKET_ENDPOINT!} ${auth} --recursive`.trim()
