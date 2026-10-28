@@ -1,12 +1,8 @@
 import { exec } from 'node:child_process'
 import { promisify } from 'node:util'
 import { FileNames } from './enums'
-import { CadsDataService } from '../back-end/api/cads.data.service.client'
-import { APIRequestContext } from '@playwright/test'
 
 const execAsync = promisify(exec)
-const apiContext: APIRequestContext = {} as APIRequestContext
-const cadsDataService = new CadsDataService(apiContext)
 
 async function executeAwsCommand(command: string) {
   const { stdout, stderr } = await execAsync(command)
@@ -18,11 +14,18 @@ async function executeAwsCommand(command: string) {
   return stdout.trim()
 }
 
-/** Use env credentials when present (Docker); otherwise the local `localstack` AWS profile. */
+function getEnvironment() {
+  return process.env.ENVIRONMENT ?? 'local'
+}
+
+function isLocalOrDocker() {
+  const env = getEnvironment()
+  return env === 'local' || env === 'docker'
+}
+
+/** Empty auth for CDP/Docker; `--profile localstack` for local runs. */
 function awsAuthFlags() {
-  return process.env.AWS_ACCESS_KEY_ID && !cadsDataService.isCDPEnvironment
-    ? ''
-    : '--profile localstack'
+  return getEnvironment() === 'local' ? '--profile localstack' : ''
 }
 
 export async function uploadFile(fileName: string) {
@@ -41,9 +44,19 @@ type S3Object = {
 
 export async function getCadsExternalBucket(): Promise<S3Object[]> {
   const auth = awsAuthFlags()
-  const command = !cadsDataService.isCDPEnvironment
-    ? `aws s3 ls s3://cads-external-bucket/ --endpoint-url=${process.env.AWS_S3_BUCKET_ENDPOINT!} ${auth} --recursive`.trim()
-    : `aws s3 ls s3:${process.env.AWS_S3_BUCKET_NAME!} ${auth} --recursive`.trim()
+  let command: string
+
+  if (isLocalOrDocker()) {
+    command =
+      `aws s3 ls s3://cads-external-bucket/ --endpoint-url=${process.env.AWS_S3_BUCKET_ENDPOINT!} ${auth} --recursive`.trim()
+  } else {
+    const bucket = process.env.AWS_S3_BUCKET_NAME
+    if (!bucket) {
+      throw new Error('AWS_S3_BUCKET_NAME is required in CDP environments')
+    }
+    command = `aws s3 ls s3://${bucket} ${auth} --recursive`.trim()
+  }
+
   const result = await executeAwsCommand(command)
 
   return result
