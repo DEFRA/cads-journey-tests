@@ -6,6 +6,7 @@ export class BasePage {
   public readonly dashboardTab: Locator
   public readonly signOutLink: Locator
   public readonly administrationTab: Locator
+  readonly isCDPEnvironment: boolean
 
   constructor(page: Page) {
     this.page = page
@@ -13,6 +14,10 @@ export class BasePage {
     this.dashboardTab = page.getByRole('link', { name: 'Dashboard' })
     this.signOutLink = page.getByRole('link', { name: 'Sign out' })
     this.administrationTab = page.getByRole('link', { name: 'Administration' })
+    this.isCDPEnvironment = !(
+      process.env.ENVIRONMENT === 'docker' ||
+      process.env.ENVIRONMENT === 'local'
+    )
   }
 
   async goto(path: string) {
