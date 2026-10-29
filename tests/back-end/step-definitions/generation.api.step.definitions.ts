@@ -43,12 +43,16 @@ export class GenerationApiStepDefinitions {
         statusCode,
         request
       )
-      const s3Bucket = await getCadsExternalBucket()
-      const file = s3Bucket.find((file) =>
-        file.key.includes(this.response!.filename)
-      )
-      if (!file) {
+      if (this.cadsDataService.isCDPEnvironment) {
         filenameExists = false
+      } else {
+        const s3Bucket = await getCadsExternalBucket()
+        const file = s3Bucket.find((file) =>
+          file.key.includes(this.response!.filename)
+        )
+        if (!file) {
+          filenameExists = false
+        }
       }
     }
     return this.response!
