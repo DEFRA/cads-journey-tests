@@ -54,8 +54,12 @@ export class CattleRegistrationsPageStepDefinitions {
     }
     expect(fs.existsSync(this.downloadPath)).toBe(true)
     expect(this.cattleRegistrationsPage.downloadButton).toBeDisabled()
-    await this.cattleRegistrationsPage.requestAnotherReportLink.waitFor({ state: 'attached' })
-    await this.cattleRegistrationsPage.requestAnotherReportLink.waitFor({ state: 'visible' })
+    await this.cattleRegistrationsPage.requestAnotherReportLink.waitFor({
+      state: 'attached'
+    })
+    await this.cattleRegistrationsPage.requestAnotherReportLink.waitFor({
+      state: 'visible'
+    })
     await this.cattleRegistrationsPage.requestAnotherReportLink.click()
     await expect(this.cattleRegistrationsPage.downloadButton).toBeEnabled()
   }
