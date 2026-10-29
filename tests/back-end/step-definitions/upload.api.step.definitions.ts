@@ -35,8 +35,7 @@ export class UploadApiStepDefinitions {
       expect(file).toBeDefined()
     }
     switch (scenarioType) {
-      case ScenarioTypes.BulkInsert: {
-      }
+      case ScenarioTypes.BulkInsert:
       case ScenarioTypes.BulkUpdate:
         break
     }
