@@ -3,5 +3,6 @@ export interface GenerationRequest {
     Scenario?: string
     RowCount?: number
     BusinessKeys?: number[]
+    References?: number[]
   }
 }

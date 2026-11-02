@@ -20,6 +20,24 @@ test.describe('Generation API Journey Tests @API', () => {
     await generationApiStepDefinitions.verifyResponse()
     await generationApiStepDefinitions.generateCSVFile()
   })
+  test('INSERT - Generation endpoint returns 200 OK status code - With references', async ({
+    generationApiStepDefinitions
+  }) => {
+    const scenario =
+      await generationApiStepDefinitions.getRequestToGenerationScenariosEndpoint(
+        TableNames.CTS.Locations,
+        ScenarioTypes.BulkInsert
+      )!
+    await generationApiStepDefinitions.getRequestToGenerationEndpoint({
+      data: {
+        Scenario: scenario?.name,
+        RowCount: 10,
+        References: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+      }
+    })
+    await generationApiStepDefinitions.verifyResponse()
+    await generationApiStepDefinitions.generateCSVFile()
+  })
   test('UPDATE - Generation endpoint returns 200 OK status code', async ({
     generationApiStepDefinitions
   }) => {
@@ -37,11 +55,24 @@ test.describe('Generation API Journey Tests @API', () => {
     await generationApiStepDefinitions.verifyResponse()
     await generationApiStepDefinitions.generateCSVFile()
   })
-  test.skip('Invalid request - Generation endpoint returns 400 BAD REQUEST status code', async ({
+  test.skip('Invalid request - Generation endpoint returns 400 BAD REQUEST status code - Invalid scenario', async ({
     generationApiStepDefinitions
   }) => {
     await generationApiStepDefinitions.getRequestToGenerationEndpoint(
-      { data: { Scenario: 'bulk_insert', RowCount: 1, BusinessKeys: [1] } },
+      { data: { Scenario: 'bulk_insert', RowCount: 1 } },
+      StatusCodes.BAD_REQUEST
+    )
+  })
+  test('Invalid request - Generation endpoint returns 400 BAD REQUEST status code - Bulk Insert without row count', async ({
+    generationApiStepDefinitions
+  }) => {
+    const scenario =
+      await generationApiStepDefinitions.getRequestToGenerationScenariosEndpoint(
+        TableNames.CTS.Locations,
+        ScenarioTypes.BulkInsert
+      )!
+    await generationApiStepDefinitions.getRequestToGenerationEndpoint(
+      { data: { Scenario: scenario?.name } },
       StatusCodes.BAD_REQUEST
     )
   })
