@@ -55,4 +55,5 @@ export interface AnimalSexesResponse {
 export interface FileImportBatchResponse {
   id: string
   status: string
+  fileName: string
 }

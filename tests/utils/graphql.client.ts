@@ -9,11 +9,11 @@ import { CadsDataService } from '../back-end/api/cads.data.service.client'
 import { StatusCodes } from 'http-status-codes'
 
 export enum fileImportBatchStatuses {
-  Success = 'SUCCESS',
-  Failed = 'FAILED',
+  ImportComplete = 'ImportComplete',
+  ProcessingComplete = 'ProcessingComplete',
   Pending = 'PENDING',
   InProgress = 'IN_PROGRESS',
-  Cancelled = 'CANCELLED'
+  Failed = 'Failed'
 }
 
 export class GraphQLClient extends CadsDataService {
@@ -78,30 +78,34 @@ export class GraphQLClient extends CadsDataService {
   }
 
   async getfileImportBatchStatus(
-    batchId: string
+    batchId: string,
+    fileName?: string
   ): Promise<fileImportBatchStatuses> {
     const startTime = Date.now()
     const timeoutMs = 120_000
     const intervalMs = 2_000
+    let tries = 0
     while (Date.now() - startTime < timeoutMs) {
       const response = await this.execute<FileImportBatchResponse>(
         'file-import-batch',
         `
         query {
-          fileImportBatch(id: ${batchId}) {
+          fileImportBatch(id: ${batchId}, fileName: ${fileName}) {
             status
+            fileName
           }
         }
       `,
-        { batchId }
+        { batchId, fileName }
       )
 
       const status = response.data?.status as fileImportBatchStatuses
 
-      console.log(`Batch ${batchId} status: ${status}`)
+      console.log(`Batch: ${batchId} Status: ${status} (Tries: ${tries++})`)
 
       switch (status) {
-        case fileImportBatchStatuses.Success:
+        case fileImportBatchStatuses.ImportComplete:
+        case fileImportBatchStatuses.ProcessingComplete:
           return status
         case fileImportBatchStatuses.Failed:
           throw new Error(`File import batch ${batchId} failed`)
