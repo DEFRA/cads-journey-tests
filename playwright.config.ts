@@ -107,7 +107,8 @@ export default defineConfig({
         '**/tests/back-end/**/*.spec.ts',
         '**/accessibility.testing.spec.ts',
         '**/lighthouse.testing.spec.ts',
-        '**/upload.api.spec.ts'
+        '**/upload.api.spec.ts',
+        '**/graphQL.api.spec.ts'
       ]
     },
     {
@@ -142,8 +143,26 @@ export default defineConfig({
             use: {
               ...devices['Desktop Chrome']
             }
+          },
+          {
+            name: 'GraphQL API Testing',
+            testMatch: ['**/graphQL.api.spec.ts'],
+            use: {
+              ...devices['Desktop Chrome']
+            }
           }
-        ])
+        ]),
+    ...(ENV === 'docker'
+      ? [
+          {
+            name: 'GraphQL API Testing',
+            testMatch: ['**/graphQL.api.spec.ts'],
+            use: {
+              ...devices['Desktop Chrome']
+            }
+          }
+        ]
+      : [])
   ],
   // Run your local dev server before starting the tests.
   // Include these *only if LOCAL=true*

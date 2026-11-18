@@ -12,6 +12,15 @@ export const GraphQLSchema = {
       Sex: 'sex',
       Description: 'description'
     }
+  },
+  FileImportBatch: {
+    table: 'cts_transactions',
+    columns: {
+      CtsFileImportId: 'cts_file_import_id',
+      FileName: 'file_name',
+      ImportStatusId: 'import_status_id',
+      GroupKey: 'group_key'
+    }
   }
 } as const
 
@@ -53,7 +62,12 @@ export interface AnimalSexesResponse {
 }
 
 export interface FileImportBatchResponse {
-  id: string
-  status: string
-  fileName: string
+  cts_transactions: {
+    nodes: {
+      cts_file_import_id: string
+      import_status_id: number
+      file_name: string
+      group_key: string
+    }[]
+  }
 }
