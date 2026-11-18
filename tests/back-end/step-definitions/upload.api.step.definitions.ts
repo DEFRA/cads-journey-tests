@@ -5,9 +5,11 @@ import { EndPoints, ScenarioTypes } from '../../utils/enums'
 import { UploadResponse } from '../../types/responses/uploadResponse.type'
 import { UploadRequest } from '../../types/requests/uploadRequest.type'
 import { getCadsExternalBucket } from '../../utils/aws'
-import { GraphQLClient } from '../../utils/graphql.client'
+import {
+  GraphQLClient,
+  fileImportBatchStatuses
+} from '../../utils/graphql.client'
 import { GraphQLSchema } from '../../utils/graphql.types'
-import { fileImportBatchStatuses } from '../../utils/graphql.client'
 export class UploadApiStepDefinitions {
   private readonly cadsDataService: CadsDataService
   private readonly graphqlClient: GraphQLClient
