@@ -9,11 +9,10 @@ import { CadsDataService } from '../back-end/api/cads.data.service.client'
 import { StatusCodes } from 'http-status-codes'
 
 export enum fileImportBatchStatuses {
-  ImportComplete = 'ImportComplete',
-  ProcessingComplete = 'ProcessingComplete',
-  Pending = 'PENDING',
-  InProgress = 'IN_PROGRESS',
-  Failed = 'Failed'
+  Pending = 1,
+  Processing = 2,
+  Complete = 3,
+  Failed = 4
 }
 
 export class GraphQLClient extends CadsDataService {
@@ -78,39 +77,33 @@ export class GraphQLClient extends CadsDataService {
   }
 
   async getfileImportBatchStatus(
-    batchId: string,
-    fileName?: string
+    query: string,
+    variables?: Record<string, unknown>
   ): Promise<fileImportBatchStatuses> {
     const startTime = Date.now()
     const timeoutMs = 120_000
     const intervalMs = 2_000
     let tries = 0
+    let groupKey: string
     while (Date.now() - startTime < timeoutMs) {
       const response = await this.execute<FileImportBatchResponse>(
-        'file-import-batch',
-        `
-        query {
-          fileImportBatch(id: ${batchId}, fileName: ${fileName}) {
-            status
-            fileName
-          }
-        }
-      `,
-        { batchId, fileName }
+        'cads',
+        query,
+        variables
       )
+      const fileImport = response.data?.cts_transactions.nodes[0]
+      const status = fileImport!.import_status_id as fileImportBatchStatuses
+      groupKey = fileImport!.group_key
 
-      const status = response.data?.status as fileImportBatchStatuses
-
-      console.log(`Batch: ${batchId} Status: ${status} (Tries: ${tries++})`)
+      console.log(`Batch: ${groupKey} Status: ${status} (Tries: ${tries++})`)
 
       switch (status) {
-        case fileImportBatchStatuses.ImportComplete:
-        case fileImportBatchStatuses.ProcessingComplete:
+        case fileImportBatchStatuses.Complete:
           return status
         case fileImportBatchStatuses.Failed:
-          throw new Error(`File import batch ${batchId} failed`)
+          throw new Error(`File import batch ${groupKey} failed`)
         case fileImportBatchStatuses.Pending:
-        case fileImportBatchStatuses.InProgress:
+        case fileImportBatchStatuses.Processing:
           break
 
         default:
@@ -127,7 +120,7 @@ export class GraphQLClient extends CadsDataService {
     }
 
     throw new Error(
-      `File import batch ${batchId} timed out after ${timeoutMs}ms`
+      `File import batch ${groupKey!} timed out after ${timeoutMs}ms`
     )
   }
 }

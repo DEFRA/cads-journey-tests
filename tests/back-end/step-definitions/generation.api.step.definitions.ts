@@ -60,6 +60,7 @@ export class GenerationApiStepDefinitions {
 
   async verifyResponse() {
     expect(this.response?.filename).toBeDefined()
+    expect(this.response?.groupKey).toBeDefined()
     expect(this.response?.content).toBeDefined()
     expect(this.response?.businessKeys).toBeDefined()
   }
