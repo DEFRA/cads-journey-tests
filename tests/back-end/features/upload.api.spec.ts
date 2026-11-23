@@ -21,7 +21,7 @@ test.describe('Upload API Journey Tests @API', () => {
       })!
     await uploadApiStepDefinitions.getRequestToUploadEndpoint({
       data: {
-        fileName: response.filename,
+        fileName: response.fileName,
         content: response.content
       }
     })
@@ -45,7 +45,7 @@ test.describe('Upload API Journey Tests @API', () => {
       })!
     await uploadApiStepDefinitions.getRequestToUploadEndpoint({
       data: {
-        fileName: response.filename,
+        fileName: response.fileName,
         content: response.content
       }
     })
@@ -78,7 +78,7 @@ test.describe('Upload API Journey Tests @API', () => {
     await uploadApiStepDefinitions.getRequestToUploadEndpoint(
       {
         data: {
-          fileName: response.filename,
+          fileName: response.fileName,
           content: ''
         }
       },
@@ -104,7 +104,7 @@ test.describe('Upload API Journey Tests @API', () => {
     await uploadApiStepDefinitions.getRequestToUploadEndpoint(
       {
         data: {
-          fileName: response.filename,
+          fileName: response.fileName,
           content: ''
         }
       },
@@ -129,7 +129,7 @@ test.describe('Upload API Journey Tests @API', () => {
       })!
     await uploadApiStepDefinitions.getRequestToUploadEndpoint({
       data: {
-        fileName: response.filename,
+        fileName: response.fileName,
         content: response.content
       }
     })
@@ -137,7 +137,7 @@ test.describe('Upload API Journey Tests @API', () => {
     await uploadApiStepDefinitions.getRequestToUploadEndpoint(
       {
         data: {
-          fileName: response.filename,
+          fileName: response.fileName,
           content: response.content
         }
       },
@@ -162,7 +162,7 @@ test.describe('Upload API Journey Tests @API', () => {
       })!
     await uploadApiStepDefinitions.getRequestToUploadEndpoint({
       data: {
-        fileName: response.filename,
+        fileName: response.fileName,
         content: response.content
       }
     })
@@ -170,7 +170,7 @@ test.describe('Upload API Journey Tests @API', () => {
     await uploadApiStepDefinitions.getRequestToUploadEndpoint(
       {
         data: {
-          fileName: response.filename,
+          fileName: response.fileName,
           content: response.content
         }
       },
