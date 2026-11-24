@@ -48,7 +48,7 @@ export class GenerationApiStepDefinitions {
       } else {
         const s3Bucket = await getCadsExternalBucket()
         const file = s3Bucket.find((file) =>
-          file.key.includes(this.response!.filename)
+          file.key.includes(this.response!.fileName)
         )
         if (!file) {
           filenameExists = false
@@ -59,17 +59,17 @@ export class GenerationApiStepDefinitions {
   }
 
   async verifyResponse() {
-    expect(this.response?.filename).toBeDefined()
+    expect(this.response?.fileName).toBeDefined()
     expect(this.response?.groupKey).toBeDefined()
     expect(this.response?.content).toBeDefined()
     expect(this.response?.businessKeys).toBeDefined()
   }
 
   async generateCSVFile() {
-    if (!this.response?.filename || !this.response?.content) {
-      throw new Error('Generation response filename and content are required')
+    if (!this.response?.fileName || !this.response?.content) {
+      throw new Error('Generation response fileName and content are required')
     }
-    const outputPath = path.join(process.cwd(), this.response.filename)
+    const outputPath = path.join(process.cwd(), this.response.fileName)
     fs.writeFileSync(outputPath, this.response.content, {
       encoding: 'utf-8'
     })

@@ -1,5 +1,5 @@
 export type GenerationResponse = {
-  filename: string
+  fileName: string
   groupKey: string
   content: string
   businessKeys: number[]
